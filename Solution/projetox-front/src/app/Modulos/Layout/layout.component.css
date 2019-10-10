@@ -1,0 +1,12 @@
+a{
+  cursor: pointer;
+}
+#toolbar-content{
+ width: 100%;
+}
+#space{
+  flex: 1 1 auto;
+}
+button{
+  font-size: 0.9em;
+}

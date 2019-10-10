@@ -1,0 +1,23 @@
+<td-layout>
+    <td-navigation-drawer flex sidenavTitle="Projeto X" logo="Logo" >
+      <mat-nav-list fxLayout="column" *ngFor="let menu of listMenu">
+        <a [routerLink]="menu.link" mat-list-item><mat-icon matListIcon svgIcon="{{ menu.menuIcon }}"></mat-icon><span matLine>{{ menu.menuName }}</span></a>
+      </mat-nav-list>
+    </td-navigation-drawer>
+    <td-layout-nav >
+        <div td-toolbar-content fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px"  id="toolbar-content" >
+          <button mat-icon-button td-menu-button tdLayoutToggle>
+            <mat-icon svgIcon="menu-icon" aria-hidden="false" aria-label="Icone do Menu"></mat-icon>
+          </button>
+          <span>Logo</span>
+          <span>{{ title }}</span>
+          <span id="space"></span>
+          <a (click)="logout()" >Sair</a>
+        </div>
+        <ng-content></ng-content>
+        <td-layout-footer color="primary" fxLayout="row" fxLayoutAlign="center center">
+           <span>Todos Direitos Resevados</span>
+        </td-layout-footer>
+    </td-layout-nav>
+</td-layout>
+
