@@ -39,8 +39,8 @@ public class PlanoContratado {
 	private Double valorTotal;
 
 	
-	@Enumerated(EnumType.ORDINAL)
-	private DiasSemana diasSemana;
+	@OneToMany(targetEntity = DiaConsulta.class, cascade = {CascadeType.PERSIST},fetch = FetchType.LAZY)
+	private List<DiaConsulta> diaConsulta;
 
 	@Enumerated(EnumType.ORDINAL)
 	private TipoContrato tipoContrato;
