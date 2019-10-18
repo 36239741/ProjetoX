@@ -1,0 +1,33 @@
+<div fxLayout="row" fxLayoutGap='30px'>
+<app-filter
+(filtro)="filterContrato($event)"
+placeholder='No. Contrato'>
+</app-filter>
+<app-filter
+(filtro) = "filterNomePaciente($event)"
+placeholder='Nome do Paciente'>
+</app-filter>
+</div>
+<div>
+
+
+<td-data-table
+  #dataTable
+  [data]="filterData"
+  [columns]="columns"
+  [style.height.%]="100">
+</td-data-table>
+
+<div class="md-padding" *ngIf="!dataTable.hasData" fxLayout="row" fxLayoutAlign="center center">
+      <h3>Nenhum contrato encontrado</h3>
+</div>
+<td-paging-bar #pagingBarPageSize [firstLast]="true" [pageSize]="pageSize" [total]="total" (change)="changePageSize($event)">
+  <span hide-xs>Linhas por linha:</span>
+  <mat-select [style.width.px]="50" [(value)]="pageSize">
+    <mat-option *ngFor="let size of [10,20,30]" [value]="size">
+      {{size}}
+    </mat-option>
+  </mat-select>
+  <span>{{pagingBarPageSize.range}} <span hide-xs>of {{pagingBarPageSize.total}}</span></span>
+</td-paging-bar>
+</div>

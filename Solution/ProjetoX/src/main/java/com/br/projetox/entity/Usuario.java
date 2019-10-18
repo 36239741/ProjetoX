@@ -8,6 +8,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.validation.constraints.NotBlank;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -41,8 +42,11 @@ public class Usuario implements UserDetails {
 	@GeneratedValue
 	@Column(name = "user_id")
 	private long id;
+	@NotBlank
+	@Column(unique = true)
 	private String email;
 	
+	@NotBlank
 	private String senha;
 	
 	@Enumerated(EnumType.ORDINAL)

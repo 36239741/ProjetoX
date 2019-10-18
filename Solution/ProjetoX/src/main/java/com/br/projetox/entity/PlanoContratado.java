@@ -11,14 +11,17 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotNull;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "tbl_plano")
@@ -33,25 +36,28 @@ public class PlanoContratado {
 	@GeneratedValue
 	@Column(name = "plano_id")
 	private long id;
-	private Double valorHora;
+	@NotNull
+	private Double valorPlano;
+	@NotNull
 	private LocalTime horarioEntrada;
+	@NotNull()
 	private LocalTime horarioSaida;
+	@NotNull
 	private Double valorTotal;
-
+	@NotNull
+	private int sessao;
 	
-	@OneToMany(targetEntity = DiaConsulta.class, cascade = {CascadeType.PERSIST},fetch = FetchType.LAZY)
+	@OneToMany(targetEntity = DiaConsulta.class ,cascade = {CascadeType.PERSIST,CascadeType.MERGE,CascadeType.REFRESH},fetch = FetchType.LAZY)
+	@JoinColumn(name = "plano_id")
 	private List<DiaConsulta> diaConsulta;
 
 	@Enumerated(EnumType.ORDINAL)
 	private TipoContrato tipoContrato;
 
-	@ManyToOne(targetEntity = Servico.class,optional = false,fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+	@ManyToOne(targetEntity = Servico.class,optional = false,fetch = FetchType.LAZY)
 	private Servico servico;
-
-	@OneToMany(targetEntity = Registro.class,mappedBy = "planoContratado",orphanRemoval = true,cascade = { CascadeType.REMOVE, CascadeType.PERSIST }, fetch = FetchType.LAZY)
-	private List<Registro> registro;
 	
-	@ManyToOne(targetEntity = Contrato.class,optional = false,fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+	@ManyToOne(targetEntity = Contrato.class,optional = false,fetch = FetchType.LAZY)
 	private Contrato contrato;
 
 

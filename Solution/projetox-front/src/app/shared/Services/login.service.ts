@@ -17,7 +17,6 @@ export class LoginService {
     ) { }
 
   autenticacaoLogin(email: string, senha: string){
-    console.log(email + senha);
     return this.http.post<{token: string, tipo: string}>(API_URL + '/authentication', {email,senha}).pipe(tap(res => {
       localStorage.setItem('token', res.tipo + res.token);
     }));
