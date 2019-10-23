@@ -15,7 +15,7 @@ INSERT INTO public.tbl_plano(
 
 INSERT INTO public.tbl_dia_consulta(
             id, dias_semana, plano_id)
-    VALUES (2, 1, 1);
+    VALUES (1, 1, 1);
 
 
 INSERT INTO public.tbl_dia_consulta(

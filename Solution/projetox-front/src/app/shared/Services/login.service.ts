@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 
-import { HttpClient } from '@angular/common/http';
-import { tap } from 'rxjs/operators';
-import { JwtHelperService } from '@auth0/angular-jwt';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { map } from 'rxjs/operators';
 
 const API_URL = 'http://localhost:8080';
 
@@ -12,19 +11,25 @@ const API_URL = 'http://localhost:8080';
 export class LoginService {
 
   constructor(
-    private http: HttpClient,
-    private jwtHelper: JwtHelperService
-    ) { }
+    private http: HttpClient ) { }
+
 
   autenticacaoLogin(email: string, senha: string){
-    return this.http.post<{token: string, tipo: string}>(API_URL + '/authentication', {email,senha}).pipe(tap(res => {
-      localStorage.setItem('token', res.tipo + res.token);
-    }));
-    }
+    const headers = new HttpHeaders({ Authorization: 'Basic ' + btoa(email + ':' + senha)});
 
-  isAuthenticated(): boolean{
-    const token = localStorage.getItem('token');
-    return !this.jwtHelper.isTokenExpired(token);
-  }
+    return this.http.get(API_URL + '/login', {headers}).pipe(
+      map(
+        userData => {
+          sessionStorage.setItem('email', email);
+          return userData;
+        }
+      )
+    );
+
+    }
+    isUserLoggedIn() {
+      let user = sessionStorage.getItem('email');
+      return !(user === null)
+    }
 
 }

@@ -7,8 +7,12 @@ import { VisualizarContratosComponent } from './visualizar-contratos.component';
 import { HttpClientModule } from '@angular/common/http';
 import { FilterModule } from './filter/filter.module';
 import { CovalentPagingModule } from '@covalent/core/paging';
-import {MatSelectModule} from '@angular/material/select';
-import {MatTableModule} from '@angular/material/table';
+import { MatSelectModule } from '@angular/material/select';
+import { ImportModuleButton } from './import/importButton/import-button.module';
+import { ImportModule } from './import/import.module';
+import { ImportComponent } from './import/import.component';
+
+
 
 @NgModule({
   declarations: [VisualizarContratosComponent],
@@ -20,10 +24,11 @@ import {MatTableModule} from '@angular/material/table';
     FlexLayoutModule,
     CovalentPagingModule,
     MatSelectModule,
-    MatTableModule
+    ImportModuleButton,
+    ImportModule
 
   ],
-  exports:[
+  exports: [
     VisualizarContratosComponent
   ]
 })

@@ -5,6 +5,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import com.br.projetox.entity.Usuario;
 import com.br.projetox.repository.UsuarioRepository;
@@ -18,9 +19,9 @@ public class ImplementDetailService implements UserDetailsService {
 	@Transactional(readOnly = true)
 	@Override
 	public UserDetails loadUserByUsername(String email)  {
-		Usuario user = null;
-		user = this.repository.findByEmailIgnoreCase(email);
-		return user;
+		Usuario usuario = this.repository.findByEmailIgnoreCase(email);
+		Assert.notNull(usuario,"Email ou senha incorretos!!");
+		return usuario;
 	}	
 
 }

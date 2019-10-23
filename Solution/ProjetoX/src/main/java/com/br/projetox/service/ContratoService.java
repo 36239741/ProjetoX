@@ -67,17 +67,15 @@ public class ContratoService {
 		Sheet sheet = workbook.getSheetAt(0);
 		final int numeroLinhas = sheet.getPhysicalNumberOfRows();
 		for (int i = 1; i < numeroLinhas; i++) {
-			try {
-				this.insertContratoFromXls(i, sheet);
-			} catch (Exception e) {
-				throw new Exception(e.getMessage() + " linha " + i);
+			Row linha = sheet.getRow(i);
+			if(!(linha.getCell(0) == null || linha.getCell(0).toString().equals("") )) {
+				this.insertContratoFromXls(linha);
 			}
 		}
 		workbook.close();
 	}
 
-	private void insertContratoFromXls(int i, Sheet sheet) {
-		Row linha = sheet.getRow(i);
+	private void insertContratoFromXls(Row linha) {
 		Contrato contrato = new Contrato();
 		contrato.setNumero(linha.getCell(NUM_CONTRATO).toString());
 		contrato.setNomePaciente(linha.getCell(NOME_PACIENTE).toString());
@@ -86,7 +84,7 @@ public class ContratoService {
 
 		/* Para cada contratado */
 		int contator = 1;
-		while (linha.getCell(contator) != null) {
+		while (!(linha.getCell(contator) == null || linha.getCell(contator).toString().equals("") )) {
 
 			PlanoContratado planoContratado = new PlanoContratado();
 			String[] planoServico = new String[2];
@@ -99,13 +97,14 @@ public class ContratoService {
 					break;
 				}
 			}
-			planoContratado.setSessao(Integer.parseInt(linha.getCell(NUMERO_SESSOES).toString()));
+			Double numeroSessoes = Double.parseDouble(linha.getCell(NUMERO_SESSOES).toString());
+			planoContratado.setSessao(numeroSessoes.intValue());
 			planoContratado.setValorPlano(Double.parseDouble(linha.getCell(VALOR_PLANO).toString()));
 			planoContratado.setHorarioEntrada(null); // linha.getCell(ENTRADA_PADRAO).toString
 			planoContratado.setHorarioSaida(null);// linha.getCell(ENTRADA_SAIDA).toString
 			String[] diasSemana = new String[7];
 			diasSemana = linha.getCell(DIAS_SEMANA).toString().trim().split(",");
-			for (i = 0; i < diasSemana.length; i++) {
+			for (int i = 0; i < diasSemana.length; i++) {
 				if (diasSemana[i] != null) {
 					DiaConsulta diaConsulta = new DiaConsulta();
 					if (diasSemana[i].equals("SEG")) {
@@ -129,6 +128,7 @@ public class ContratoService {
 			contator = contator + MULTIPLICADOR_PROXIMO_SERVICO;
 			contrato.getPlanoContratado().add(planoContratado);
 		}
+		contrato.calcularValorTotal();
 		this.repository.save(contrato);
 	}
 }

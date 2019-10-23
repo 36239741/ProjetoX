@@ -19,7 +19,7 @@ import com.br.projetox.service.ContratoService;
 
 import javassist.NotFoundException;
 
-@CrossOrigin(origins = {"http://localhost:4200"}, maxAge = 4800, allowCredentials = "false")
+@CrossOrigin(origins="*", maxAge=3600)
 @RestController
 @RequestMapping(path = "/contratos")
 public class ContratoController {

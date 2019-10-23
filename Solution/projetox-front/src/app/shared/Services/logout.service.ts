@@ -8,6 +8,6 @@ export class LogoutService {
   constructor() { }
 
   logout(): void{
-    localStorage.removeItem('token');
+    sessionStorage.removeItem('email');
   }
 }

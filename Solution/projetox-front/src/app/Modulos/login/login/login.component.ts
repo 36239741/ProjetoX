@@ -51,15 +51,15 @@ export class LoginComponent implements OnInit, OnDestroy {
    const API_URL = 'http://localhost:4200';
    const email: string = this.form.form.get('email').value;
    const senha: string = this.form.form.get('senha').value;
-
    if(this.form.valid){
     this.subscription = this.autenticacaoLogin.autenticacaoLogin(email,senha).subscribe(
        () =>{
       this.route.navigate(['/home']);
        },
         err => {
+          console.log(err);
           this.form.refresh();
-          if(err.status === 400){
+          if(err.status === 401){
           this.errorLogin = 'Usuario ou senha estao incorretos.';
          }
         });

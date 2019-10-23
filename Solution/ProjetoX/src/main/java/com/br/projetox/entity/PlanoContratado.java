@@ -1,6 +1,7 @@
 package com.br.projetox.entity;
 
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -49,7 +50,7 @@ public class PlanoContratado {
 	
 	@OneToMany(targetEntity = DiaConsulta.class ,cascade = {CascadeType.PERSIST,CascadeType.MERGE,CascadeType.REFRESH},fetch = FetchType.LAZY)
 	@JoinColumn(name = "plano_id")
-	private List<DiaConsulta> diaConsulta;
+	private List<DiaConsulta>  diaConsulta = new ArrayList<DiaConsulta>();;
 
 	@Enumerated(EnumType.ORDINAL)
 	private TipoContrato tipoContrato;

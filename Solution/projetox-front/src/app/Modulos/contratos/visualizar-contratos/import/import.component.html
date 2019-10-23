@@ -1,0 +1,66 @@
+<div fxLayout="column" class="height" fxLayoutAlign="center center">
+  <h1>
+    Importacao de Contrato
+  </h1>
+  <div fxLayout="row" fxLayoutAlign="center center" class="height">
+    <div fxLayout="row" fxLayoutAlign="center center" class="height">
+      <mat-form-field
+        tdFileDrop
+        [disabled]="disabled"
+        (fileDrop)="files = $event"
+        (click)="fileInput.inputElement.click()"
+        (keyup.enter)="fileInput.inputElement.click()"
+        (keyup.delete)="fileInput.clear()"
+        (keyup.backspace)="fileInput.clear()"
+      >
+        <input
+          matInput
+          placeholder="Selecionar Planilha"
+          [value]="files?.length ? files?.length + ' files' : files?.name"
+          [disabled]="disabled"
+          readonly
+        />
+      </mat-form-field>
+      <button
+        mat-icon-button
+        *ngIf="files"
+        (click)="fileInput.clear()"
+        (keyup.enter)="fileInput.clear()"
+      >
+        <mat-icon>cancel</mat-icon>
+      </button>
+      <td-file-input
+        class="push-left-sm push-right-sm"
+        #fileInput
+        [(ngModel)]="files"
+        multiple
+        [disabled]="disabled"
+      >
+        <mat-icon>folder</mat-icon>
+        <span class="text-upper">Browse...</span>
+      </td-file-input>
+    </div>
+  </div>
+  <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="20px">
+  <div>
+    <button
+    class="import"
+    mat-raised-button
+    color="primary"
+    (click)="buttonFechar($event)"
+    >
+      Fechar
+    </button>
+  </div>
+  <div>
+        <button
+          class="import"
+          mat-raised-button
+          color="primary"
+          [disabled]="!files"
+        >
+          Importar
+        </button>
+      </div>  
+    </div>  
+</div>

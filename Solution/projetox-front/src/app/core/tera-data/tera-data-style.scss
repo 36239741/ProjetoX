@@ -13,17 +13,11 @@ $typography: mat-typography-config(
 );
 
 @include mat-core($typography); // $typography is an **optional** argument for the mat-core
+$primary2: mat-palette($mat-blue, 700);
+$accent2:  mat-palette($mat-orange, 800);
+$warn2:    mat-palette($mat-red, 600);
 
-$primary: mat-palette($mat-orange, 800, 100, 900);
-$accent:  mat-palette($mat-light-blue, 600, 100, 900);
+$blue-orange: mat-light-theme($primary2, $accent2, $warn2);
 
-$warn:    mat-palette($mat-red, 600, 100, 900);
-
-$theme: mat-light-theme($primary, $accent, $warn);
-
-@include angular-material-theme($theme);
-@include covalent-theme($theme, $typography); // $typography is an **optional** argument for the covalent-theme
-
-// (optional) Additional themes
-@include covalent-markdown-theme($theme);
-@include covalent-highlight-theme();
+@include angular-material-theme($blue-orange);
+@include covalent-theme($blue-orange);
