@@ -1,6 +1,7 @@
 package com.br.projetox.service;
 
 import java.io.File;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,17 +59,17 @@ public class ContratoService {
 	public Optional<Contrato> findByNumeroContrato(int numeroContrato) throws NotFoundException {
 		Optional<Contrato> contrato = this.repository.findByNumero(numeroContrato);
 		contrato.orElseThrow(
-				() -> new NotFoundException("Nenhum contrato encontrado com esse numero:" + numeroContrato));
+				() -> new NotFoundException("Nenhum contrato encontrado com esse número:" + numeroContrato));
 		return contrato;
 	}
 
 	public void importPlanilhaContratos() throws Exception {
-		Workbook workbook = WorkbookFactory.create(new File("/home/henrique/Documentos/GitHub/ProjetoX/Docs/PlanilhaDeDados.xlsx"));
+		Workbook workbook = WorkbookFactory.create(new File("/Users/marcielilanger/Documents/IFPR/ProjetoHenrique/ProjetoX/Docs/PlanilhaDeDados.xlsx"));
 		Sheet sheet = workbook.getSheetAt(0);
 		final int numeroLinhas = sheet.getPhysicalNumberOfRows();
 		for (int i = 1; i < numeroLinhas; i++) {
 			Row linha = sheet.getRow(i);
-			if(!(linha.getCell(0) == null || linha.getCell(0).toString().equals("") )) {
+			if(!(linha == null ||  linha.getCell(0) == null || linha.getCell(0).toString().equals("") )) {
 				this.insertContratoFromXls(linha);
 			}
 		}
@@ -77,7 +78,8 @@ public class ContratoService {
 
 	private void insertContratoFromXls(Row linha) {
 		Contrato contrato = new Contrato();
-		contrato.setNumero(linha.getCell(NUM_CONTRATO).toString());
+		Double numeroContrato = Double.parseDouble(linha.getCell(NUM_CONTRATO).toString());
+		contrato.setNumero(numeroContrato.intValue() + "");
 		contrato.setNomePaciente(linha.getCell(NOME_PACIENTE).toString());
 
 		List<Servico> servicos = this.servicoService.listServicos();
@@ -99,9 +101,12 @@ public class ContratoService {
 			}
 			Double numeroSessoes = Double.parseDouble(linha.getCell(NUMERO_SESSOES).toString());
 			planoContratado.setSessao(numeroSessoes.intValue());
-			planoContratado.setValorPlano(Double.parseDouble(linha.getCell(VALOR_PLANO).toString()));
-			planoContratado.setHorarioEntrada(null); // linha.getCell(ENTRADA_PADRAO).toString
-			planoContratado.setHorarioSaida(null);// linha.getCell(ENTRADA_SAIDA).toString
+			planoContratado.setValorTotal(Double.parseDouble(linha.getCell(VALOR_PLANO).toString()));
+			planoContratado.calcularValorSessao();
+			String[] horaEntrada = linha.getCell(ENTRADA_PADRAO).toString().trim().split(":");
+			planoContratado.setHorarioEntrada(LocalTime.of(Integer.parseInt(horaEntrada[0]), Integer.parseInt(horaEntrada[1]))); // 
+			String[] horaSaida = linha.getCell(ENTRADA_PADRAO).toString().trim().split(":");
+			planoContratado.setHorarioSaida(LocalTime.of(Integer.parseInt(horaSaida[0]), Integer.parseInt(horaSaida[1])));// linha.getCell(ENTRADA_SAIDA).toString
 			String[] diasSemana = new String[7];
 			diasSemana = linha.getCell(DIAS_SEMANA).toString().trim().split(",");
 			for (int i = 0; i < diasSemana.length; i++) {
@@ -126,6 +131,7 @@ public class ContratoService {
 				}
 			}
 			contator = contator + MULTIPLICADOR_PROXIMO_SERVICO;
+			planoContratado.setContrato(contrato);
 			contrato.getPlanoContratado().add(planoContratado);
 		}
 		contrato.calcularValorTotal();

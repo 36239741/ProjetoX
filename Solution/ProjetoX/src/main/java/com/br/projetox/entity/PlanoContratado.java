@@ -11,6 +11,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -34,9 +35,12 @@ public class PlanoContratado {
 	
 	
 	@Id
-	@GeneratedValue
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name = "plano_id")
 	private long id;
+	/*
+	 * Valor da sessão
+	 */
 	@NotNull
 	private Double valorPlano;
 	@NotNull
@@ -61,5 +65,8 @@ public class PlanoContratado {
 	@ManyToOne(targetEntity = Contrato.class,optional = false,fetch = FetchType.LAZY)
 	private Contrato contrato;
 
+	public void calcularValorSessao() {
+		this.valorPlano = this.valorTotal / this.sessao;
+	}
 
 }
