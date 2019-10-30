@@ -13,17 +13,17 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
-@Entity(name = "tbl_dia_Consulta")
-@EqualsAndHashCode
-public class DiaConsulta implements Serializable {
+@Entity
+@EqualsAndHashCode(callSuper = true)
+public class DiaConsulta extends AbstractEntity implements Serializable {
 	
 	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -8626885819771227527L;
-	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@Id()
+	@GeneratedValue()
 	private long id;
 	@Enumerated(EnumType.ORDINAL)
 	private DiasSemana diasSemana;

@@ -1,9 +1,10 @@
 package com.br.projetox.entity;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 
@@ -13,20 +14,23 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
+@Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
-@Entity(name = "tbl_servico")
-public class Servico {
+@EqualsAndHashCode(callSuper = true)
+public class Servico extends AbstractEntity implements Serializable {
 	
 	/*
 	 * ATRIBUTOS
 	 */	
 	
 	
-	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name = "servico_id")
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6794652905640725604L;
+	@Id()
+	@GeneratedValue()
 	private long id;
 	@NotNull
 	@Column(unique = true)

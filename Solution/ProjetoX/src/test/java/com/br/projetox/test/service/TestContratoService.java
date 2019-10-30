@@ -1,7 +1,5 @@
 package com.br.projetox.test.service;
 
-import java.util.Optional;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +22,11 @@ public class TestContratoService extends AbstractIntegrationTest {
 	}
 	@Test
 	public void testFindByNumeroContratoMustPass() throws NotFoundException {
-		Optional<Contrato> contrato = null;
-		Integer numeroContrato = 1;
+		Contrato contrato = null;
+		String numeroContrato = "1";
 		contrato = this.service.findByNumeroContrato(numeroContrato);
 		Assert.assertNotNull(contrato);
-		Assert.assertEquals(numeroContrato, contrato.get().getNumero());
+		Assert.assertEquals(numeroContrato, contrato.getNumero());
 	}
 	
 														/*MUST FAIL*/
@@ -36,8 +34,8 @@ public class TestContratoService extends AbstractIntegrationTest {
 	
 	@Test(expected = NotFoundException.class)
 	public void TestFindByNumeroContratoMustFail() throws NotFoundException {
-		Optional<Contrato> contrato = null;
-		Integer numeroContrato = 2; 
+		Contrato contrato = null;
+		String numeroContrato = "2";
 		contrato = this.service.findByNumeroContrato(numeroContrato);
 		Assert.assertNotNull(contrato);
 

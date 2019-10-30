@@ -59,8 +59,8 @@ export class LoginComponent implements OnInit, OnDestroy {
         err => {
           console.log(err);
           this.form.refresh();
-          if(err.status === 401){
-          this.errorLogin = 'Usuario ou senha estao incorretos.';
+          if(err.status === 0){
+          this.errorLogin = 'Email ou senha incorretos.';
          }
         });
 

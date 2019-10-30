@@ -1,5 +1,6 @@
 package com.br.projetox.entity;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,10 +11,11 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,18 +23,23 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
+@Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
-@Entity(name = "tbl_contrato")
-public class Contrato {
+@EqualsAndHashCode(callSuper = true)
+public class Contrato extends AbstractEntity implements Serializable {
 	
 	/*
 	 * ATRIBUTOS
 	 */	
 	
-	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4109793839195820893L;
+
+	@Id()
+	@GeneratedValue()
 	@Column(name = "contrato_id")
 	private long id;
 	
@@ -46,18 +53,22 @@ public class Contrato {
 	
 	@NotNull
 	private Double valorTotal;
+	
 	private Byte[] biometria;
 	
-	
-	@OneToMany(targetEntity = PlanoContratado.class,cascade = {CascadeType.REMOVE,CascadeType.PERSIST,CascadeType.MERGE}, fetch = FetchType.LAZY)
-	@JoinColumn(name = "contrato_id")
+	@JsonIgnoreProperties("contrato")
+	@OneToMany(targetEntity = PlanoContratado.class,cascade = {CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.MERGE}, fetch = FetchType.LAZY)
 	private List<PlanoContratado> planoContratado = new ArrayList<PlanoContratado>();
 	
 	public void calcularValorTotal() {
 		this.valorTotal = 0.0;
-		for(PlanoContratado plano: planoContratado) {
-			this.valorTotal += plano.getValorPlano();
+		for(PlanoContratado plano: this.planoContratado) {
+			this.valorTotal += plano.getValorTotal();
 		}
+	}
+	
+	public void clearToList() {
+		this.planoContratado.clear();
 	}
 	
 }

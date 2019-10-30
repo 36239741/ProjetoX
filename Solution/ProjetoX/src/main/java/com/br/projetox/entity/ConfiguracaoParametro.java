@@ -1,5 +1,6 @@
 package com.br.projetox.entity;
 
+import java.io.Serializable;
 import java.time.LocalTime;
 
 import javax.persistence.Column;
@@ -14,13 +15,17 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
+@Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
-@Entity(name = "tbl_configuracao")
-public class ConfiguracaoParametro {
-	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+@EqualsAndHashCode(callSuper = true)
+public class ConfiguracaoParametro extends AbstractEntity implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2372037262770701882L;
+	@Id()
+	@GeneratedValue()
 	@Column(name = "configuracao_id")
 	private long id;
 	private LocalTime tempoSessao;

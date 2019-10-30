@@ -1,0 +1,43 @@
+<div fxLayout='row' fxLayoutGap='90px'>
+    <div fxLayout='column' fxLayoutAlign="center center" >
+        <h3>No:</h3><p>{{ contrato.numero }}</p>
+    </div>
+    <div fxLayout='column' fxLayoutAlign="center start" class='servicos'>
+      <h3>Nome:</h3><p>{{ contrato.nomePaciente }}</p>
+    </div>
+    <div fxLayout='row' class='servicos' fxLayoutAlign='end'>
+        <div fxLayout='column' fxLayoutAlign='center end' fxLayoutGap="20px" class='servicos'>
+            <button mat-raised-button color="primary">Registros E/S</button>
+            <button mat-raised-button color="primary">Novo Serviço</button>
+        </div>
+      </div>
+</div>
+<div >
+      <div fxLayout='column' class='table' fxLayoutAlign='center'>
+        <h3>Serviços Contratados</h3>
+        <app-tabela-servicos  [columns]='columns' [data]='data'></app-tabela-servicos>
+      </div>
+</div>
+
+<div fxLayout='row' fxLayoutAlign='space-between' class='servicos'>
+  <div fxLayout='column' fxLayoutGap='10px' fxLayoutAlign= 'center center'>
+    <h3>Situação Biometria</h3>
+    <p>Cadastrado</p>
+    <br/>
+    <button mat-raised-button color="primary"><mat-icon>refresh</mat-icon>Atualizar Biometria</button>
+  </div>
+  <div fxLayout='column' fxLayoutAlign='center center'>
+    <h3>Total Plano Particular</h3>
+    <p>{{ totalPlanoParticular | currency:'BRL' }}</p>
+  </div>
+  <div fxLayout='column' fxLayoutAlign='center center'>
+      <h3>Total Plano Mensal</h3>
+      <p>{{ totalPLanoMensal  | currency:'BRL'}}</p>
+    </div>
+    <div fxLayout='column' fxLayoutAlign='center center'>
+        <h3>Total do Contrato</h3>
+        <p>{{ contrato.valorTotal | currency:'BRL' }}</p>
+    </div>
+</div>
+
+

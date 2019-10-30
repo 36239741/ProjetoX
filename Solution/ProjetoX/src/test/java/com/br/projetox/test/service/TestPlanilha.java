@@ -1,10 +1,5 @@
 package com.br.projetox.test.service;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-
-import org.directwebremoting.io.FileTransfer;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -19,6 +14,5 @@ public class TestPlanilha extends AbstractIntegrationTest {
 	@Test
 	public void importPlanilhaContratosTestMustPass() throws Exception  {
 		this.contratoService.importPlanilhaContratos();
-		
 	}
 }

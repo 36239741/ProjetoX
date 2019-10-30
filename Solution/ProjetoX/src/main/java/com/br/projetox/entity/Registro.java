@@ -1,5 +1,6 @@
 	package com.br.projetox.entity;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
@@ -18,19 +19,23 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-@Entity(name="tbl_registro")
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
+@Entity
 @Data
-public class Registro {
+public class Registro extends AbstractEntity implements Serializable {
 	
 	/*
 	 * ATRIBUTOS
 	 */	
 	
 	
-	@Id
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -616540646619945740L;
+	@Id()
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name = "registro_id")
 	private long id;

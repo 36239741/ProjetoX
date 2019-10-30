@@ -8,10 +8,13 @@ import { VisualizarContratosModule } from './visualizar-contratos/visualizar-con
 import { MatCardModule } from '@angular/material/card';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { HttpClientModule } from '@angular/common/http';
-
+import { DetatalharContratosModule } from './detalhar-contratos/detatalhar-contratos.module';
+import { CovalentBreadcrumbsModule } from '@covalent/core/breadcrumbs';
+import { RouterModule } from '@angular/router';
+import { BreadCrumbsModule } from '../../shared/components/bread-crumbs/bread-crumbs.module';
 
 @NgModule({
-  declarations: [ContratosComponent, ],
+  declarations: [ContratosComponent],
   imports: [
     CommonModule,
     ContratosRoutingModule,
@@ -19,7 +22,11 @@ import { HttpClientModule } from '@angular/common/http';
     VisualizarContratosModule,
     MatCardModule,
     FlexLayoutModule,
-    HttpClientModule
+    HttpClientModule,
+    DetatalharContratosModule,
+    CovalentBreadcrumbsModule,
+    RouterModule,
+    BreadCrumbsModule
 
   ]
 })

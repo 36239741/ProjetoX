@@ -1,5 +1,6 @@
 package com.br.projetox.entity;
 
+import java.io.Serializable;
 import java.util.Collection;
 
 import javax.persistence.Column;
@@ -7,7 +8,6 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotBlank;
 
@@ -25,22 +25,26 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @AllArgsConstructor
+@Entity
 @EqualsAndHashCode
-@Entity(name = "tbl_usuario")
-public class Usuario implements UserDetails {
+public class Usuario implements UserDetails, Serializable {
 	
 	/*
 	 * ATRIBUTOS
 	 */	
 	
+	/**
+	 * 
+	 */
+
 	@Override
 	public String toString() {
 		return "Usuario [id=" + id + ", email=" + email + ", senha=" + senha + ", authorityType=" + authorityType + "]";
 	}
+	private static final long serialVersionUID = 30474420772499602L;
 
-	private static final long serialVersionUID = 1L;
-	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@Id()
+	@GeneratedValue()
 	@Column(name = "user_id")
 	private long id;
 	@NotBlank

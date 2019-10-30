@@ -9,7 +9,8 @@ import { LoginComponent } from './Modulos/login/login/login.component';
 const routes: Routes = [
   {path: '', component: LoginComponent},
   {path: 'home', component: HomeComponent},
-  {path: 'contratos', loadChildren: () => import('./Modulos/contratos/contratos.module').then(m => m.ContratosModule)},
+  {path: 'contratos', loadChildren: () => import('./Modulos/contratos/contratos.module').then(m => m.ContratosModule),
+  data: {breadcrumb: 'Contratos'}},
   {path: 'relatorios', loadChildren: () => import('./Modulos/relatorios/relatorios.module').then(m => m.RelatoriosModule)}
 ];
 

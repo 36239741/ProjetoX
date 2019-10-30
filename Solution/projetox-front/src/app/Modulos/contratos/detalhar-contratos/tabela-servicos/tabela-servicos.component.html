@@ -1,0 +1,19 @@
+<td-data-table
+  #dataTable
+  [data]="data['0']"
+  [columns]="columns"
+  [clickable]="false"
+  [style.height.px]="200"
+  [style.height.%]="100"
+  class="table">
+  <ng-template tdDataTableTemplate="acoes" let-value="value" let-row="row" let-column="column">
+      <div fxLayout="row" fxLayoutAlign='center center' fxLayoutGap="5px">
+        <span flex>{{value}}</span>
+        <mat-icon>edit</mat-icon>
+        <mat-icon>delete</mat-icon>
+      </div>
+    </ng-template>
+</td-data-table>
+<div class="md-padding" *ngIf="!dataTable.hasData" fxLayout="row" fxLayoutAlign="center center">
+  <h3>Nenhum Serviço Econtrado</h3>
+</div>

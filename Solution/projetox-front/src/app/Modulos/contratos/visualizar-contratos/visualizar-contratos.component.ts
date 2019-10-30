@@ -1,13 +1,16 @@
-import { Contrato } from './../../../shared/model/Contrato';
+import { Subscription } from 'rxjs';
+import { Router } from '@angular/router';
 import { ContratoService } from './../../../shared/Services/contrato.service';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 
-import { ITdDataTableColumn , TdDataTableService} from '@covalent/core/data-table';
-import { IPageChangeEvent, TdPagingBarComponent } from '@covalent/core/paging';
+import {
+  ITdDataTableColumn,
+} from '@covalent/core/data-table';
+import { IPageChangeEvent } from '@covalent/core/paging';
 import { TdDialogService } from '@covalent/core/dialogs';
 import { ImportComponent } from './import/import.component';
-import { Observable } from 'rxjs';
-
+import { PageContrato } from '../../../shared/model/page-contrato';
+import { Contrato } from 'src/app/shared/model/Contrato';
 
 const DECIMAL_FORMAT: (v: any) => any = (v: number) => v.toFixed(2);
 
@@ -19,62 +22,95 @@ const DECIMAL_FORMAT: (v: any) => any = (v: number) => v.toFixed(2);
 export class VisualizarContratosComponent implements OnInit {
 
   columns: ITdDataTableColumn[] = [
-    { name: 'contrato',  label: 'No. Contrato' },
-    { name: 'paciente', label: 'Nome do Paciente' },
-    { name: 'valor', label: 'Valor Contratado', numeric: true, format: DECIMAL_FORMAT},
+    { name: 'numero', label: 'No. Contrato' },
+    { name: 'nomePaciente', label: 'Nome do Paciente' },
+    {
+      name: 'valorTotal',
+      label: 'Valor Contratado',
+      numeric: true,
+      format: DECIMAL_FORMAT
+    }
   ];
-  basicData: Observable<Contrato>;
-
-@ViewChild(TdPagingBarComponent, {static: true}) pagingBar: TdPagingBarComponent;
-  filterData: Observable<Contrato>
-  excludedColumnsFilterContrato: string[] = ["paciente", "valor"];
-  excludedColumnsFilterNomePaciente: string[] = ["valor", "contrato"];
-  filtroByNumeroContrato: string = '';
-  filteredTotal: number;
+  pageContrato: PageContrato;
+  contratos: any[] = [];
+  excludedColumnsFilterContrato: string[] = ['nomePaciente', 'valorTotal','id'];
+  excludedColumnsFilterNomePaciente: string[] = ['valorTotal', 'numero','id'];
   pageSize: number = 10;
-  total:number;
-  fromRow: number;
-  page: number;
-  size: number;
+  total: number;
+  page: number = 0;
+  numero: string = '';
+  nomePaciente: string = '';
+  numeroContrato: string = '';
+  contrato: Contrato;
+  findContratoAfterImport: Boolean = false;
 
-  constructor(private tableService: TdDataTableService,
-              private _dialogService: TdDialogService,
-              private contratoService: ContratoService) { }
+  constructor(
+    private _dialogService: TdDialogService,
+    private contratoService: ContratoService,
+    private route: Router  ) {}
 
   ngOnInit() {
-   this.startTable();
+    this.startTable();
   }
   startTable() {
-    this.basicData = this.contratoService.findAllContratos(0,this.pageSize);
-    console.log(this.basicData.subscribe());
-
+    this.contratoService
+      .findAllContratos(this.page, this.pageSize)
+      .subscribe(pageContrato => {
+          this.pageContrato = pageContrato;
+          this.total = pageContrato.totalElements;
+          this.page = pageContrato.totalPages;
+          this.contratos = this.pageContrato['content'];
+      });
   }
-  //changePageSize(event: IPageChangeEvent): void {
-    //this.fromRow = event.fromRow;
-    //this.page = event.page;
-    //this.size = event.pageSize;
-    //this.filterData = this.basicData;
-    //this.total =this.filterData.length;
-    //this.filterData = this.tableService.pageData(this.filterData, event.fromRow , event.page * event.pageSize);
-  //}
-   //filterContrato(fitroContrato: string){
-     //this.filterData = this.tableService.filterData(this.basicData, fitroContrato, true, this.excludedColumnsFilterContrato);
-     //this.total =  this.filterData.length;
-  //}
-  //filterNomePaciente(filtroNomePaciente: string){
-     //this.filterData = this.tableService.filterData(this.basicData, filtroNomePaciente, true, this.excludedColumnsFilterNomePaciente);
-     //this.total = this.filterData.length;
-
-  //}
-  openModalImport($event){
-    this._dialogService.open(ImportComponent,{
-      width: "500px",
-      height: "500px",
-      disableClose:false
-
+  findByFilter(){
+    this.contratoService.findByFilters(this.nomePaciente,this.numero, this.page = 0, this.pageSize = 10)
+    .subscribe(pageFilter => {
+      this.contratos = pageFilter['content'];
     });
   }
+  changePageSize(event: IPageChangeEvent){
+    this.pageSize = event.pageSize;
+    this.page = event.page - 1;
+    this.startTable();
+  }
+  filterContrato(event){
+    if(event != ''){
+      this.numero = event;
+      this.findByFilter();
+      this.total = this.contratos.length;
+    }
+    else{
+      this.numero = '';
+      this.page = 0;
+      this.startTable();
+    }
+  }
+
+  filterNomePaciente(event){
+    if(event != ''){
+      this.nomePaciente = event;
+      this.findByFilter();
+      this.total = this.contratos.length;
+    }
+    else{
+      this.nomePaciente = ''
+      this.page = 0;
+      this.startTable();
+    }
+
+  }
+  rowClick(event: any){
+    this.numeroContrato = event.row.numero;
+    this.route.navigate(['contratos/detalhar/', this.numeroContrato]);
+  }
 
 
+  openModalImport($event) {
+    this._dialogService.open(ImportComponent, {
+      width: "500px",
+      height: "500px",
+      disableClose: false
+    });
+  }
 
 }

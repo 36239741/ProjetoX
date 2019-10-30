@@ -4,10 +4,12 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { JwtModule } from '@auth0/angular-jwt';
 import { LoginModule } from './Modulos/login/login.module';
 import { HomeModule } from './Modulos/home/home.module';
-
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { CovalentLoadingModule } from '@covalent/core/loading';
+import { BasicInterceptorService } from './core/interceptor/basic-interceptor.service';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 @NgModule({
   declarations: [
@@ -19,16 +21,17 @@ import { HomeModule } from './Modulos/home/home.module';
     BrowserAnimationsModule,
     LoginModule,
     HomeModule,
-    JwtModule.forRoot({
-      config: {
-        tokenGetter: function  tokenGetter() {
-             return localStorage.getItem('token');},
-        whitelistedDomains: ['localhost:4200/index'],
-        blacklistedRoutes: ['http://localhost:4200/']
-      }
-    })
+    HttpClientModule,
+    CovalentLoadingModule,
+    MatProgressSpinnerModule
+
+
   ],
-  providers: [],
+  providers: [{
+    provide: HTTP_INTERCEPTORS ,
+    useClass: BasicInterceptorService,
+    multi: true
+  }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -1,5 +1,7 @@
 package com.br.projetox.security;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +15,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 
 import com.br.projetox.security.filter.handler.FailedHandler;
@@ -58,15 +61,11 @@ public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http.csrf().disable()
 		.httpBasic()
+		.authenticationEntryPoint(new CustomEntryPoint())
 		.and()
 		.authorizeRequests().antMatchers(HttpMethod.OPTIONS,"/**").permitAll()
 		.anyRequest()
 		.authenticated();
-
-	
-		http.exceptionHandling()
-		.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED));
-
 	}
 		
 

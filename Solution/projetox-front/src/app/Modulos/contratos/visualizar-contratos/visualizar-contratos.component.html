@@ -1,10 +1,9 @@
-<div fxLayout="row" fxLayoutGap="30px" claas="filter">
+<div fxLayout="row" fxLayoutGap="30px" class="filter">
   <app-filter (filtro)="filterContrato($event)" placeholder="No. Contrato">
   </app-filter>
   <app-filter
     (filtro)="filterNomePaciente($event)"
-    placeholder="Nome do Paciente"
-  >
+    placeholder="Nome do Paciente">
   </app-filter>
   <div fxLayoutAlign="end center" class="import">
    <app-import-button (click)="openModalImport($event)"></app-import-button>
@@ -13,9 +12,12 @@
 <div>
   <td-data-table
     #dataTable
-    [data]="filterData"
+    [data]="contratos"
     [columns]="columns"
     [style.height.%]="100"
+    (rowClick)="rowClick($event)"
+    [clickable]="true"
+    [sortOrder]="'ASC'"
   >
   </td-data-table>
 
@@ -29,7 +31,6 @@
   </div>
   <td-paging-bar
     #pagingBarPageSize
-    [firstLast]="true"
     [pageSize]="pageSize"
     [total]="total"
     (change)="changePageSize($event)"

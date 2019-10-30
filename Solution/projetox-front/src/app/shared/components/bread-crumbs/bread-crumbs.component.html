@@ -1,0 +1,8 @@
+<div fxLayout="row">
+    <td-breadcrumbs *ngFor="let breadCrumbs of breadcrumbs">
+        <mat-chip-list>
+              <a td-breadcrumb routerLinkActive='active'><mat-chip color="primary" class="matchip" selected >{{ breadCrumbs.label }}</mat-chip></a>
+        </mat-chip-list>
+    </td-breadcrumbs>
+</div>
+

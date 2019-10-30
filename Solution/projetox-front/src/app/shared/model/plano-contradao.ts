@@ -1,17 +1,16 @@
 import { DiaConsulta } from "./dia-consulta";
-import { Registro } from "./registro";
-import { Contrato } from "./Contrato";
 import { Servico } from "./servico";
+import { HorarioEntradaOrHorarioSaida } from './Contrato';
 
-export interface PlanoContratado{
+export class PlanoContratado {
   id: number;
   valorPlano: number;
-  horarioEntrada: string;
-  horarioSaida: string;
+  horarioEntrada: HorarioEntradaOrHorarioSaida;
+  horarioSaida: HorarioEntradaOrHorarioSaida;
   valorTotal: number;
-  diaConsulta: DiaConsulta;
+  sessao: number;
+  diaConsulta: DiaConsulta[];
   tipoContrato: string;
   servico: Servico;
-  registro: Registro;
-  contrato: Contrato;
 }
+

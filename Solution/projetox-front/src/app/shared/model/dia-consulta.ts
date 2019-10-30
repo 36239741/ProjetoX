@@ -1,4 +1,4 @@
-export interface DiaConsulta {
+export class DiaConsulta {
   id: number;
-  diaSemana: string;
+  diasSemana: string;
 }

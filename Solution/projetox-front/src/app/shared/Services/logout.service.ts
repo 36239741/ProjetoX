@@ -8,6 +8,7 @@ export class LogoutService {
   constructor() { }
 
   logout(): void{
-    sessionStorage.removeItem('email');
+    sessionStorage.removeItem('currentUser');
+    sessionStorage.removeItem('username');
   }
 }

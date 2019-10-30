@@ -1,5 +1,6 @@
 package com.br.projetox.entity;
 
+import java.io.Serializable;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,32 +12,34 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
-
+@Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "tbl_plano")
-public class PlanoContratado {
+@EqualsAndHashCode(callSuper = true)
+public class PlanoContratado extends AbstractEntity implements Serializable{
 	
 	/*
 	 * ATRIBUTOS
 	 */	
 	
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2720110599255732525L;
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name = "plano_id")
+	@GeneratedValue()
 	private long id;
 	/*
 	 * Valor da sessão
@@ -52,9 +55,8 @@ public class PlanoContratado {
 	@NotNull
 	private int sessao;
 	
-	@OneToMany(targetEntity = DiaConsulta.class ,cascade = {CascadeType.PERSIST,CascadeType.MERGE,CascadeType.REFRESH},fetch = FetchType.LAZY)
-	@JoinColumn(name = "plano_id")
-	private List<DiaConsulta>  diaConsulta = new ArrayList<DiaConsulta>();;
+	@OneToMany(targetEntity = DiaConsulta.class,cascade = {CascadeType.PERSIST,CascadeType.MERGE,CascadeType.REFRESH},fetch = FetchType.LAZY,orphanRemoval = true)
+	private List<DiaConsulta>  diaConsulta = new ArrayList<DiaConsulta>();
 
 	@Enumerated(EnumType.ORDINAL)
 	private TipoContrato tipoContrato;

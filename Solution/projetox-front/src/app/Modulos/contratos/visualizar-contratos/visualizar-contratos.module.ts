@@ -10,7 +10,6 @@ import { CovalentPagingModule } from '@covalent/core/paging';
 import { MatSelectModule } from '@angular/material/select';
 import { ImportModuleButton } from './import/importButton/import-button.module';
 import { ImportModule } from './import/import.module';
-import { ImportComponent } from './import/import.component';
 
 
 
@@ -25,8 +24,7 @@ import { ImportComponent } from './import/import.component';
     CovalentPagingModule,
     MatSelectModule,
     ImportModuleButton,
-    ImportModule
-
+    ImportModule,
   ],
   exports: [
     VisualizarContratosComponent
