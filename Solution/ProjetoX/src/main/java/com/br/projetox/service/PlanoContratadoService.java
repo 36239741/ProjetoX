@@ -10,7 +10,16 @@ import com.br.projetox.repository.PlanoContratoRepository;
 @Transactional
 public class PlanoContratadoService {
 	private PlanoContratoRepository planoContraRepository;
+	
 	public void savePlanoContratado(PlanoContratado planoContratado) {
 		this.planoContraRepository.save(planoContratado);
 	}
+	
+	@Transactional(readOnly = true)
+	public PlanoContratado findPlanoContratado(long servicoId, long contratoId, int tipoContrato)  {
+		PlanoContratado planoContratado = null;
+		 planoContratado = this.planoContraRepository.findPlanoContratado(servicoId, contratoId, tipoContrato);
+		return planoContratado;
+	}
+	
 }

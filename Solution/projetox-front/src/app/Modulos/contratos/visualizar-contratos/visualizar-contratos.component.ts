@@ -1,5 +1,5 @@
 import { Subscription } from 'rxjs';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { ContratoService } from './../../../shared/Services/contrato.service';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 
@@ -11,6 +11,7 @@ import { TdDialogService } from '@covalent/core/dialogs';
 import { ImportComponent } from './import/import.component';
 import { PageContrato } from '../../../shared/model/page-contrato';
 import { Contrato } from 'src/app/shared/model/Contrato';
+import { BehaviorSubjectContratoRefreshService } from 'src/app/shared/Services/behavior-subject-contrato-refresh.service';
 
 const DECIMAL_FORMAT: (v: any) => any = (v: number) => v.toFixed(2);
 
@@ -19,7 +20,8 @@ const DECIMAL_FORMAT: (v: any) => any = (v: number) => v.toFixed(2);
   templateUrl: './visualizar-contratos.component.html',
   styleUrls: ['./visualizar-contratos.component.css']
 })
-export class VisualizarContratosComponent implements OnInit {
+export class VisualizarContratosComponent implements OnInit, OnDestroy {
+
 
   columns: ITdDataTableColumn[] = [
     { name: 'numero', label: 'No. Contrato' },
@@ -32,6 +34,7 @@ export class VisualizarContratosComponent implements OnInit {
     }
   ];
   pageContrato: PageContrato;
+  subscription: Subscription;
   contratos: any[] = [];
   excludedColumnsFilterContrato: string[] = ['nomePaciente', 'valorTotal','id'];
   excludedColumnsFilterNomePaciente: string[] = ['valorTotal', 'numero','id'];
@@ -47,20 +50,20 @@ export class VisualizarContratosComponent implements OnInit {
   constructor(
     private _dialogService: TdDialogService,
     private contratoService: ContratoService,
+    private activeRoute: ActivatedRoute,
+    private behaviorRefreshTableContrato: BehaviorSubjectContratoRefreshService,
     private route: Router  ) {}
 
   ngOnInit() {
     this.startTable();
+    this.refreshTableContratoAfterImport();
+
   }
   startTable() {
-    this.contratoService
-      .findAllContratos(this.page, this.pageSize)
-      .subscribe(pageContrato => {
-          this.pageContrato = pageContrato;
-          this.total = pageContrato.totalElements;
-          this.page = pageContrato.totalPages;
-          this.contratos = this.pageContrato['content'];
-      });
+    this.pageContrato = this.activeRoute.snapshot.data['contratos'];
+    this.total = this.pageContrato.totalElements;
+    this.page = this.pageContrato.totalElements;
+    this.contratos = this.pageContrato['content'];
   }
   findByFilter(){
     this.contratoService.findByFilters(this.nomePaciente,this.numero, this.page = 0, this.pageSize = 10)
@@ -84,6 +87,16 @@ export class VisualizarContratosComponent implements OnInit {
       this.page = 0;
       this.startTable();
     }
+  }
+  refreshTableContratoAfterImport(){
+    this.subscription = this.behaviorRefreshTableContrato.getBehaviorView().subscribe(data => {
+      if(data === true){
+        this.contratoService.findAllContratos(0 , 10 ).subscribe(data =>{
+          this.contratos = data['content'];
+        });
+      }
+    });
+
   }
 
   filterNomePaciente(event){
@@ -111,6 +124,9 @@ export class VisualizarContratosComponent implements OnInit {
       height: "500px",
       disableClose: false
     });
+  }
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 
 }

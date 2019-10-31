@@ -28,7 +28,7 @@ export class DetatalharContratosComponent implements OnInit {
   totalPlanoParticular: number = 0;
   totalPLanoMensal: number = 0;
   constructor(private contratoService: ContratoService,
-              private route: ActivatedRoute ) { }
+              private activeRoute: ActivatedRoute ) { }
 
   ngOnInit() {
     this.lodingTable();
@@ -46,19 +46,15 @@ export class DetatalharContratosComponent implements OnInit {
   ];
 
   lodingTable(): void{
-    this.route.params.subscribe(res => this.numeroContrato = res.id);
     this.findContrato();
 
   }
   findContrato(): void{
-    this.contratoService.findByContrato(this.numeroContrato).subscribe(data => {
-      this.contrato = data;
-      this.data.push(this.contrato.planoContratado);
-      console.log(this.contrato.planoContratado);
-      this.calcularValorPlanos();
-
-  });
+    this.contrato = this.activeRoute.snapshot.data['findByContrato'];
+    this.data.push(this.contrato.planoContratado);
+    this.calcularValorPlanos();
   }
+
   calcularValorPlanos(){
      this.contrato.planoContratado.forEach(data => {
        if(data.tipoContrato.toLocaleLowerCase().trim() === 'plano'){

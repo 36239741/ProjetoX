@@ -16,7 +16,8 @@ export class ImportComponent implements OnInit{
   constructor(private _dialogService: TdDialogService,
               private contratoService: ContratoService,
               private loading: TdLoadingService,
-              private behaviorSubject: BehaviorMessageFeedBackService) {
+              private behaviorSubject: BehaviorMessageFeedBackService,
+              private behaviorRefreshTableContrato: BehaviorSubjectContratoRefreshService) {
                 this.loading.create({
                   name: 'spinnerProgress',
                   type: LoadingType.Circular,
@@ -55,6 +56,7 @@ export class ImportComponent implements OnInit{
       this.messageFeedBackOpen = true;
       this.isSuccess = true;
       this.behaviorSubject.setBehaviorView(res);
+      this.behaviorRefreshTableContrato.setBehaviorView(true);
     },
     () => this.loading.resolve('spinnerProgress'));
   }

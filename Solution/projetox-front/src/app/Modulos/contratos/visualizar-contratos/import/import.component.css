@@ -1,5 +1,5 @@
 .height{
-  height: 100%;
+  height: 70%;
 }
 .import{
   width: 200px;
@@ -8,4 +8,8 @@
 }
 .error{
   color: red;
+}
+.successMessage{
+  height: 100%;
+  position: relative;
 }

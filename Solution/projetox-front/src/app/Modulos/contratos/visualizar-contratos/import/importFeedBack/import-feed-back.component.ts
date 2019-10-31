@@ -1,5 +1,5 @@
 import { Subscription } from 'rxjs';
-import { Component, OnInit, Input, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { BehaviorMessageFeedBackService } from 'src/app/shared/Services/behavior-message-feed-back.service';
 
 
@@ -11,8 +11,6 @@ import { BehaviorMessageFeedBackService } from 'src/app/shared/Services/behavior
 export class ImportFeedBackComponent implements OnInit, OnDestroy {
 
 
-
-  @Input() opened: Boolean = false;
   message: String = '';
   subscription: Subscription;
   constructor(private behaviorFeedBack: BehaviorMessageFeedBackService) { }
