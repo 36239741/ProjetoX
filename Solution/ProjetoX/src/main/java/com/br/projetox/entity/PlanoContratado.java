@@ -39,9 +39,7 @@ public class PlanoContratado extends AbstractEntity implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 2720110599255732525L;
-	@Id
-	@GeneratedValue()
-	private long id;
+
 	/*
 	 * Valor da sessão
 	 */

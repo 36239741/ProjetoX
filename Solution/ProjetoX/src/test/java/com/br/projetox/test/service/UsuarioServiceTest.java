@@ -7,10 +7,13 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import com.br.projetox.entity.Usuario;
 import com.br.projetox.repository.UsuarioRepository;
 
-public class UsuarioService extends AbstractIntegrationTest {
+public class UsuarioServiceTest extends AbstractIntegrationTest {
 	@Autowired
 	private  UsuarioRepository repo;
 	
+	/*
+	 * ==================== TESTES DE SALVAR USUÁRIO ==============================
+	 */
 	@Test
 	public void saveUsuarioMustPass() {
 		Usuario user = new Usuario();

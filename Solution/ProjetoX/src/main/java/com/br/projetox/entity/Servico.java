@@ -29,9 +29,7 @@ public class Servico extends AbstractEntity implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = -6794652905640725604L;
-	@Id()
-	@GeneratedValue()
-	private long id;
+
 	@NotNull
 	@Column(unique = true)
 	private String servico;

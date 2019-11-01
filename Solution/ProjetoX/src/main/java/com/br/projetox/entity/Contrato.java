@@ -38,10 +38,6 @@ public class Contrato extends AbstractEntity implements Serializable {
 	 */
 	private static final long serialVersionUID = -4109793839195820893L;
 
-	@Id()
-	@GeneratedValue()
-	@Column(name = "contrato_id")
-	private long id;
 	
 	@NotNull
 	@Column(unique = true)

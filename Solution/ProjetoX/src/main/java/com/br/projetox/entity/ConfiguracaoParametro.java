@@ -24,10 +24,7 @@ public class ConfiguracaoParametro extends AbstractEntity implements Serializabl
 	 * 
 	 */
 	private static final long serialVersionUID = 2372037262770701882L;
-	@Id()
-	@GeneratedValue()
-	@Column(name = "configuracao_id")
-	private long id;
+
 	private LocalTime tempoSessao;
 	private LocalTime tempoToleranciaAtraso;
 	private Double valorMinutoAdicional;

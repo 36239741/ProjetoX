@@ -10,10 +10,23 @@ import com.br.projetox.service.ContratoService;
 
 import javassist.NotFoundException;
 
-public class TestContratoService extends AbstractIntegrationTest {
+public class ContratoServiceTest extends AbstractIntegrationTest {
 	@Autowired
 	private ContratoService service;
 	
+	
+	/*
+	 * ==================== TESTES DE IMPORTAÇÃO DA PLANILHA ==============================
+	 */
+	
+	@Test
+	public void importPlanilhaContratosTestMustPass() throws Exception  {
+		this.service.importPlanilhaContratos();
+	}
+	
+	/*
+	 * ==================== TESTES DE .... ==============================
+	 */
 	@Test
 	public void testFindAllMustPass() {
 		Page<Contrato> page = null;

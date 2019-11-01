@@ -7,8 +7,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.validation.constraints.NotBlank;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,6 +17,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
@@ -26,8 +25,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@EqualsAndHashCode
-public class Usuario implements UserDetails, Serializable {
+@EqualsAndHashCode(callSuper = true)
+@Data
+public class Usuario extends AbstractEntity  implements UserDetails, Serializable {
 	
 	/*
 	 * ATRIBUTOS
@@ -37,16 +37,9 @@ public class Usuario implements UserDetails, Serializable {
 	 * 
 	 */
 
-	@Override
-	public String toString() {
-		return "Usuario [id=" + id + ", email=" + email + ", senha=" + senha + ", authorityType=" + authorityType + "]";
-	}
 	private static final long serialVersionUID = 30474420772499602L;
 
-	@Id()
-	@GeneratedValue()
-	@Column(name = "user_id")
-	private long id;
+
 	@NotBlank
 	@Column(unique = true)
 	private String email;
@@ -103,39 +96,21 @@ public class Usuario implements UserDetails, Serializable {
 		return new UsernamePasswordAuthenticationToken(email, senha);
 	}
 	@JsonProperty(access = Access.WRITE_ONLY)
-	public long getId() {
-		return id;
+	public Long getId() {
+		return super.getId();
 	}
 
-	public void setId(long id) {
-		this.id = id;
-	}
-	
 	@JsonProperty(access = Access.WRITE_ONLY)
 	public String getEmail() {
 		return email;
 	}
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
 	@JsonProperty(access = Access.WRITE_ONLY)
 	public String getSenha() {
 		return senha;
 	}
 
-	public void setSenha(String senha) {
-		this.senha = senha;
-	}
-
-	public AuthorityType getAuthorityType() {
-		return authorityType;
-	}
-
-	public void setAuthorityType(AuthorityType authorityType) {
-		this.authorityType = authorityType;
-	}
-
+	
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}

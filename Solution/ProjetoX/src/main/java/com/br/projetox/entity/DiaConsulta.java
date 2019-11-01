@@ -22,9 +22,7 @@ public class DiaConsulta extends AbstractEntity implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = -8626885819771227527L;
-	@Id()
-	@GeneratedValue()
-	private long id;
+
 	@Enumerated(EnumType.ORDINAL)
 	private DiasSemana diasSemana;
 }

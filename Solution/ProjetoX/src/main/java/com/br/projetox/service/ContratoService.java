@@ -30,10 +30,13 @@ import javassist.NotFoundException;
 @Service
 @Transactional
 public class ContratoService {
+	
 	@Autowired
 	private ServicoService servicoService;
+	
 	@Autowired
 	private PlanoContratadoService planoContratadoService;
+	
 	@Autowired
 	private ContratoRepository repository;
 

@@ -35,10 +35,7 @@ public class Registro extends AbstractEntity implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = -616540646619945740L;
-	@Id()
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name = "registro_id")
-	private long id;
+
 	private LocalDateTime dataHoraEntrada;
 	private LocalDateTime dataHoraSaida;
 	private LocalTime tempoTotal;
