@@ -1,5 +1,7 @@
 package com.br.projetox.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +23,19 @@ public class PlanoContratadoService {
 	 */
 	public void savePlanoContratado(PlanoContratado planoContratado) {
 		this.planoContraRepository.save(planoContratado);
+	}
+	
+	public List<PlanoContratado> findAll() {
+		return this.planoContraRepository.findAll();
+	}
+	
+	
+	public PlanoContratado findbyContractTypeAndServiceId(TipoContrato tipoContrato, long serviceId){
+		return this.planoContraRepository.findbyContractTypeAndServiceId(tipoContrato, serviceId);
+	}
+	
+	public List<PlanoContratado> findByContractId(Long contratoId){
+		return this.planoContraRepository.findByContratoId(contratoId);
 	}
 	
 	/*

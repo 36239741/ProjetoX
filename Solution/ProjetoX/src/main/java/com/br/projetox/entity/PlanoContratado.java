@@ -6,14 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
@@ -54,13 +50,14 @@ public class PlanoContratado extends AbstractEntity implements Serializable{
 	@NotNull
 	private int sessao;
 	
-	@OneToMany(targetEntity = DiaConsulta.class,cascade = {CascadeType.PERSIST,CascadeType.MERGE,CascadeType.REFRESH},fetch = FetchType.EAGER,orphanRemoval = true)
+
+	@OneToMany(targetEntity = DiaConsulta.class,cascade = {CascadeType.MERGE,CascadeType.PERSIST},fetch = FetchType.EAGER)
 	private List<DiaConsulta>  diaConsulta = new ArrayList<DiaConsulta>();
 	
 	@Enumerated(EnumType.ORDINAL)
 	private TipoContrato tipoContrato;
 
-	@ManyToOne(targetEntity = Servico.class,optional = false,fetch = FetchType.LAZY)
+	@ManyToOne(targetEntity = Servico.class,optional = false,fetch = FetchType.EAGER)
 	private Servico servico;
 	
 	@ManyToOne(targetEntity = Contrato.class,optional = false,fetch = FetchType.LAZY)

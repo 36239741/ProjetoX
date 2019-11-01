@@ -74,6 +74,10 @@ export class VisualizarContratosComponent implements OnInit, OnDestroy {
   changePageSize(event: IPageChangeEvent){
     this.pageSize = event.pageSize;
     this.page = event.page - 1;
+    console.log(event.pageSize);
+    this.contratoService.findAllContratos(this.pageSize,this.page).subscribe(data =>{
+      this.contratos = data['content'];
+    });
     this.startTable();
   }
   filterContrato(event){

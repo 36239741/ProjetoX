@@ -1,5 +1,7 @@
 package com.br.projetox.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,4 +20,15 @@ public interface PlanoContratoRepository extends JpaRepository<PlanoContratado, 
 			+ "AND plano.tipoContrato = :tipoContrato "
 			+ "AND plano.ativo = true")
 	 PlanoContratado findPlanoContratadoAtivoByContratoAndServicoAndTipoContrato(@Param("servicoId") long servicoId ,@Param("contratoId") long contratoId, @Param("tipoContrato") TipoContrato tipoContrato);
+	
+	@Query("FROM PlanoContratado plano "
+			+ "WHERE "
+			+ "plano.servico.id = :servicoId "
+			+ "AND plano.tipoContrato = :tipoContrato ")
+	PlanoContratado findbyContractTypeAndServiceId(@Param("tipoContrato")TipoContrato tipoContrato, @Param("servicoId") long servicoId);
+	
+	@Query("FROM PlanoContratado plano "
+			+ "WHERE "
+			+ "plano.servico.id = :servicoId ")
+	List<PlanoContratado> findByContratoId(@Param("servicoId") long servicoId);
 }

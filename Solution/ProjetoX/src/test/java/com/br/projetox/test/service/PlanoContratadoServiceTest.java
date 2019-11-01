@@ -1,5 +1,7 @@
 package com.br.projetox.test.service;
 
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +26,7 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 	@Autowired 
 	private ServicoRepository servicoRepository;
 	
-	@WithUserDetails("marcieli.langer@mailinator.com")
+	@WithUserDetails("henrique_nitatori@hotmail.com")
 	@Sql({	"/dataset/truncate.sql",
 			"/dataset/Usuario.sql",
 			"/dataset/Servico.sql",
@@ -39,6 +41,31 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 		
 		Assert.assertNotNull(plano);
 		Assert.assertNotNull(plano.getId());
+	}
+	
+										/* VERIFICA O RETORNO DE LISTA DE PLANO CONTRATADO */
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({	"/dataset/truncate.sql",
+			"/dataset/Usuario.sql",
+			"/dataset/Servico.sql",
+			"/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql"})
+	@Test
+	public void findbyContractIdTestMustPassVerificandoABuscaPorContrato()  {
+		final Long contratoId = 1L;
+		List<PlanoContratado> planoContratado = this.planoContratoService.findbyContractId(contratoId);
+		
+		Assert.assertNotNull(planoContratado);
+		Assert.assertEquals(1, planoContratado.size());
+	}
+	
+										/* TESTE DE BUSCA DE TODOS OS PLANOS CONTRTADOS */
+	@Test
+	public void findAllMustPass() {
+		final List<PlanoContratado> planoContratado = this.planoContratoService.findAll();
+		Assert.assertNotNull(planoContratado);
+		Assert.assertEquals(0, planoContratado.size());;
+		
 	}
 	
 }

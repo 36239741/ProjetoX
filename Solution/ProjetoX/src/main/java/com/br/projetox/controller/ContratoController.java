@@ -42,7 +42,7 @@ public class ContratoController {
 	@GetMapping(path = "/{numeroContrato}")
 	public ResponseEntity<Contrato> findBynumeroContrato(@Valid @PathVariable String numeroContrato) throws NotFoundException{
 		Contrato contrato = null;
-		contrato = this.service.findByNumeroContrato(numeroContrato);
+		contrato = this.service.findByContractNumber(numeroContrato);
 		return ResponseEntity.ok(contrato);
 		
 	}

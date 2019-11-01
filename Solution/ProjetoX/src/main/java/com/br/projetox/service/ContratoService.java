@@ -37,6 +37,7 @@ public class ContratoService {
 	@Autowired
 	private PlanoContratadoService planoContratadoService;
 	
+
 	@Autowired
 	private ContratoRepository repository;
 
@@ -50,11 +51,11 @@ public class ContratoService {
 	private static final Integer DIAS_SEMANA = 7;
 	private static final Integer MULTIPLICADOR_PROXIMO_SERVICO = 6;
 
-	/*
-	 * @Param int pageNum, int pageSize retorna todos contratos ne forma pageable
-	 * 
-	 * @Return Page<contrato>
-	 */
+	/*Método para a busca de todos os contratos 
+	@param pageNum int -  numero da pagina
+	@param pageSize int - total de contratos retornado por pagina
+	@return Page<contrato>
+	*/
 	@Transactional(readOnly = true)
 	public Page<Contrato> findAll(int pageNum, int pageSize) {
 		Page<Contrato> page = null;
@@ -65,18 +66,36 @@ public class ContratoService {
 		});
 		return page;
 	}
+	
+	/*Método de busca que utiliza o campo numero , nomePaciente aonde pode ser utilizados em conjunto
+	 * ou separados
+	@param numero String - numero do contrato cadastrado
+	@param nomePaciente String - nome do paciente contido no contrato
+	@param pageable PageRequet - variavel que contem especificacoes de retorno
+	@return Page<Contrato>
+	*/
 	@Transactional(readOnly = true)
 	public Page<Contrato> findByFilters(String numero,String nomePaciente, PageRequest pageable){
 		return this.repository.findByFilters(numero, nomePaciente, pageable);
 	}
-
-	public Contrato findByNumeroContrato(String numeroContrato) throws NotFoundException {
+	
+	/*Método para busca de contratos atraves do numero do contrato cadastrado
+	@param numeroContrato String - numero do contrato salvo
+	@return contrato
+	@throws NotFoundException - retorna a excessao quando nao for encontrado nenhum contrato
+	*/
+	public Contrato findByContractNumber(String numeroContrato) throws NotFoundException {
 		Optional<Contrato> contrato = this.repository.findByNumero(numeroContrato);
 		contrato.orElseThrow(
 				() -> new NotFoundException("Nenhum contrato encontrado com esse número de contrato:" + numeroContrato));
 		return contrato.get();
 	}
-
+	
+	/*Método que recebe a planilha de dados e faz aas contagens das linhas e a percorre,
+	 * suportando somente os formatos xlxs e xls
+	@param file FileTransfer - contem a planinhla de dados , tipo da variavel da biblioteca do DWR
+	@return HashMap<String, Integer>
+	*/
 	public HashMap<String, Integer> importPlanilhaContratos(FileTransfer file) throws Exception {
 		List<Contrato> listContrato = new ArrayList<>();
 		Workbook workbook = WorkbookFactory.create(file.getInputStream());
@@ -85,14 +104,17 @@ public class ContratoService {
 		for (int i = 1; i < numeroLinhas; i++) {
 			Row linha = sheet.getRow(i);
 			if(!(linha == null ||  linha.getCell(0) == null || linha.getCell(0).toString().equals("") )) {
-				listContrato.add(this.insertContratoFromXls(linha));
+				listContrato.add(this.recoveryOfCellValues(linha));
 			}
 		}
 		workbook.close();
-		return this.countSaveAndUpdateContract(listContrato);
+		return this.saveAndUpdateCount(listContrato);
 	}
-
-	private Contrato insertContratoFromXls(Row linha) throws NumberFormatException, NotFoundException {
+	/*Método que recupera os valores das celulas da planilha
+	@param linha Row - recebe as linhas das planilha
+	@return Contrato
+	*/
+	private Contrato recoveryOfCellValues(Row linha) throws NumberFormatException, NotFoundException {
 		Contrato contrato = new Contrato();
 		Double numeroContrato = Double.parseDouble(linha.getCell(NUM_CONTRATO).toString());
 		contrato.setNumero(numeroContrato.intValue() + "");
@@ -128,7 +150,7 @@ public class ContratoService {
 			String[] diasSemana = new String[7];
 			diasSemana = linha.getCell(DIAS_SEMANA + atualizarNumeroCelula).toString().trim().split(",");
 			
-			this.listDiasSemanas(diasSemana).forEach(dias -> { planoContratado.getDiaConsulta().add(dias); });
+			this.checkDaysOfTheWeek(diasSemana).forEach(dias -> { planoContratado.getDiaConsulta().add(dias); });
 			
 			contator = contator + MULTIPLICADOR_PROXIMO_SERVICO;
 			atualizarNumeroCelula +=  6;
@@ -139,7 +161,13 @@ public class ContratoService {
 		return contrato;
 	}
 	
-	private List<DiaConsulta> listDiasSemanas(String diasSemana[]){
+	/*Método verifica os dias da semana vindo da planilha
+	@param diasSemana String[] - um array de String contendo os dias da semana informados
+	@return List<DiaConsulta>
+	@throws NullPointerException - retorna a excessao quando nao for encontrado nenhum dado compativel 
+	com a verificacao
+	*/
+	private List<DiaConsulta> checkDaysOfTheWeek(String diasSemana[]){
 		List<DiaConsulta> listDiasConsulta = new ArrayList<>();
 		for (int i = 0; i < diasSemana.length; i++) {
 			if (diasSemana[i] != null) {
@@ -166,7 +194,11 @@ public class ContratoService {
 		return listDiasConsulta;
 	}
 	
-	private HashMap<String, Integer> countSaveAndUpdateContract(List<Contrato> contratos)  {
+	/*Metodo para contar os contratos atualizados e salvos
+	@param contratos List<> - lista contendo os contratos
+	@return HashMap<string,integer> - contagem de contratos salvos e atualizados
+	*/
+	private HashMap<String, Integer> saveAndUpdateCount(List<Contrato> contratos)  {
 		int update = 0;
 		int save = 0;
 		Optional<Contrato> findContrato = null;
@@ -176,9 +208,11 @@ public class ContratoService {
 				findContrato.get().setNomePaciente(contratos.get(i).getNomePaciente());
 				findContrato.get().calcularValorTotal();
 				findContrato.get().setValorTotal(contratos.get(i).getValorTotal());
+			
+					
 				this.repository.save(findContrato.get());
-				
 				update += 1;
+					
 			}
 			else {
 				this.repository.save(contratos.get(i));
