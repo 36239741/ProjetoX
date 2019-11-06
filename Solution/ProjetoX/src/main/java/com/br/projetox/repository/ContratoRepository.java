@@ -24,5 +24,19 @@ public interface ContratoRepository extends JpaRepository<Contrato, Long> {
 	@Query("FROM Contrato contrato "
 			+ "WHERE ( lower(contrato.numero) LIKE '%' || lower(:numero) || '%' OR :numero IS NULL) AND "
 			+ "( lower(contrato.nomePaciente) LIKE '%' || lower(:nomePaciente) || '%' OR :nomePaciente IS NULL)")
-	public Page<Contrato> findByFilters(@Param("numero") String numero, @Param("nomePaciente") String nomePaciente, Pageable pageable);
+	public Page<Contrato> findByFilters(@Param("numero") String numero,
+			@Param("nomePaciente") String nomePaciente,
+			Pageable pageable);
+	
+	@Query("FROM Contrato contrato "
+			+ "WHERE ( lower(contrato.numero) LIKE '%' || lower(:numero) || '%' OR :numero IS NULL) AND "
+			+ "( lower(contrato.nomePaciente) LIKE '%' || lower(:nomePaciente) || '%' OR :nomePaciente IS NULL) AND "
+			+ "contrato.ativo = :ativo")
+	public Page<Contrato> findByFiltersParamActive(@Param("numero") String numero,
+			@Param("nomePaciente") String nomePaciente,
+			Pageable pageable, @Param("ativo") Boolean ativo);
+	
+	@Query("SELECT COUNT(*) FROM Contrato contrato "
+			+ "WHERE contrato.ativo = true")
+	public Integer findActiveContractNumber();
 }

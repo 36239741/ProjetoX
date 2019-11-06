@@ -5,6 +5,14 @@
     (filtro)="filterNomePaciente($event)"
     placeholder="Nome do Paciente">
   </app-filter>
+<mat-form-field fxLayoutAlign="center">
+  <mat-label>Status do contrato</mat-label>
+  <mat-select ([value])="statusContrato" (selectionChange)="filterContratoStatusContrato($event)">
+    <mat-option *ngFor="let statusContrato of statuContrato" [value]="statusContrato.value">
+      {{statusContrato.viewValue}}
+    </mat-option>
+  </mat-select>
+</mat-form-field>
   <div fxLayoutAlign="end center" class="import">
    <app-import-button (click)="openModalImport($event)"></app-import-button>
   </div>
@@ -17,10 +25,15 @@
     [style.height.%]="100"
     (rowClick)="rowClick($event)"
     [clickable]="true"
-    [sortOrder]="'ASC'"
-  >
+    (sortChange)="sort($event)"
+    [sortOrder]="sortOrder"
+    [sortBy]="sortBy">
+    <ng-template tdDataTableTemplate="ativo" let-value="value" let-row="row" let-column="column" >
+      <div fxLayout="row" >
+        <span  flex [style.color]="value === true ? 'green' : 'red'">{{ value === true ? 'Ativo' : 'Inativo'}}</span>
+      </div>
+    </ng-template>
   </td-data-table>
-
   <div
     class="md-padding"
     *ngIf="!dataTable.hasData"
@@ -34,7 +47,8 @@
     [pageSize]="pageSize"
     [total]="total"
     (change)="changePageSize($event)"
-  >
+    fxLayoutAlign="center center"
+    >
     <span hide-xs>Linhas por linha:</span>
     <mat-select [style.width.px]="50" [(value)]="pageSize">
       <mat-option *ngFor="let size of [10, 20, 30]" [value]="size">
@@ -45,5 +59,11 @@
       >{{ pagingBarPageSize.range }}
       <span hide-xs>of {{ pagingBarPageSize.total }}</span></span
     >
-  </td-paging-bar>
+   </td-paging-bar>
+
+</div>
+<div fxLayout="column" fxLayoutAlign="center center" >
+    <h3>Total de contratos ativos</h3>
+    <span>{{ numeroContratosAtivos }}</span>
+
 </div>

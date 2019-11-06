@@ -1,7 +1,7 @@
 import { ContratoService } from './../Services/contrato.service';
 import { Injectable } from '@angular/core';
 
-import { Resolve, Route } from '@angular/router';
+import { Resolve } from '@angular/router';
 import { Observable } from 'rxjs';
 import { Contrato } from '../model/Contrato';
 

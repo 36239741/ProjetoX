@@ -5,6 +5,7 @@ import { ContratosComponent } from './contratos.component';
 import { DetatalharContratosComponent } from './detalhar-contratos/detatalhar-contratos.component';
 import { ContratoResolverResolve } from '../../shared/resolvers/contrato-resolver.resolve';
 import { ContratoResolveFindByNumeroResolve } from '../../shared/resolvers/contrato-resolve-find-by-numero';
+import { findActiveContractNumberResolve } from '../../shared/resolvers/find-active-contract-number';
 
 
 
@@ -14,7 +15,9 @@ const routes: Routes = [
   children: [
     {path: '', component: VisualizarContratosComponent,
     data: {breadcrumb: 'Visualizar Contratos',},
-    resolve: {contratos : ContratoResolverResolve}},
+    resolve: {contratos : ContratoResolverResolve,
+             contratosAtivos : findActiveContractNumberResolve},
+            },
 
     {path: 'detalhar/:id', component: DetatalharContratosComponent,
     data: {breadcrumb: 'Detalhar Contrato'},

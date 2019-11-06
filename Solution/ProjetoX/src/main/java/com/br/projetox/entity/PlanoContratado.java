@@ -12,6 +12,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 import lombok.AllArgsConstructor;
@@ -51,7 +52,10 @@ public class PlanoContratado extends AbstractEntity implements Serializable{
 	private int sessao;
 	
 
-	@OneToMany(targetEntity = DiaConsulta.class,cascade = {CascadeType.MERGE,CascadeType.PERSIST},fetch = FetchType.EAGER)
+	@OneToMany(targetEntity = DiaConsulta.class,cascade = {
+			CascadeType.PERSIST,
+			CascadeType.MERGE,
+			CascadeType.REMOVE},fetch = FetchType.EAGER)
 	private List<DiaConsulta>  diaConsulta = new ArrayList<DiaConsulta>();
 	
 	@Enumerated(EnumType.ORDINAL)
@@ -60,14 +64,18 @@ public class PlanoContratado extends AbstractEntity implements Serializable{
 	@ManyToOne(targetEntity = Servico.class,optional = false,fetch = FetchType.EAGER)
 	private Servico servico;
 	
-	@ManyToOne(targetEntity = Contrato.class,optional = false,fetch = FetchType.LAZY)
+	@ManyToOne(targetEntity = Contrato.class,optional = true,fetch = FetchType.LAZY)
 	private Contrato contrato;
 	
 	private Boolean ativo = true;
+	
 
 	public void calcularValorSessao() {
 		this.valorPlano = this.valorTotal / this.sessao;
 	}
+	
+
+			
 	
 
 

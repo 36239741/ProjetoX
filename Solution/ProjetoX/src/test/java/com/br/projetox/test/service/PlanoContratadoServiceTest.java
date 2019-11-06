@@ -26,6 +26,7 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 	@Autowired 
 	private ServicoRepository servicoRepository;
 	
+										/*VERIFICA A BUSCA DE UM PLANO CONTRATADO*/
 	@WithUserDetails("henrique_nitatori@hotmail.com")
 	@Sql({	"/dataset/truncate.sql",
 			"/dataset/Usuario.sql",
@@ -43,6 +44,8 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 		Assert.assertNotNull(plano.getId());
 	}
 	
+
+	
 										/* VERIFICA O RETORNO DE LISTA DE PLANO CONTRATADO */
 	@WithUserDetails("henrique_nitatori@hotmail.com")
 	@Sql({	"/dataset/truncate.sql",
@@ -53,7 +56,7 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 	@Test
 	public void findbyContractIdTestMustPassVerificandoABuscaPorContrato()  {
 		final Long contratoId = 1L;
-		List<PlanoContratado> planoContratado = this.planoContratoService.findbyContractId(contratoId);
+		List<PlanoContratado> planoContratado = this.planoContratoService.findByContractId(contratoId);
 		
 		Assert.assertNotNull(planoContratado);
 		Assert.assertEquals(1, planoContratado.size());

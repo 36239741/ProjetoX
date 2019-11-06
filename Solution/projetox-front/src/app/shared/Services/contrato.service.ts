@@ -3,8 +3,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { map, catchError } from 'rxjs/operators';
 import { Observable, throwError } from 'rxjs';
-import { PageContrato } from '../model/page-contrato';
-import { Contrato } from '../model/Contrato';
+import { Contrato, PageContrato } from '../model/Contrato';
 import { FeedBack } from '../model/feedBack';
 
 
@@ -34,8 +33,15 @@ export class ContratoService {
         'Something bad happened; please try again later.');
     };
 
-  findAllContratos(page:number , size:number ): Observable<PageContrato>{
-    return this.httpClient.get<PageContrato>(API_URL + '/contratos?page='+ page + "&size=" + size).pipe(
+  findActiveContractNumber(): Observable<Number>{
+    return this.httpClient.get<Number>(API_URL + '/contratos/contratos-ativos').pipe(
+      map((data : Number) => data),
+      catchError(this.handleError)
+    );
+  }
+
+  findAllContratos(page:number , size:number, sort:string, atributo:string ): Observable<PageContrato>{
+    return this.httpClient.get<PageContrato>(API_URL + '/contratos?page='+ page + "&size=" + size + "&sort="+ sort + "&atributo=" + atributo).pipe(
      map((data: PageContrato) => data),
      catchError(this.handleError)
 
@@ -47,9 +53,9 @@ export class ContratoService {
       catchError(this.handleError)
     );
   }
-  findByFilters(nome: String, numero: String, page: number, size: number): Observable<PageContrato>{
+  findByFilters(nome: String, numero: String, page: number, size: number, statusContrato: boolean): Observable<PageContrato>{
     return this.httpClient.get<PageContrato>(API_URL + '/contratos/filter?nomePaciente=' + nome +
-    '&numero=' + numero + '&page=' + page + '&size=' + size ).pipe(map((data: PageContrato) => data),
+    '&numero=' + numero + '&ativo=' + statusContrato + '&page=' + page + '&size=' + size ).pipe(map((data: PageContrato) => data),
     catchError(this.handleError));
   }
 

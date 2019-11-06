@@ -3,8 +3,9 @@
   [data]="data['0']"
   [columns]="columns"
   [clickable]="false"
-  [style.height.px]="200"
   [style.height.%]="100"
+  [style.width.%]="100"
+  [sortOrder]="'ASC'"
   class="table">
   <ng-template tdDataTableTemplate="acoes" let-value="value" let-row="row" let-column="column">
       <div fxLayout="row" fxLayoutAlign='center center' fxLayoutGap="5px">
@@ -17,3 +18,5 @@
 <div class="md-padding" *ngIf="!dataTable.hasData" fxLayout="row" fxLayoutAlign="center center">
   <h3>Nenhum Serviço Econtrado</h3>
 </div>
+
+

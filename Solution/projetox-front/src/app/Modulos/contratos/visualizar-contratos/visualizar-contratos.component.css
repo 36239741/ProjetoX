@@ -1,12 +1,13 @@
 *{
   font-size: 1.05em;
 }
-td-data-table{
-  height: 100%;
-}
 .filter{
  width: 100%;
 }
 .import{
   width: 100%;
+}
+.contratosAtivosContainer{
+  width: 100%;
+  height: 130px;
 }

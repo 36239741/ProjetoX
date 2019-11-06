@@ -8,16 +8,13 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -55,8 +52,14 @@ public class Contrato extends AbstractEntity implements Serializable {
 	private Byte[] biometria;
 	
 	@JsonIgnoreProperties("contrato")
-	@OneToMany(targetEntity = PlanoContratado.class,cascade = {CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.MERGE}, fetch = FetchType.LAZY)
+	@OneToMany(targetEntity = PlanoContratado.class,cascade = {CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.MERGE}, fetch = FetchType.LAZY,mappedBy = "contrato")
 	private List<PlanoContratado> planoContratado = new ArrayList<PlanoContratado>();
+	
+	private Boolean ativo = true;
+	
+	@Transient
+	private TipoContrato tipoContratoTransient;
+
 	
 	public void calcularValorTotal() {
 		this.valorTotal = 0.0;
@@ -69,6 +72,25 @@ public class Contrato extends AbstractEntity implements Serializable {
 		this.planoContratado.clear();
 	}
 	
+    
+	public TipoContrato getTipoContratoTransient() {
+		int contratoPlanoParticular = 0;
+		int contratoPlano = 0;
+		for(PlanoContratado planoContratao: this.planoContratado) {
+			if(planoContratao.getTipoContrato().equals(TipoContrato.PLANO)) {
+				this.tipoContratoTransient = TipoContrato.PLANO;
+				contratoPlano = 1;
+			}
+			else if(planoContratao.getTipoContrato().equals(TipoContrato.PARTICULAR)){
+				this.tipoContratoTransient = TipoContrato.PARTICULAR;
+				contratoPlanoParticular = 1;
+			}
+		}
+		if (contratoPlanoParticular == 1 && contratoPlano == 1) {
+			this.tipoContratoTransient = TipoContrato.MISTO;
+		}
+		return this.tipoContratoTransient;
+	}
 
 	
 	

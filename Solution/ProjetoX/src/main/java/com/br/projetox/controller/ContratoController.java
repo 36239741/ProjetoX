@@ -9,6 +9,7 @@ import org.directwebremoting.io.FileTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,7 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.br.projetox.entity.Contrato;
 import com.br.projetox.service.ContratoService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javassist.NotFoundException;
 
@@ -32,13 +32,23 @@ public class ContratoController {
 	@Autowired
 	private ContratoService service;
 	
+	
+	
+	@GetMapping(path = "/contratos-ativos")
+	public ResponseEntity<Integer> findActiveContractNumber(){
+		return ResponseEntity.ok(this.service.findActiveContractNumber());
+	}
 	@GetMapping
-	public ResponseEntity<Page<Contrato>> findAll(@RequestParam(name = "page" , required = true) Integer page , @RequestParam(name = "size",required = true)
-	Integer size){
+	public ResponseEntity<Page<Contrato>> findAll(@RequestParam(name = "page" , required = true) Integer page ,
+			@RequestParam(name = "size",required = true)Integer size, @RequestParam(name = "sort") String sort,
+			@RequestParam(name = "atributo") String atributo){
 		Page<Contrato> returnPage = null;
-		returnPage = this.service.findAll(page, size);
+		Direction direction =null;
+		direction = sort.trim().equals("ASC")? Direction.ASC : Direction.DESC;
+		returnPage = this.service.findAll(page, size,direction,atributo);
 		return ResponseEntity.ok(returnPage);
-}
+	}
+	
 	@GetMapping(path = "/{numeroContrato}")
 	public ResponseEntity<Contrato> findBynumeroContrato(@Valid @PathVariable String numeroContrato) throws NotFoundException{
 		Contrato contrato = null;
@@ -49,8 +59,17 @@ public class ContratoController {
 	@GetMapping(path = "/filter")
 	public ResponseEntity<Page<Contrato>> findByFilters(@RequestParam(name = "numero") String numero,
 			@RequestParam(name = "nomePaciente") String nomePaciente, @RequestParam(name = "page") int page,
-			@RequestParam(name = "size") int size){
-			Page<Contrato> pageable = this.service.findByFilters(numero, nomePaciente, PageRequest.of(page, size));
+			@RequestParam(name = "size") int size, @RequestParam(name = "ativo") String ativo){
+		Page<Contrato> pageable = null;
+		if(ativo.equals("true") || ativo.equals("false")) {
+			pageable = this.service.findByFiltersParamActive(numero,
+					nomePaciente, 
+					PageRequest.of(page, size), 
+					Boolean.parseBoolean(ativo));
+		}
+		else {
+			pageable = this.service.findByFilters(numero, nomePaciente, PageRequest.of(page, size));
+		}
 		return ResponseEntity.ok(pageable);
 	}
 	@PostMapping

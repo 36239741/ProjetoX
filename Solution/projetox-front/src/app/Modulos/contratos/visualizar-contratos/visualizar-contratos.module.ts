@@ -12,7 +12,6 @@ import { ImportModuleButton } from './import/importButton/import-button.module';
 import { ImportModule } from './import/import.module';
 
 
-
 @NgModule({
   declarations: [VisualizarContratosComponent],
   imports: [

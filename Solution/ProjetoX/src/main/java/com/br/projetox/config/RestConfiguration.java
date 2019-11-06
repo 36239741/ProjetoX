@@ -16,13 +16,12 @@ public class RestConfiguration implements Jackson2ObjectMapperBuilderCustomizer 
 	public void customize(Jackson2ObjectMapperBuilder jacksonObjectMapperBuilder) {
 		
 	    Hibernate5Module hibernateModule = new Hibernate5Module();
-
 	    hibernateModule.configure(Feature.FORCE_LAZY_LOADING, true);
-
+	    hibernateModule.configure(Feature.USE_TRANSIENT_ANNOTATION, false);
 	    jacksonObjectMapperBuilder.modules(hibernateModule);
-	    
 	    jacksonObjectMapperBuilder.featuresToDisable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 	    jacksonObjectMapperBuilder.featuresToDisable(MapperFeature.DEFAULT_VIEW_INCLUSION);
+	    
 		
 	}
 

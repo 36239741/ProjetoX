@@ -20,6 +20,7 @@
       nomePaciente: string;
       valorTotal: number;
       biometria?: any;
+      tipoContratoTransient: string;
       planoContratado: PlanoContratado[];
   }
 
@@ -44,7 +45,7 @@
       empty: boolean;
   }
 
-  export interface RootObject {
+  export interface PageContrato {
       contrato: Contrato[];
       pageable: Pageable;
       totalElements: number;

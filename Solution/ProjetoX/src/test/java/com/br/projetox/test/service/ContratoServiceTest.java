@@ -1,7 +1,12 @@
 package com.br.projetox.test.service;
 
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.apache.poi.util.IOUtils;
@@ -9,10 +14,14 @@ import org.directwebremoting.io.FileTransfer;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
+import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.transaction.TransactionSystemException;
 
 import com.br.projetox.entity.Contrato;
+import com.br.projetox.entity.DiaConsulta;
+import com.br.projetox.entity.DiasSemana;
 import com.br.projetox.entity.PlanoContratado;
 import com.br.projetox.entity.Servico;
 import com.br.projetox.entity.TipoContrato;
@@ -37,15 +46,14 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	@Autowired
 	private ServicoRepository serviceRepository;
 	
+  
+	
 	
 	/*
 	 * ==================== TESTES DE IMPORTAÇÃO DA PLANILHA ==============================
 	 */
 	
 	/*Fazer testes que verifiquem:
-	# quantos contratos foram criados, tanto pelo map de retorno como pelo repositório
-	# quantos contratos foram atualizados, tanto pelo map de retorno como pelo repositório
-	# quantos planos há após import da planilha
 	# erros diversos, como: planilha mal preenchida, sem alguns valores importantes por exemplo
 	*/
 	
@@ -64,16 +72,70 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 		Assert.assertEquals(2, contratos.size());
 	}
 	
-								/* TESTE PARA VERIFICAR A ATUALIZACAO DO PLANO CONTRATADO UTILIZANDO CAMPO SESSAO*/
+					/*TESTE PARA VERIFICAR O RETORNO DO MAP ,VERIFICANDO O NUMERO DE CONTRATOS SALVOS*/
+		@Sql({"/dataset/truncate.sql",
+			"/dataset/Servico.sql"})
+	@Test
+	public void importPlanilhaContratosTestMustPassVerificandoContratosSalvos() throws Exception  {
+		FileInputStream fileInputStream = new FileInputStream( "/home/henrique/Documentos/GitHub/ProjetoX/Docs/PlanilhaDeDados.xlsx" );
+		byte[] arquivoBytes = IOUtils.toByteArray( fileInputStream );
+		HashMap<String, Integer> map = null;
+		map = this.service.importPlanilhaContratos(new FileTransfer( "PlanilhaDeDados.xlsx", "xls", arquivoBytes ));
+		final int saveContrato = 2;
+		
+		Assert.assertNotNull(map);
+		Assert.assertEquals(map.get("save").intValue(), saveContrato);
+	}
+		
+		/*TESTE QUE VERIFICA QUANTOS CONTRATOS FORAM ATUALIZADOS*/
+		@Sql({"/dataset/truncate.sql",
+			"/dataset/Servico.sql",
+			"/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql"})
+	@Test
+	public void importPlanilhaContratosTestMustPassVerificandoContratosAtualizados() throws Exception  {
+		FileInputStream fileInputStream = new FileInputStream( "/home/henrique/Documentos/GitHub/ProjetoX/Docs/PlanilhasDeTeste/importPlanilhaContratosTestMustPassVerificandoContratosAtualizados.xlsx" );
+		byte[] arquivoBytes = IOUtils.toByteArray( fileInputStream );
+		HashMap<String, Integer> map = null;
+		map = this.service.importPlanilhaContratos(new FileTransfer( "importPlanilhaContratosTestMustPassVerificandoContratosAtualizados.xlsx", "xls", arquivoBytes ));
+		final int updateContrato = 1;
+		final int saveContrato = 1;
+
+		
+		
+		Assert.assertNotNull(map);
+		Assert.assertEquals(map.get("update").intValue(), updateContrato);
+		Assert.assertEquals(map.get("save").intValue(), saveContrato);
+
+	}
+		/*TESTE QUE VERIFICA QUANTOS CONTRATOS FORAM ATUALIZADOS*/
+		@Sql({"/dataset/truncate.sql",
+			"/dataset/Servico.sql",})
+	@Test
+	public void importPlanilhaContratosTestMustPassVerificandoPlanosContratados() throws Exception  {
+		FileInputStream fileInputStream = new FileInputStream( "/home/henrique/Documentos/GitHub/ProjetoX/Docs/PlanilhasDeTeste/importPlanilhaContratosTestMustPassVerificandoPlanosContratados.xlsx" );
+		byte[] arquivoBytes = IOUtils.toByteArray( fileInputStream );
+		final int numerosPlanosContratados = 14;
+		this.service.importPlanilhaContratos(new FileTransfer( "importPlanilhaContratosTestMustPassVerificandoPlanosContratados.xlsx", "xls", arquivoBytes ));
+
+		List<PlanoContratado> listPlanoContratado = this.planoContratadoRepository.findAll();
+		
+		
+		Assert.assertNotNull(listPlanoContratado);
+		Assert.assertEquals(numerosPlanosContratados, listPlanoContratado.size());
+
+	}
+	
+								/* TESTE PARA VERIFICAR A ATUALIZACAO DO PLANO CONTRATADO UTILIZANDO CAMPO SESSAO E O CAMPO SERVICO*/
 	@Sql({	"/dataset/truncate.sql",
 			"/dataset/Servico.sql",
 			"/dataset/Contrato.sql",
 			"/dataset/PlanoContratado.sql"})
 	@Test
 	public void importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratado() throws Exception  {
-		FileInputStream fileInputStream = new FileInputStream( "/home/henrique/Documentos/GitHub/ProjetoX/Docs/PlanilhaTest.xlsx" );
+		FileInputStream fileInputStream = new FileInputStream( "/home/henrique/Documentos/GitHub/ProjetoX/Docs/PlanilhasDeTeste/importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratado.xlsx" );
 		byte[] arquivoBytes = IOUtils.toByteArray( fileInputStream );
-		this.service.importPlanilhaContratos(new FileTransfer( "PlanilhaDeDados.xlsx", "xls", arquivoBytes ));
+		this.service.importPlanilhaContratos(new FileTransfer( "importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratado.xlsx", "xls", arquivoBytes ));
 		
 		final Optional<Contrato> contrato =  this.contratoRepository.findByNumero("1");
 		Assert.assertNotNull(contrato.get());
@@ -95,33 +157,277 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 		
 	}
 	
-	/*
-	 * ==================== TESTES DE .... ==============================
-	 */
+							/* TESTE PARA VERIFICAR A ATUALIZACAO DO PLANO CONTRATADO UTILIZANDO CAMPO ENTRADA E SAIDA PADRAO*/
+	@Sql({	"/dataset/truncate.sql",
+	"/dataset/Servico.sql",
+	"/dataset/Contrato.sql",
+	"/dataset/PlanoContratado.sql"})
 	@Test
-	public void testFindAllMustPass() {
-		Page<Contrato> page = null;
-		page = this.service.findAll(0,1);
-		Assert.assertNotNull(page);
+	public void importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoPeloCampoEntradaESaida() throws Exception  {
+	FileInputStream fileInputStream = new FileInputStream( "/home/henrique/Documentos/GitHub/ProjetoX/Docs/PlanilhasDeTeste/importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoPeloCampoEntradaESaida.xlsx" );
+	byte[] arquivoBytes = IOUtils.toByteArray( fileInputStream );
+	this.service.importPlanilhaContratos(new FileTransfer( "importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoPeloCampoEntradaESaida.xlsx", "xls", arquivoBytes ));
+	
+	final Optional<Contrato> contrato =  this.contratoRepository.findByNumero("1");
+	Assert.assertNotNull(contrato.get());
+	
+	final int contratoId = 1;
+	final LocalTime horaDeEntrada = LocalTime.parse("09:00");
+	final LocalTime horaSaida = LocalTime.parse("09:40");
+	final String servico = "Neuropsicopedagogia";
+	final TipoContrato tipoContrato = TipoContrato.PARTICULAR;
+	
+	Servico objectServico = this.serviceRepository.findByServicoIgnoreCase(servico);
+	
+	PlanoContratado planoContratado = this.planoContratadoRepository.findPlanoContratadoAtivoByContratoAndServicoAndTipoContrato(
+	objectServico.getId(),
+	contratoId, 
+	tipoContrato);	
+	
+	Assert.assertNotNull(planoContratado);
+	Assert.assertEquals(horaDeEntrada,planoContratado.getHorarioEntrada());
+	Assert.assertEquals(horaSaida, planoContratado.getHorarioSaida());
+	
 	}
+	
+				/* TESTE PARA VERIFICAR A ATUALIZACAO DO PLANO CONTRATADO UTILIZANDO CAPO VALOR TOTAL E CALCULANDO VALOR DO PLANO */
+	@Sql({	"/dataset/truncate.sql",
+	"/dataset/Servico.sql",
+	"/dataset/Contrato.sql",
+	"/dataset/PlanoContratado.sql"})
 	@Test
-	public void testFindByNumeroContratoMustPass() throws NotFoundException {
-		Contrato contrato = null;
-		String numeroContrato = "1";
-		contrato = this.service.findByContractNumber(numeroContrato);
+	public void importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoPeloCampoValorPlano() throws Exception  {
+	FileInputStream fileInputStream = new FileInputStream( "/home/henrique/Documentos/GitHub/ProjetoX/Docs/PlanilhasDeTeste/importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoPeloCampoValorPlano.xlsx" );
+	byte[] arquivoBytes = IOUtils.toByteArray( fileInputStream );
+	this.service.importPlanilhaContratos(new FileTransfer( "importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoPeloCampoValorPlano.xlsx", "xls", arquivoBytes ));
+	
+	final Optional<Contrato> contrato =  this.contratoRepository.findByNumero("1");
+	Assert.assertNotNull(contrato.get());
+	
+	final int contratoId = 1;
+	final Double valorPlano = 200.00 / 4;
+	final Double valorTotal = 200.00 ;
+	final String servico = "Neuropsicopedagogia";
+	final TipoContrato tipoContrato = TipoContrato.PARTICULAR;
+	
+	Servico objectServico = this.serviceRepository.findByServicoIgnoreCase(servico);
+	
+	PlanoContratado planoContratado = this.planoContratadoRepository.findPlanoContratadoAtivoByContratoAndServicoAndTipoContrato(
+	objectServico.getId(),
+	contratoId, 
+	tipoContrato);	
+	
+	Assert.assertNotNull(planoContratado);
+	Assert.assertEquals(valorPlano,planoContratado.getValorPlano());
+	Assert.assertEquals(valorTotal, planoContratado.getValorTotal());
+	
+	}
+	
+		/* TESTE PARA VERIFICAR A ATUALIZACAO DO PLANO CONTRATADO UTILIZANDO CAMPO DIAS SEMANA */
+	@Sql({	"/dataset/truncate.sql",
+	"/dataset/Servico.sql",
+	"/dataset/Contrato.sql",
+	"/dataset/PlanoContratado.sql",
+	"/dataset/Usuario.sql"})
+	@Test
+	public void importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoPeloCampoDiasSemana() throws Exception  {
+	FileInputStream fileInputStream = new FileInputStream( "/home/henrique/Documentos/GitHub/ProjetoX/Docs/PlanilhasDeTeste/importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoPeloCampoDiasSemana.xlsx" );
+	byte[] arquivoBytes = IOUtils.toByteArray( fileInputStream );
+	this.service.importPlanilhaContratos(new FileTransfer( "importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoPeloCampoDiasSemana.xlsx", "xls", arquivoBytes ));
+	
+	final Optional<Contrato> contrato =  this.contratoRepository.findByNumero("1");
+	Assert.assertNotNull(contrato.get());
+	final List<DiaConsulta> diasSemana = new ArrayList<DiaConsulta>();
+	DiaConsulta dia1 = new DiaConsulta();
+	dia1.setDiasSemana(DiasSemana.SEGUNDA);
+	DiaConsulta dia2 = new DiaConsulta();
+	dia2.setDiasSemana(DiasSemana.TERCA);
+	diasSemana.add(dia1);
+	diasSemana.add(dia2);
+	final int contratoId = 1;
+	
+	final String servico = "Neuropsicopedagogia";
+	final TipoContrato tipoContrato = TipoContrato.PARTICULAR;
+	
+	Servico objectServico = this.serviceRepository.findByServicoIgnoreCase(servico);
+	
+	PlanoContratado planoContratado = this.planoContratadoRepository.findPlanoContratadoAtivoByContratoAndServicoAndTipoContrato(
+	objectServico.getId(),
+	contratoId, 
+	tipoContrato);	
+	
+	
+	Assert.assertNotNull(planoContratado);
+	Assert.assertEquals(diasSemana.toString(), planoContratado.getDiaConsulta().toString());
+
+	
+	}
+	/* TESTE PARA VERIFICAR A ATUALIZACAO DO PLANO CONTRATADO REMOVENDO DIAS DA SEMANA*/
+	@Sql({	"/dataset/truncate.sql",
+	"/dataset/Servico.sql",
+	"/dataset/Contrato.sql",
+	"/dataset/PlanoContratado.sql",
+	"/dataset/Usuario.sql"})
+	@Test
+	public void importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoRemovendoDiaDaSemana() throws Exception  {
+	FileInputStream fileInputStream = new FileInputStream( "/home/henrique/Documentos/GitHub/ProjetoX/Docs/PlanilhasDeTeste/importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoRemovendoDiaDaSemana.xlsx" );
+	byte[] arquivoBytes = IOUtils.toByteArray( fileInputStream );
+	this.service.importPlanilhaContratos(new FileTransfer( "importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoRemovendoDiaDaSemana.xlsx", "xls", arquivoBytes ));
+	
+	final Optional<Contrato> contrato =  this.contratoRepository.findByNumero("2");
+	Assert.assertNotNull(contrato.get());
+	final List<DiaConsulta> diasSemana = new ArrayList<DiaConsulta>();
+	DiaConsulta dia1 = new DiaConsulta();
+	dia1.setDiasSemana(DiasSemana.SEGUNDA);
+	diasSemana.add(dia1);
+	final String servico = "Fonoaudiologia";
+	final TipoContrato tipoContrato = TipoContrato.PLANO;
+	
+	Servico objectServico = this.serviceRepository.findByServicoIgnoreCase(servico);
+	
+	PlanoContratado planoContratado = this.planoContratadoRepository.findPlanoContratadoAtivoByContratoAndServicoAndTipoContrato(
+	objectServico.getId(),
+	contrato.get().getId(), 
+	tipoContrato);	
+	
+	
+	Assert.assertNotNull(planoContratado);
+	Assert.assertEquals(diasSemana.toString(), planoContratado.getDiaConsulta().toString());
+
+	
+	}
+		/* TESTE PARA VERIFICAR PARA VERIFICAR A PERFORMACE DE IMPORTACAO DA PLANILHA */
+	@Sql({	"/dataset/truncate.sql",
+	"/dataset/Servico.sql",
+	"/dataset/Contrato.sql",
+	"/dataset/PlanoContratado.sql"})
+	@Test
+	public void importPlanilhaContratosTestMustPassVerificandoPerformaceDeImporatacao() throws Exception  {
+	FileInputStream fileInputStream = new FileInputStream( "/home/henrique/Documentos/GitHub/ProjetoX/Docs/PlanilhasDeTeste/importPlanilhaContratosTestMustPassVerificandoPerformaceDeImporatacao.xlsx" );
+	byte[] arquivoBytes = IOUtils.toByteArray( fileInputStream );
+	this.service.importPlanilhaContratos(new FileTransfer( "importPlanilhaContratosTestMustPassVerificandoPerformaceDeImporatacao.xlsx", "xls", arquivoBytes ));
+	final int numerosContratosInseridos = 11;
+	
+	List<Contrato> list = this.contratoRepository.findAll();
+	Assert.assertNotNull(list);
+	Assert.assertEquals(numerosContratosInseridos, list.size());
+	
+	}
+	/*TESTE QUE VERIFICA O TIPO DE RETORNO MISTO DO ATRIBUTO planoContratadoTransient*/
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({	"/dataset/truncate.sql",
+			"/dataset/Usuario.sql",
+			"/dataset/Servico.sql",
+			"/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql"})
+	@Test
+	public void ContratoMustPassVerificandoRetornoTipoPlanoCotratadoTransientTipoMisto() throws NotFoundException {
+		final TipoContrato tipoContrato = TipoContrato.MISTO;
+		
+		final Optional<Contrato> contrato = this.contratoRepository.findByNumero("1");
+		
 		Assert.assertNotNull(contrato);
-		Assert.assertEquals(numeroContrato, contrato.getNumero());
+		Assert.assertEquals(tipoContrato, contrato.get().getTipoContratoTransient());
 	}
+	/*TESTE QUE VERIFICA O TIPO DE RETORNO MISTO DO ATRIBUTO planoContratadoTransient*/
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({	"/dataset/truncate.sql",
+			"/dataset/Usuario.sql",
+			"/dataset/Servico.sql",
+			"/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql"})
+	@Test
+	public void ContratoMustPassVerificandoAdicionandoPlanoContratadoEmContratoExistene() throws Exception {
+		FileInputStream fileInputStream = new FileInputStream( "/home/henrique/Documentos/GitHub/ProjetoX/Docs/PlanilhasDeTeste/ContratoMustPassVerificandoAdicionandoPlanoContratadoEmContratoExistene.xlsx" );
+		byte[] arquivoBytes = IOUtils.toByteArray( fileInputStream );
+		final HashMap<String, Integer> map =this.service.importPlanilhaContratos(new FileTransfer( "ContratoMustPassVerificandoAdicionandoPlanoContratadoEmContratoExistene.xlsx", "xls", arquivoBytes ));
+		
+		
+		Assert.assertNotNull(map);
+
+	}
+	
+	/*TESTE QUE VERIFICA O TIPO DE RETORNO MISTO DO ATRIBUTO planoContratadoTransient*/
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({	"/dataset/truncate.sql",
+			"/dataset/Usuario.sql",
+			"/dataset/Servico.sql",
+			"/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql"})
+	@Test
+	public void ContratoMustPassVerificandoNumerosDeContratosAtivos() throws Exception {
+		FileInputStream fileInputStream = new FileInputStream( "/home/henrique/Documentos/GitHub/ProjetoX/Docs/PlanilhasDeTeste/importPlanilhaContratosTestMustPassVerificandoPerformaceDeImporatacao.xlsx" );
+		byte[] arquivoBytes = IOUtils.toByteArray( fileInputStream );
+		this.service.importPlanilhaContratos(new FileTransfer( "importPlanilhaContratosTestMustPassVerificandoPerformaceDeImporatacao.xlsx", "xls", arquivoBytes ));
+
+		final Integer numeroContratosAtivos = 10;
+		final Integer contratosAtivos = this.service.findActiveContractNumber();
+		
+		Assert.assertNotNull(contratosAtivos);
+		Assert.assertEquals(numeroContratosAtivos, contratosAtivos);
+	}
+
 	
 														/*MUST FAIL*/
 	
-	
-	@Test(expected = NotFoundException.class)
-	public void TestFindByNumeroContratoMustFail() throws NotFoundException {
-		Contrato contrato = null;
-		String numeroContrato = "2";
-		contrato = this.service.findByContractNumber(numeroContrato);
-		Assert.assertNotNull(contrato);
+		/* TESTE PARA VERIFICAR A FALHA QUE OCORRE QUANDO A PLANILHA ESTA INCOMPLETA FALTANDO DIAS DA SEMANA */
+	@Sql({	"/dataset/truncate.sql",
+	"/dataset/Servico.sql",
+	"/dataset/Contrato.sql",
+	"/dataset/PlanoContratado.sql"})
+	@Test(expected = NullPointerException.class)
+	@Rollback(false)
+	public void importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletaDiasSemanaFaltando() throws Exception  {
+	FileInputStream fileInputStream = new FileInputStream( "/home/henrique/Documentos/GitHub/ProjetoX/Docs/PlanilhasDeTeste/importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletaDiasSemanaFaltando.xlsx" );
+	byte[] arquivoBytes = IOUtils.toByteArray( fileInputStream );
+	this.service.importPlanilhaContratos(new FileTransfer( "importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletaDiasSemanaFaltando.xlsx", "xls", arquivoBytes ));
 
+}
+		/* TESTE PARA VERIFICAR A FALHA QUE OCORRE QUANDO A PLANILHA ESTA INCOMPLETA FALTANDO HORARIO DE SAIDA PADRAO */
+	@Sql({	"/dataset/truncate.sql",
+	"/dataset/Servico.sql",
+	"/dataset/Contrato.sql",
+	"/dataset/PlanoContratado.sql"})
+	@Test(expected = NumberFormatException.class)
+	@Rollback(false)
+	public void importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletasFaltandoSaidaPadrao() throws Exception  {
+	FileInputStream fileInputStream = new FileInputStream( "/home/henrique/Documentos/GitHub/ProjetoX/Docs/PlanilhasDeTeste/importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletasFaltandoSaidaPadrao.xlsx" );
+	byte[] arquivoBytes = IOUtils.toByteArray( fileInputStream );
+	this.service.importPlanilhaContratos(new FileTransfer( "importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletasFaltandoSaidaPadrao.xlsx", "xls", arquivoBytes ));
+	
+	}
+		/* TESTE PARA VERIFICAR A FALHA QUE OCORRE QUANDO A PLANILHA ESTA INCOMPLETA FALTANDO VALOR DO PLANO */
+	@Sql({	"/dataset/truncate.sql",
+	"/dataset/Servico.sql",
+	"/dataset/Contrato.sql",
+	"/dataset/PlanoContratado.sql"})
+	@Test(expected = NumberFormatException.class)
+	@Rollback(false)
+	public void importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletasFaltandoValorDoPlano() throws Exception  {
+	FileInputStream fileInputStream = new FileInputStream( "/home/henrique/Documentos/GitHub/ProjetoX/Docs/PlanilhasDeTeste/importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletasFaltandoSaidaPadrao.xlsx" );
+	byte[] arquivoBytes = IOUtils.toByteArray( fileInputStream );
+	this.service.importPlanilhaContratos(new FileTransfer( "importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletasFaltandoValorDoPlano.xlsx", "xls", arquivoBytes ));
+	
+	}
+		/* TESTE PARA VERIFICAR A FALHA QUE OCORRE QUANDO A PLANILHA ESTA INCOMPLETA FALTANDO NOME PACIENTE */
+	@Sql({	"/dataset/truncate.sql",
+	"/dataset/Servico.sql",
+	"/dataset/Contrato.sql",
+	"/dataset/PlanoContratado.sql"})
+	@Test()
+	@Rollback(false)
+	public void importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletasFaltandoNomePaciente() throws Exception  {
+	FileInputStream fileInputStream = new FileInputStream( "/home/henrique/Documentos/GitHub/ProjetoX/Docs/PlanilhasDeTeste/importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletasFaltandoNomePacient.xlsx" );
+	byte[] arquivoBytes = IOUtils.toByteArray( fileInputStream );
+	final String constraintError = "ConstraintViolationException";
+	String constraintViolaton = null;
+		try {
+			this.service.importPlanilhaContratos(new FileTransfer( "importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletasFaltandoNomePaciente.xlsx", "xls", arquivoBytes ));
+		}catch(TransactionSystemException e){
+			constraintViolaton = e.getRootCause().getClass().getSimpleName();
+		}
+		Assert.assertEquals(constraintError, constraintViolaton);
+		
+		 
 	}
 }

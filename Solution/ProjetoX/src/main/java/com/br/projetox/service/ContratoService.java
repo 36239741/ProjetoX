@@ -14,6 +14,7 @@ import org.directwebremoting.io.FileTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,20 +52,27 @@ public class ContratoService {
 	private static final Integer DIAS_SEMANA = 7;
 	private static final Integer MULTIPLICADOR_PROXIMO_SERVICO = 6;
 
-	/*Método para a busca de todos os contratos 
+	/*Método para a busca de todos os contratos com ordenacao
 	@param pageNum int -  numero da pagina
 	@param pageSize int - total de contratos retornado por pagina
+	@param direction Direction - tipo de ordenacao ASC ou DESC
+	@param atributo String - atributo da entidade que sera referencia para ordenacao
 	@return Page<contrato>
 	*/
-	@Transactional(readOnly = true)
-	public Page<Contrato> findAll(int pageNum, int pageSize) {
+	public Page<Contrato> findAll(int pageNum, int pageSize, Direction direction, String atributo  ) {
 		Page<Contrato> page = null;
-		PageRequest pageable = PageRequest.of(pageNum, pageSize);
+		PageRequest pageable = PageRequest.of(pageNum,
+				pageSize,org.springframework.data.domain.Sort.by(direction,
+						atributo));
 		page = this.repository.findAll(pageable);
-		page.forEach(data ->{
-			data.clearToList();
-		});
+		page.forEach(data -> data.clearToList());
 		return page;
+	}
+	
+	/*Método que busca o numero de contratos ativo
+	@return Integer*/
+	public Integer findActiveContractNumber() {
+		return this.repository.findActiveContractNumber();
 	}
 	
 	/*Método de busca que utiliza o campo numero , nomePaciente aonde pode ser utilizados em conjunto
@@ -79,6 +87,20 @@ public class ContratoService {
 		return this.repository.findByFilters(numero, nomePaciente, pageable);
 	}
 	
+	/*Método de busca que utiliza o campo numero , nomePaciente aonde pode ser utilizados em conjunto
+	 * ou separados
+	@param numero String - numero do contrato cadastrado
+	@param nomePaciente String - nome do paciente contido no contrato
+	@param pageable PageRequet - variavel que contem especificacoes de retorno
+	@param ativo boolean - variavel que delimita a busca por estado do contrato ativo ou inativo
+	@return Page<Contrato>
+	*/
+	public Page<Contrato> findByFiltersParamActive(String numero,String nomePaciente, PageRequest pageable,Boolean ativo){
+		return this.repository.findByFiltersParamActive(numero, nomePaciente, pageable, ativo);
+
+	}
+	
+	
 	/*Método para busca de contratos atraves do numero do contrato cadastrado
 	@param numeroContrato String - numero do contrato salvo
 	@return contrato
@@ -86,9 +108,9 @@ public class ContratoService {
 	*/
 	public Contrato findByContractNumber(String numeroContrato) throws NotFoundException {
 		Optional<Contrato> contrato = this.repository.findByNumero(numeroContrato);
-		contrato.orElseThrow(
+		return contrato.orElseThrow(
 				() -> new NotFoundException("Nenhum contrato encontrado com esse número de contrato:" + numeroContrato));
-		return contrato.get();
+		
 	}
 	
 	/*Método que recebe a planilha de dados e faz aas contagens das linhas e a percorre,
@@ -104,35 +126,42 @@ public class ContratoService {
 		for (int i = 1; i < numeroLinhas; i++) {
 			Row linha = sheet.getRow(i);
 			if(!(linha == null ||  linha.getCell(0) == null || linha.getCell(0).toString().equals("") )) {
-				listContrato.add(this.recoveryOfCellValues(linha));
+				listContrato.add(this.recoveryContractValues(linha));
 			}
 		}
 		workbook.close();
 		return this.saveAndUpdateCount(listContrato);
 	}
-	/*Método que recupera os valores das celulas da planilha
+	
+	/*Método que recupera os valores do contrato
 	@param linha Row - recebe as linhas das planilha
 	@return Contrato
 	*/
-	private Contrato recoveryOfCellValues(Row linha) throws NumberFormatException, NotFoundException {
+	private Contrato recoveryContractValues(Row linha) throws Exception  {
 		Contrato contrato = new Contrato();
 		Double numeroContrato = Double.parseDouble(linha.getCell(NUM_CONTRATO).toString());
 		contrato.setNumero(numeroContrato.intValue() + "");
 		contrato.setNomePaciente(linha.getCell(NOME_PACIENTE).toString());
+		
+			return recoverContractedPlans(linha, contrato);	
 
+	}
+	
+	/*Método que recupera os valores dos planos contratados
+	@param linha Row - recebe as linhas da planilha
+	@param contrato Contrato - recebe o contrato para insercao do plano
+	@return Contrato*/
+	private Contrato recoverContractedPlans(Row linha, Contrato contrato) {
+	
 		List<Servico> servicos = this.servicoService.listServicos();
-
-		/* Para cada contratado */
 		int contator = 2;
 		int atualizarNumeroCelula = 0;
 		while (!(linha.getCell(contator) == null || linha.getCell(contator).toString().equals("") )) {
-
 			PlanoContratado planoContratado = new PlanoContratado();
 			String[] planoServico = new String[2];
 			planoServico = linha.getCell(PLANO + atualizarNumeroCelula).toString().trim().split("-");
 			planoContratado.setTipoContrato(
 					(planoServico[0].trim().equals("Particular") ? TipoContrato.PARTICULAR : TipoContrato.PLANO));
-
 			for (Servico servico : servicos) {
 				if (servico.getServico().equals(planoServico[1].trim())) {
 					planoContratado.setServico(servico);
@@ -150,21 +179,22 @@ public class ContratoService {
 			String[] diasSemana = new String[7];
 			diasSemana = linha.getCell(DIAS_SEMANA + atualizarNumeroCelula).toString().trim().split(",");
 			
-			this.checkDaysOfTheWeek(diasSemana).forEach(dias -> { planoContratado.getDiaConsulta().add(dias); });
+			this.checkDaysOfTheWeek(diasSemana).forEach(dias ->  planoContratado.getDiaConsulta().add(dias) );
 			
-			contator = contator + MULTIPLICADOR_PROXIMO_SERVICO;
+			contator += MULTIPLICADOR_PROXIMO_SERVICO;
 			atualizarNumeroCelula +=  6;
 			planoContratado.setContrato(contrato);
 			contrato.getPlanoContratado().add(planoContratado);
 		}
 		contrato.calcularValorTotal();
+
 		return contrato;
 	}
 	
 	/*Método verifica os dias da semana vindo da planilha
 	@param diasSemana String[] - um array de String contendo os dias da semana informados
 	@return List<DiaConsulta>
-	@throws NullPointerException - retorna a excessao quando nao for encontrado nenhum dado compativel 
+	@throws NullPointerException - retorna a excessao quando os valores do array nao atender nenhum else if
 	com a verificacao
 	*/
 	private List<DiaConsulta> checkDaysOfTheWeek(String diasSemana[]){
@@ -194,7 +224,9 @@ public class ContratoService {
 		return listDiasConsulta;
 	}
 	
-	/*Metodo para contar os contratos atualizados e salvos
+
+	
+	/*Metodo que salva ou atualiza os contratos 
 	@param contratos List<> - lista contendo os contratos
 	@return HashMap<string,integer> - contagem de contratos salvos e atualizados
 	*/
@@ -208,11 +240,9 @@ public class ContratoService {
 				findContrato.get().setNomePaciente(contratos.get(i).getNomePaciente());
 				findContrato.get().calcularValorTotal();
 				findContrato.get().setValorTotal(contratos.get(i).getValorTotal());
-			
-					
+				checkContractedPlan(contratos, findContrato, i);
 				this.repository.save(findContrato.get());
 				update += 1;
-					
 			}
 			else {
 				this.repository.save(contratos.get(i));
@@ -225,7 +255,40 @@ public class ContratoService {
 		map.put("save", save);
 		return map;
 	}
-		
+	
+
+	/*Metodo que verifica se existe um plano contratado ja cadastrado no contrato ,se exister e le ira fazer o update
+	se nao ira salvar o novo plano
+	@param contratos List<Contratos>  - contem os contratos a serem verificados
+	@param contrato Optional<Contrato> - contem o contrato especifico para fazer a busca do plano contratado
+	@param i int - contador do for
+	@return void*/
+	private void checkContractedPlan(List<Contrato> contratos, Optional<Contrato> findContrato, int i) {
+		for(PlanoContratado planoContratado: contratos.get(i).getPlanoContratado()) {
+			Long servicoId = this.servicoService.findServico(planoContratado.getServico().getServico()).getId();
+			PlanoContratado findPlanoContratado  = this.planoContratadoService.findPlanoContratadoAtivo(
+					servicoId,
+					findContrato.get().getId(),
+					planoContratado.getTipoContrato());
+			if(findPlanoContratado != null) {
+				findPlanoContratado.setDiaConsulta(planoContratado.getDiaConsulta());
+				findPlanoContratado.setHorarioEntrada(planoContratado.getHorarioEntrada());
+				findPlanoContratado.setHorarioSaida(planoContratado.getHorarioSaida());
+				findPlanoContratado.setServico(planoContratado.getServico());
+				findPlanoContratado.setSessao(planoContratado.getSessao());
+				findPlanoContratado.setTipoContrato(planoContratado.getTipoContrato());
+				findPlanoContratado.setValorTotal(planoContratado.getValorTotal());
+				findPlanoContratado.calcularValorSessao();
+				findContrato.get().getPlanoContratado().add(findPlanoContratado);
+			}
+			else {
+				planoContratado.calcularValorSessao();
+				planoContratado.setContrato(findContrato.get());
+				findContrato.get().getPlanoContratado().add(planoContratado);
+			}
+
+		}
+	}
 		
 	
 }

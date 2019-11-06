@@ -6,7 +6,8 @@ import { ITdDataTableColumn } from '@covalent/core/data-table';
 @Component({
   selector: 'app-tabela-servicos',
   templateUrl: './tabela-servicos.component.html',
-  styleUrls: ['./tabela-servicos.component.css']
+  styleUrls: ['./tabela-servicos.component.css'],
+  preserveWhitespaces: true,
 })
 export class TabelaServicosComponent implements OnInit {
 
