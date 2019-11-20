@@ -34,10 +34,7 @@ public class ContratoController {
 	
 	
 	
-	@GetMapping(path = "/contratos-ativos")
-	public ResponseEntity<Integer> findActiveContractNumber(){
-		return ResponseEntity.ok(this.service.findActiveContractNumber());
-	}
+
 	@GetMapping
 	public ResponseEntity<Page<Contrato>> findAll(@RequestParam(name = "page" , required = true) Integer page ,
 			@RequestParam(name = "size",required = true)Integer size, @RequestParam(name = "sort") String sort,
@@ -65,7 +62,7 @@ public class ContratoController {
 			pageable = this.service.findByFiltersParamActive(numero,
 					nomePaciente, 
 					PageRequest.of(page, size), 
-					Boolean.parseBoolean(ativo));
+					Boolean.parseBoolean(ativo));	
 		}
 		else {
 			pageable = this.service.findByFilters(numero, nomePaciente, PageRequest.of(page, size));

@@ -11,6 +11,6 @@ export class PlanoContratado {
   sessao: number;
   diaConsulta: DiaConsulta[];
   tipoContrato: string;
-  servico: Servico;
+  servico?: Servico;
 }
 

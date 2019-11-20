@@ -1,9 +1,9 @@
 <td-search-input
-appearance="outline"
+appearance="legacy"
 [placeholder]="placeholder"
 clearIcon="cancel"
 [showUnderline]="true"
 [debounce]="400"
 (searchDebounce)="filterByNumeroContrato($event)"
-(clear)="searchInputTerm = ''">
+(clear)="filterByNumeroContrato()">
 </td-search-input>

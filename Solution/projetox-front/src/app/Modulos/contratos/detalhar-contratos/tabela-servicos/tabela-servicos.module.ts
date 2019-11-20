@@ -6,6 +6,8 @@ import { CovalentDataTableModule } from '@covalent/core/data-table';
 import { TabelaServicosComponent } from './tabela-servicos.component';
 import { MatSelectModule } from '@angular/material/select';
 import {MatIconModule} from '@angular/material/icon';
+import { RouterModule } from '@angular/router';
+
 
 
 @NgModule({
@@ -15,7 +17,8 @@ import {MatIconModule} from '@angular/material/icon';
     CovalentDataTableModule,
     MatSelectModule,
     FlexLayoutModule,
-    MatIconModule
+    MatIconModule,
+    RouterModule
     ],
   exports:[
     TabelaServicosComponent

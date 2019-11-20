@@ -7,15 +7,15 @@
     </div>
     <div fxLayout='row' class='servicos' fxLayoutAlign='end'>
         <div fxLayout='column' fxLayoutAlign='center end' fxLayoutGap="20px" class='servicos'>
-            <button mat-raised-button color="primary">Registros E/S</button>
-            <button mat-raised-button color="primary">Novo Serviço</button>
+           <button mat-raised-button color="primary" >Registros E/S</button>
+         <button mat-raised-button color="primary"  routerLink="novo-servico">Novo Serviço</button>
         </div>
       </div>
 </div>
 <div>
       <div fxLayout='column' class='table' fxLayoutAlign='center'>
         <h3>Serviços Contratados</h3>
-        <app-tabela-servicos  [columns]='columns' [data]='data'></app-tabela-servicos>
+        <app-tabela-servicos  [columns]='columns' [data]='data' (editar)="editarPlano($event)"></app-tabela-servicos>
       </div>
 </div>
 <div fxLayout='row' fxLayoutAlign='space-between' class='servicos'>

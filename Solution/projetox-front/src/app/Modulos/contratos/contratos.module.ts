@@ -12,6 +12,8 @@ import { DetatalharContratosModule } from './detalhar-contratos/detatalhar-contr
 import { CovalentBreadcrumbsModule } from '@covalent/core/breadcrumbs';
 import { RouterModule } from '@angular/router';
 import { BreadCrumbsModule } from '../../shared/components/bread-crumbs/bread-crumbs.module';
+import { NovoServicoModule } from './novo-servico/novo-servico.module';
+import { EditarPlanoContratadoModule } from './editar-plano-contratado/editar-plano-contratado.module';
 
 @NgModule({
   declarations: [ContratosComponent],
@@ -20,13 +22,15 @@ import { BreadCrumbsModule } from '../../shared/components/bread-crumbs/bread-cr
     ContratosRoutingModule,
     LayoutModule,
     VisualizarContratosModule,
+    NovoServicoModule,
     MatCardModule,
     FlexLayoutModule,
     HttpClientModule,
     DetatalharContratosModule,
     CovalentBreadcrumbsModule,
     RouterModule,
-    BreadCrumbsModule
+    BreadCrumbsModule,
+    EditarPlanoContratadoModule
 
   ]
 })

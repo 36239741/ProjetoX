@@ -36,7 +36,5 @@ public interface ContratoRepository extends JpaRepository<Contrato, Long> {
 			@Param("nomePaciente") String nomePaciente,
 			Pageable pageable, @Param("ativo") Boolean ativo);
 	
-	@Query("SELECT COUNT(*) FROM Contrato contrato "
-			+ "WHERE contrato.ativo = true")
-	public Integer findActiveContractNumber();
+
 }

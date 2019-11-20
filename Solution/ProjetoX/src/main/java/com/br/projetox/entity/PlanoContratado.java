@@ -12,7 +12,6 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 import lombok.AllArgsConstructor;
@@ -67,6 +66,7 @@ public class PlanoContratado extends AbstractEntity implements Serializable{
 	@ManyToOne(targetEntity = Contrato.class,optional = true,fetch = FetchType.LAZY)
 	private Contrato contrato;
 	
+	@NotNull
 	private Boolean ativo = true;
 	
 
@@ -74,7 +74,7 @@ public class PlanoContratado extends AbstractEntity implements Serializable{
 		this.valorPlano = this.valorTotal / this.sessao;
 	}
 	
-
+	
 			
 	
 

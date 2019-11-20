@@ -1,5 +1,5 @@
 export interface Servico {
   long: number;
-  service: string;
+  servico: string;
   valor: number;
 }

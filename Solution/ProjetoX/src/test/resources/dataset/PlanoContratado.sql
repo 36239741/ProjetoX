@@ -11,7 +11,7 @@ INSERT INTO public.plano_contratado(
             sessao, tipo_contrato, valor_plano, valor_total, usuario_id, 
             contrato_id, servico_id)
     VALUES (2, current_timestamp, null, true, current_timestamp, '23:10:00', 
-            5, 1, 1000.00, 2000.00, null, 
+            4, 1, 1000.00, 2000.00, null, 
             1, 4);
 
 INSERT INTO public.plano_contratado(

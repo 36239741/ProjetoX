@@ -33,12 +33,6 @@ export class ContratoService {
         'Something bad happened; please try again later.');
     };
 
-  findActiveContractNumber(): Observable<Number>{
-    return this.httpClient.get<Number>(API_URL + '/contratos/contratos-ativos').pipe(
-      map((data : Number) => data),
-      catchError(this.handleError)
-    );
-  }
 
   findAllContratos(page:number , size:number, sort:string, atributo:string ): Observable<PageContrato>{
     return this.httpClient.get<PageContrato>(API_URL + '/contratos?page='+ page + "&size=" + size + "&sort="+ sort + "&atributo=" + atributo).pipe(

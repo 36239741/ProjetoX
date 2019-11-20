@@ -21,7 +21,7 @@ public class ServicoService {
 		Assert.notNull(returnServico, "Nenhum servico encontrado");
 		return returnServico;
 	}
-	public List<Servico> listServicos(){
+	public List<Servico> findAll(){
 		return this.repository.findAll();
 	}
 }

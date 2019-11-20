@@ -54,7 +54,7 @@ public class Contrato extends AbstractEntity implements Serializable {
 	@JsonIgnoreProperties("contrato")
 	@OneToMany(targetEntity = PlanoContratado.class,cascade = {CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.MERGE}, fetch = FetchType.LAZY,mappedBy = "contrato")
 	private List<PlanoContratado> planoContratado = new ArrayList<PlanoContratado>();
-	
+	@NotNull
 	private Boolean ativo = true;
 	
 	@Transient

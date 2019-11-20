@@ -5,7 +5,10 @@ import { ContratosComponent } from './contratos.component';
 import { DetatalharContratosComponent } from './detalhar-contratos/detatalhar-contratos.component';
 import { ContratoResolverResolve } from '../../shared/resolvers/contrato-resolver.resolve';
 import { ContratoResolveFindByNumeroResolve } from '../../shared/resolvers/contrato-resolve-find-by-numero';
-import { findActiveContractNumberResolve } from '../../shared/resolvers/find-active-contract-number';
+import { findActiveContractNumberResolve } from '../../shared/resolvers/find-active-contract-number.resolve';
+import { NovoServicoComponent } from './novo-servico/novo-servico.component';
+import { FindAllResolve } from '../../shared/resolvers/find-all-services.resolve';
+import { EditarPlanoContratadoComponent } from './editar-plano-contratado/editar-plano-contratado.component';
 
 
 
@@ -14,14 +17,23 @@ const routes: Routes = [
   {path: '', component: ContratosComponent,
   children: [
     {path: '', component: VisualizarContratosComponent,
-    data: {breadcrumb: 'Visualizar Contratos',},
+    data: {breadcrumb: 'Visualizar Contratos', },
     resolve: {contratos : ContratoResolverResolve,
              contratosAtivos : findActiveContractNumberResolve},
             },
 
-    {path: 'detalhar/:id', component: DetatalharContratosComponent,
+    {path: ':id', component: DetatalharContratosComponent,
     data: {breadcrumb: 'Detalhar Contrato'},
-    resolve: {findByContrato: ContratoResolveFindByNumeroResolve}}
+    resolve: {findByContrato: ContratoResolveFindByNumeroResolve}},
+
+    {path: ':id/novo-servico', component: NovoServicoComponent,
+    data: {breadcrumb: 'Novo Serviço'},
+     resolve: { findAllService: FindAllResolve }},
+
+     {path: ':id/editar-servico', component: EditarPlanoContratadoComponent,
+     data: {breadcrumb: 'Editar Serviço'},
+     resolve: { findAllService: FindAllResolve }},
+     
   ],
 },
 ];
