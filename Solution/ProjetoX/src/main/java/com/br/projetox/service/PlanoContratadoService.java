@@ -32,22 +32,19 @@ public class PlanoContratadoService {
 
 	@Autowired
 	private PlanoContratoRepository planoContraRepository;
-	
-	
-	
-	public void deleteLogical(Map<String, Object> map) {
-		Servico servico = this.servicoService.findServico(map.get("servico").toString());
-		TipoContrato tipo ;
-		if (map.get("tipoContrato").toString().toLowerCase().equals("plano")) {
-			tipo = TipoContrato.PLANO;
-		} else {
-			tipo = TipoContrato.PARTICULAR;
-		}
-		this.planoContraRepository.deleteLogical(servico.getId(),Long.parseLong(map.get("numeroContrato").toString())
-				, tipo);
+
+	public void deleteLogical(String planoContratadoId) {
+		this.planoContraRepository.deleteLogical(Long.parseLong(planoContratadoId));
 	}
-	
-	public List<PlanoContratado> findAllPlanoContratadoByContratoId(String contratoId){
+
+	/*
+	 * Método pega todos planos contratados ativos , de um determinado contrato
+	 * 
+	 * @param contratoId String - pega o numero do contrato
+	 * 
+	 * @return List<PlanoContratado>
+	 */
+	public List<PlanoContratado> findAllPlanoContratadoByContratoId(String contratoId) {
 		return this.planoContraRepository.findByContratoId(Long.parseLong(contratoId));
 	}
 
@@ -64,32 +61,32 @@ public class PlanoContratadoService {
 	 */
 	public PlanoContratado mapPlanoContratado(Map<String, Object> mapPlanoContratado) throws NotFoundException {
 		try {
-		PlanoContratado planoContratado = new PlanoContratado();
-		planoContratado.setHorarioEntrada(LocalTime.parse(mapPlanoContratado.get("horarioEntrada").toString()));
-		planoContratado.setHorarioSaida(LocalTime.parse(mapPlanoContratado.get("horarioSaida").toString()));
-		planoContratado.setSessao(Integer.parseInt(mapPlanoContratado.get("sessao").toString()));
-		planoContratado.setValorPlano(Double.parseDouble(mapPlanoContratado.get("valorPlano").toString()));
-		List<String> list = (List<String>) mapPlanoContratado.get("diaConsulta");
-		String[] diaConsulta = new String[7];
-		diaConsulta = list.toArray(diaConsulta);
+			PlanoContratado planoContratado = new PlanoContratado();
+			planoContratado.setHorarioEntrada(LocalTime.parse(mapPlanoContratado.get("horarioEntrada").toString()));
+			planoContratado.setHorarioSaida(LocalTime.parse(mapPlanoContratado.get("horarioSaida").toString()));
+			planoContratado.setSessao(Integer.parseInt(mapPlanoContratado.get("sessao").toString()));
+			planoContratado.setValorPlano(Double.parseDouble(mapPlanoContratado.get("valorPlano").toString()));
+			List<String> list = (List<String>) mapPlanoContratado.get("diaConsulta");
+			String[] diaConsulta = new String[7];
+			diaConsulta = list.toArray(diaConsulta);
 
-		List<DiaConsulta> listDiaConsulta = this.contratoService.checkDaysOfTheWeek(diaConsulta);
-		planoContratado.setDiaConsulta(listDiaConsulta);
+			List<DiaConsulta> listDiaConsulta = this.contratoService.checkDaysOfTheWeek(diaConsulta);
+			planoContratado.setDiaConsulta(listDiaConsulta);
 
-		Contrato contrato = this.contratoService
-				.findByContractNumber(mapPlanoContratado.get("numeroContrato").toString());
-		planoContratado.setContrato(contrato);
-		if (mapPlanoContratado.get("tipoContrato").toString().toLowerCase().equals("plano")) {
-			planoContratado.setTipoContrato(TipoContrato.PLANO);
-		} else {
-			planoContratado.setTipoContrato(TipoContrato.PARTICULAR);
-		}
-		Servico servico = this.servicoService.findServico(mapPlanoContratado.get("servico").toString());
-		planoContratado.setServico(servico);
-		planoContratado.setValorTotal(Double.parseDouble(mapPlanoContratado.get("valorTotal").toString()));
-		planoContratado.calcularValorSessao();
-		return planoContratado;
-		}catch(NullPointerException e) {
+			Contrato contrato = this.contratoService
+					.findByContractNumber(mapPlanoContratado.get("numeroContrato").toString());
+			planoContratado.setContrato(contrato);
+			if (mapPlanoContratado.get("tipoContrato").toString().toLowerCase().equals("plano")) {
+				planoContratado.setTipoContrato(TipoContrato.PLANO);
+			} else {
+				planoContratado.setTipoContrato(TipoContrato.PARTICULAR);
+			}
+			Servico servico = this.servicoService.findServico(mapPlanoContratado.get("servico").toString());
+			planoContratado.setServico(servico);
+			planoContratado.setValorTotal(Double.parseDouble(mapPlanoContratado.get("valorTotal").toString()));
+			planoContratado.calcularValorSessao();
+			return planoContratado;
+		} catch (NullPointerException e) {
 			throw new MapPlanoContratadoException("Map com campos nulos");
 		}
 	}
@@ -109,9 +106,8 @@ public class PlanoContratadoService {
 				savePlanoContratado.getContrato().getId(), savePlanoContratado.getTipoContrato());
 		if (findPlanoContratado == null) {
 			this.planoContraRepository.save(savePlanoContratado);
-			Contrato contrato = this.contratoService.
-					findByContractNumber(mapPlanoContratado.
-							get("numeroContrato").toString());
+			Contrato contrato = this.contratoService
+					.findByContractNumber(mapPlanoContratado.get("numeroContrato").toString());
 			contrato.setValorTotal(contrato.getValorTotal() + savePlanoContratado.getValorTotal());
 			this.contratoService.saveContrato(contrato);
 		} else {
@@ -146,16 +142,21 @@ public class PlanoContratadoService {
 	public void updatePlanoContrato(Map<String, Object> mapPlanoContratado) throws NotFoundException {
 		PlanoContratado planoContratado = this.mapPlanoContratado(mapPlanoContratado);
 		planoContratado.setId(Long.parseLong(mapPlanoContratado.get("id").toString()));
-		PlanoContratado findPlanoContratado = this.planoContraRepository.findPlanoContratadoAtivoByContratoAndServicoAndTipoContrato(planoContratado.getServico().getId(),
-				Long.parseLong(mapPlanoContratado.get("numeroContrato").toString()), planoContratado.getTipoContrato());
-		if(findPlanoContratado == null) {
-			this.planoContraRepository.save(planoContratado);
-			this.contractUpdateValor(mapPlanoContratado);
-		}
-		else {
-			throw new DuplicatePlanoContratadoException("Plano contratado duplicado");
-		}
+		PlanoContratado findPlanoContratado = this.planoContraRepository
+				.findPlanoContratadoAtivoByContratoAndServicoAndTipoContrato(planoContratado.getServico().getId(),
+						Long.parseLong(mapPlanoContratado.get("numeroContrato").toString()),
+						planoContratado.getTipoContrato());
+			if (planoContratado != findPlanoContratado) {
+				if(findPlanoContratado != null) {
+					this.planoContraRepository.save(planoContratado);
+					this.contractUpdateValor(mapPlanoContratado);
+				}
+			} else {
+				throw new DuplicatePlanoContratadoException("Plano contratado duplicado");
+			}
 
+
+		
 	}
 
 	public List<PlanoContratado> findAll() {

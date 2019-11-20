@@ -38,9 +38,7 @@ public interface PlanoContratoRepository extends JpaRepository<PlanoContratado, 
 	@Query("UPDATE PlanoContratado plano "
 			+ "SET plano.ativo = false "
 			+ "WHERE "
-			+ "plano.servico.id = :servicoId "
-			+ "AND plano.contrato.id = :contratoId "
-			+ "AND plano.tipoContrato = :tipoContrato ")
-	 void deleteLogical(@Param("servicoId") long servicoId ,@Param("contratoId") long contratoId, @Param("tipoContrato") TipoContrato tipoContrato);
+			+ "plano.id = :planoId ")
+	 void deleteLogical(@Param("planoId") long planoId );
 	
 }

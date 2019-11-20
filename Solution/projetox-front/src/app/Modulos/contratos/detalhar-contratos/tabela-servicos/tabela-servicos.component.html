@@ -11,7 +11,7 @@
       <div fxLayout="row" fxLayoutAlign='center center' fxLayoutGap="5px">
         <span flex>{{value}}</span>
         <a (click)="clickEditar(row)" routerLink="editar-servico"><mat-icon>edit</mat-icon></a>
-        <a (click)="clickDeletar(row)"><mat-icon>delete</mat-icon></a>
+        <a (click)="clickDeletar(row)" (click)="dataTable.refresh()"><mat-icon>delete</mat-icon></a>
       </div>
     </ng-template>
 </td-data-table>

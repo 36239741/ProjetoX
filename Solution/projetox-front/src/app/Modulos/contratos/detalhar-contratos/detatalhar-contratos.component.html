@@ -15,7 +15,7 @@
 <div>
       <div fxLayout='column' class='table' fxLayoutAlign='center'>
         <h3>Serviços Contratados</h3>
-        <app-tabela-servicos  [columns]='columns' [data]='data' (editar)="editarPlano($event)"></app-tabela-servicos>
+        <app-tabela-servicos  [columns]='columns' [data]='data' (editar)="editarPlano($event)" (deletar)="deletarPlano($event)"></app-tabela-servicos>
       </div>
 </div>
 <div fxLayout='row' fxLayoutAlign='space-between' class='servicos'>

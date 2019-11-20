@@ -1,3 +1,5 @@
+import { TabelaServicosComponent } from './tabela-servicos/tabela-servicos.component';
+import { PlanoContratadoService } from './../../../shared/Services/plano-contratado.service';
 import { HorarioEntradaOrHorarioSaida, Contrato } from './../../../shared/model/Contrato';
 import { Component, OnInit} from '@angular/core';
 import { ITdDataTableColumn } from '@covalent/core/data-table';
@@ -28,7 +30,8 @@ export class DetatalharContratosComponent implements OnInit {
   totalPLanoMensal: number = 0;
   constructor(private activeRoute: ActivatedRoute,
               private behaviorInformacoesContrato: BehaviorInformacoesContratoService,
-              private behaviorPlanoContratado: BehaviorPlanoContratadoService) { }
+              private behaviorPlanoContratado: BehaviorPlanoContratadoService,
+              private planoContratadoService: PlanoContratadoService) { }
 
   ngOnInit() {
     this.lodingTable();
@@ -49,7 +52,6 @@ export class DetatalharContratosComponent implements OnInit {
   lodingTable(): void{
     this.findContrato();
     this.pegarDetalhesContrato();
-    console.log(this.contrato);
 
   }
   /*Metodo que recupera o contrato atraves de um snapshot na rota ativa do detalhar-contratos.module
@@ -77,7 +79,19 @@ export class DetatalharContratosComponent implements OnInit {
   editarPlano(event){
     this.behaviorPlanoContratado.setBehaviorView(event);
   }
-
+  /*Metodo que faz o delete logico de um plano contratado e atualiza os dados da tabela
+  @param event any - recebe um evento que contem os dados do plano contratado da linha da tabela
+  return void*/
+  deletarPlano(event){
+    this.planoContratadoService.deletePlanoContratado(event.id).subscribe(data =>{
+        this.planoContratadoService.findAllPlanoContratado(this.contrato.numero).subscribe(data =>{
+            this.data = [];
+            this.data.push(data);
+        });
+    });
+  }
+  /*Metodo que pega o numero do contrato e o nome do paciente e insere em um objeto behavior
+  return void*/
   pegarDetalhesContrato(){
     let detalhesContrato: String[] = [];
     detalhesContrato.push(this.contrato.numero);

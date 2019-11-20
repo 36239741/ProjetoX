@@ -21,6 +21,7 @@ import com.br.projetox.entity.TipoContrato;
 import com.br.projetox.exception.DuplicatePlanoContratadoException;
 import com.br.projetox.exception.MapPlanoContratadoException;
 import com.br.projetox.repository.ContratoRepository;
+import com.br.projetox.repository.PlanoContratoRepository;
 import com.br.projetox.repository.ServicoRepository;
 import com.br.projetox.service.PlanoContratadoService;
 
@@ -31,64 +32,70 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 	private PlanoContratadoService planoContratoService;
 	
 	@Autowired
-	private ContratoRepository contratoRepository;
-	
-	@Autowired 
-	private ServicoRepository servicoRepository;
-	
-										/*VERIFICA A BUSCA DE UM PLANO CONTRATADO*/
-	@WithUserDetails("henrique_nitatori@hotmail.com")
-	@Sql({	"/dataset/truncate.sql",
-			"/dataset/Usuario.sql",
-			"/dataset/Servico.sql",
-			"/dataset/Contrato.sql",
-			"/dataset/PlanoContratado.sql"})
-	@Test
-	public void findPlanoContratadoAtivoTestMustPass() throws NotFoundException {
-		final Long servicoId = this.servicoRepository.findById(1L).orElse(null).getId();
-		final Long contratoId = this.contratoRepository.findById(1L).orElse(null).getId();
-		
-		final PlanoContratado plano = this.planoContratoService.findPlanoContratadoAtivo(servicoId, contratoId, TipoContrato.PLANO);
-		
-		Assert.assertNotNull(plano);
-		Assert.assertNotNull(plano.getId());
-	}
+	private PlanoContratoRepository planoContratadoRepository;
 
-									/* DELETA UM PLANO CONTRATADO */
+	@Autowired
+	private ContratoRepository contratoRepository;
+
+	@Autowired
+	private ServicoRepository servicoRepository;
+
+	/* VERIFICA A BUSCA DE UM PLANO CONTRATADO */
 	@WithUserDetails("henrique_nitatori@hotmail.com")
 	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
 			"/dataset/PlanoContratado.sql" })
 	@Test
-	public void deleteLogicalTestMustPassDeletandoUmPlanoContratado() throws NotFoundException {
-		Map<String, Object> map = new HashMap();
-		map.put("numeroContrato", "1");
-		map.put("servico", "Neuropsicopedagogia");
-		map.put("tipoContrato", "plano");
-		this.planoContratoService.deleteLogical(map);
+	public void findPlanoContratadoAtivoTestMustPass() throws NotFoundException {
+		final Long servicoId = this.servicoRepository.findById(1L).orElse(null).getId();
+		final Long contratoId = this.contratoRepository.findById(1L).orElse(null).getId();
+
+		final PlanoContratado plano = this.planoContratoService.findPlanoContratadoAtivo(servicoId, contratoId,
+				TipoContrato.PLANO);
+
+		Assert.assertNotNull(plano);
+		Assert.assertNotNull(plano.getId());
 	}
-	
-		/*VERIFICA O RETORNO DA FUNCAO QUE CALCULA O TOTAL DO VALOR DO TIPO PLANO E PARTICULAR*/
+
+	/*
+	 * DELETA UM PLANO CONTRATADO
+	 */
+	 @WithUserDetails("henrique_nitatori@hotmail.com")
+	  
+	  @Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql",
+	  "/dataset/Servico.sql", "/dataset/Contrato.sql",
+	  "/dataset/PlanoContratado.sql" })
+	  
+	  @Test public void deleteLogicalTestMustPassDeletandoUmPlanoContratado()
+	  throws NotFoundException { 
+		 this.planoContratoService.deleteLogical("1");
+		 PlanoContratado plano = this.planoContratadoRepository.findById(Long.parseLong("1")).get();
+		 Assert.assertEquals(false, plano.getAtivo());
+	  }
+	 
+
+	/*
+	 * VERIFICA O RETORNO DA FUNCAO QUE CALCULA O TOTAL DO VALOR DO TIPO PLANO E
+	 * PARTICULAR
+	 */
 	@WithUserDetails("henrique_nitatori@hotmail.com")
-	@Sql({	"/dataset/truncate.sql",
-	"/dataset/Usuario.sql",
-	"/dataset/Servico.sql",
-	"/dataset/Contrato.sql",
-	"/dataset/PlanoContratado.sql"})
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql" })
 	@Test
 	public void findTotalActiveContractsMustPassVerificandoRetornoDaFuncao() throws NotFoundException {
 		final Double particular = 4000.00;
 		final Double plano = 2000.00;
-		Map<String,Double> map = this.planoContratoService.findTotalActiveContracts();
-		
+		Map<String, Double> map = this.planoContratoService.findTotalActiveContracts();
+
 		Assert.assertNotNull(map);
 		Assert.assertEquals(map.get("Particular"), plano);
 		Assert.assertEquals(map.get("Plano"), particular);
-		
+
 	}
-		/*TESTA O METODO QUE MAPEIA UM OBJETO PLANO CONTRATADO ATRAVES DE UM HASHMAP*/
+
+	/* TESTA O METODO QUE MAPEIA UM OBJETO PLANO CONTRATADO ATRAVES DE UM HASHMAP */
 	@Test
 	public void mapPlanoContratandoMustPassMapeandoUmMapEmUmPlanoContratado() throws NotFoundException {
-		Map <String, Object> map = new  HashMap<>();
+		Map<String, Object> map = new HashMap<>();
 		map.put("horarioEntrada", "12:00");
 		map.put("horarioSaida", "13:00");
 		map.put("sessao", "3");
@@ -111,27 +118,23 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 		Servico servico = this.servicoRepository.findByServicoIgnoreCase(map.get("servico").toString());
 		PlanoContratado planoContratado = this.planoContratoService.mapPlanoContratado(map);
 		Assert.assertNotNull(planoContratado);
-		Assert.assertEquals(dias, planoContratado.getDiaConsulta() );
-		Assert.assertEquals(LocalTime.parse(map.get("horarioEntrada").toString()), planoContratado.getHorarioEntrada() );
-		Assert.assertEquals(LocalTime.parse(map.get("horarioSaida").toString()), planoContratado.getHorarioSaida() );
-		Assert.assertEquals(Integer.parseInt(map.get("sessao").toString()), planoContratado.getSessao() );
-		Assert.assertEquals(map.get("numeroContrato"), "1" );
-		Assert.assertEquals(TipoContrato.PLANO, planoContratado.getTipoContrato() );
+		Assert.assertEquals(dias, planoContratado.getDiaConsulta());
+		Assert.assertEquals(LocalTime.parse(map.get("horarioEntrada").toString()), planoContratado.getHorarioEntrada());
+		Assert.assertEquals(LocalTime.parse(map.get("horarioSaida").toString()), planoContratado.getHorarioSaida());
+		Assert.assertEquals(Integer.parseInt(map.get("sessao").toString()), planoContratado.getSessao());
+		Assert.assertEquals(map.get("numeroContrato"), "1");
+		Assert.assertEquals(TipoContrato.PLANO, planoContratado.getTipoContrato());
 		Assert.assertEquals(servico, planoContratado.getServico());
-		
-		
-		
+
 	}
-										/*TESTA O METODO SAVE DO PLANO CONTRATADO*/
+
+	/* TESTA O METODO SAVE DO PLANO CONTRATADO */
 	@WithUserDetails("henrique_nitatori@hotmail.com")
-	@Sql({	"/dataset/truncate.sql",
-	"/dataset/Usuario.sql",
-	"/dataset/Servico.sql",
-	"/dataset/Contrato.sql",
-	"/dataset/PlanoContratado.sql"})											
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql" })
 	@Test
 	public void mapPlanoContratandoMustPassSave() throws NotFoundException {
-		Map <String, Object> map = new  HashMap<>();
+		Map<String, Object> map = new HashMap<>();
 		map.put("horarioEntrada", "12:00");
 		map.put("horarioSaida", "13:00");
 		map.put("sessao", "3");
@@ -156,7 +159,8 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 		final Double valorTotalContrato = 2000.00;
 		Assert.assertEquals(valorTotalContrato, contrato.getValorTotal());
 	}
-						/*TESTA O METODO UPDATE DO PLANO CONTRATADO PELO CAMPO HORARIO DE ENTRADA*/
+
+	/* TESTA O METODO UPDATE DO PLANO CONTRATADO PELO CAMPO HORARIO DE ENTRADA */
 	@WithUserDetails("henrique_nitatori@hotmail.com")
 	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
 			"/dataset/PlanoContratado.sql" })
@@ -188,9 +192,11 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 		PlanoContratado findPlanoContratado = this.planoContratoService.findPlanoContratadoAtivo(servico.getId(),
 				Long.parseLong(map.get("numeroContrato").toString()), TipoContrato.PLANO);
 		Assert.assertNotNull(findPlanoContratado);
-		Assert.assertEquals(LocalTime.parse(map.get("horarioEntrada").toString()), findPlanoContratado.getHorarioEntrada());
+		Assert.assertEquals(LocalTime.parse(map.get("horarioEntrada").toString()),
+				findPlanoContratado.getHorarioEntrada());
 	}
-	
+
+
 	/* TESTA O METODO UPDATE DO PLANO CONTRATADO PELO CAMPO HORARIO DE SAIDA */
 	@WithUserDetails("henrique_nitatori@hotmail.com")
 	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
@@ -223,10 +229,10 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 		PlanoContratado findPlanoContratado = this.planoContratoService.findPlanoContratadoAtivo(servico.getId(),
 				Long.parseLong(map.get("numeroContrato").toString()), TipoContrato.PLANO);
 		Assert.assertNotNull(findPlanoContratado);
-		Assert.assertEquals(LocalTime.parse(map.get("horarioSaida").toString()),
-				findPlanoContratado.getHorarioSaida());
+		Assert.assertEquals(LocalTime.parse(map.get("horarioSaida").toString()), findPlanoContratado.getHorarioSaida());
 	}
-						/* TESTA O METODO UPDATE DO PLANO CONTRATADO PELO CAMPO HORARIO DE SESSAO */
+
+	/* TESTA O METODO UPDATE DO PLANO CONTRATADO PELO CAMPO HORARIO DE SESSAO */
 	@WithUserDetails("henrique_nitatori@hotmail.com")
 	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
 			"/dataset/PlanoContratado.sql" })
@@ -258,9 +264,9 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 		PlanoContratado findPlanoContratado = this.planoContratoService.findPlanoContratadoAtivo(servico.getId(),
 				Long.parseLong(map.get("numeroContrato").toString()), TipoContrato.PLANO);
 		Assert.assertNotNull(findPlanoContratado);
-		Assert.assertEquals(Integer.parseInt("5"),
-				findPlanoContratado.getSessao());
+		Assert.assertEquals(Integer.parseInt("5"), findPlanoContratado.getSessao());
 	}
+
 	/* TESTA O METODO UPDATE DO PLANO CONTRATADO PELO CAMPO TIPO CONTRATO */
 	@WithUserDetails("henrique_nitatori@hotmail.com")
 	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
@@ -293,45 +299,36 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 		PlanoContratado findPlanoContratado = this.planoContratoService.findPlanoContratadoAtivo(servico.getId(),
 				Long.parseLong(map.get("numeroContrato").toString()), TipoContrato.PARTICULAR);
 		Assert.assertNotNull(findPlanoContratado);
-		Assert.assertEquals(TipoContrato.PARTICULAR,
-				findPlanoContratado.getTipoContrato());
+		Assert.assertEquals(TipoContrato.PARTICULAR, findPlanoContratado.getTipoContrato());
 	}
-		
 
-	
-										/* VERIFICA O RETORNO DE LISTA DE PLANO CONTRATADO */
+	/* VERIFICA O RETORNO DE LISTA DE PLANO CONTRATADO */
 	@WithUserDetails("henrique_nitatori@hotmail.com")
-	@Sql({	"/dataset/truncate.sql",
-			"/dataset/Usuario.sql",
-			"/dataset/Servico.sql",
-			"/dataset/Contrato.sql",
-			"/dataset/PlanoContratado.sql"})
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql" })
 	@Test
-	public void findbyContractIdTestMustPassVerificandoABuscaPorContrato()  {
+	public void findbyContractIdTestMustPassVerificandoABuscaPorContrato() {
 		final Long contratoId = 1L;
 		List<PlanoContratado> planoContratado = this.planoContratoService.findByContractId(contratoId);
-		
+
 		Assert.assertNotNull(planoContratado);
 		Assert.assertEquals(1, planoContratado.size());
 	}
-	
-										/* TESTE DE BUSCA DE TODOS OS PLANOS CONTRTADOS */
+
+	/* TESTE DE BUSCA DE TODOS OS PLANOS CONTRTADOS */
 	@Test
 	public void findAllMustPass() {
 		final List<PlanoContratado> planoContratado = this.planoContratoService.findAll();
 		Assert.assertNotNull(planoContratado);
-		Assert.assertEquals(0, planoContratado.size());;
-		
+		Assert.assertEquals(0, planoContratado.size());
+		;
+
 	}
-	
-	@Test
-	public void mapPlanoContratado() {
-		Map<String, Object> mapPlanoContratado = new HashMap<>();
-		
-	}
-											/*MUST FAIL*/
-	
-							/* TESTA O METODO SAVE COM PLANO CONTRATADO DUPLICADO */
+
+
+	/* MUST FAIL */
+
+	/* TESTA O METODO SAVE COM PLANO CONTRATADO DUPLICADO */
 	@WithUserDetails("henrique_nitatori@hotmail.com")
 	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
 			"/dataset/PlanoContratado.sql" })
@@ -360,10 +357,10 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 		this.planoContratoService.savePlanoContratato(map);
 	}
 
-	/*TESTA O METODO QUE MAPEIA UM OBJETO PLANO CONTRATADO ATRAVES DE UM HASHMAP*/
+	/* TESTA O METODO QUE MAPEIA UM OBJETO PLANO CONTRATADO ATRAVES DE UM HASHMAP */
 	@Test(expected = MapPlanoContratadoException.class)
 	public void mapPlanoContratandoMustFailFaltaDeUmCampoPreenchido() throws NotFoundException {
-		Map <String, Object> map = new  HashMap<>();
+		Map<String, Object> map = new HashMap<>();
 		map.put("horarioEntrada", "12:00");
 		map.put("horarioSaida", "13:00");
 		map.put("sessao", "3");
