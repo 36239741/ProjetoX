@@ -8,6 +8,7 @@ import { ContratoResolveFindByNumeroResolve } from '../../shared/resolvers/contr
 import { findActiveContractNumberResolve } from '../../shared/resolvers/find-active-contract-number.resolve';
 import { NovoServicoComponent } from './novo-servico/novo-servico.component';
 import { FindAllResolve } from '../../shared/resolvers/find-all-services.resolve';
+import { FindAllPlanoContratadoResolve } from '../../shared/resolvers/find-all-plano-contratado';
 import { EditarPlanoContratadoComponent } from './editar-plano-contratado/editar-plano-contratado.component';
 
 
@@ -24,7 +25,8 @@ const routes: Routes = [
 
     {path: ':id', component: DetatalharContratosComponent,
     data: {breadcrumb: 'Detalhar Contrato'},
-    resolve: {findByContrato: ContratoResolveFindByNumeroResolve}},
+    resolve: {findByContrato: ContratoResolveFindByNumeroResolve, 
+              planoContratado: FindAllPlanoContratadoResolve}},
 
     {path: ':id/novo-servico', component: NovoServicoComponent,
     data: {breadcrumb: 'Novo Serviço'},

@@ -128,6 +128,7 @@ public class ContratoService {
 	 */
 	public Contrato findByContractNumber(String numeroContrato) throws NotFoundException {
 		Optional<Contrato> contrato = this.repository.findByNumero(numeroContrato);
+		contrato.get().getPlanoContratado().clear();
 		return contrato.orElseThrow(() -> new NotFoundException(
 				"Nenhum contrato encontrado com esse número de contrato:" + numeroContrato));
 

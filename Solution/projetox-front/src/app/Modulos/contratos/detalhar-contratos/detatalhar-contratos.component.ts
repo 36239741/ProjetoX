@@ -56,6 +56,7 @@ export class DetatalharContratosComponent implements OnInit {
   @return void*/
   findContrato(): void{
     this.contrato = this.activeRoute.snapshot.data['findByContrato'];
+    this.contrato.planoContratado = this.activeRoute.snapshot.data['planoContratado'];
     this.data.push(this.contrato.planoContratado);
     this.calcularValorPlanos();
   }

@@ -30,8 +30,9 @@ public interface PlanoContratoRepository extends JpaRepository<PlanoContratado, 
 	
 	@Query("FROM PlanoContratado plano "
 			+ "WHERE "
-			+ "plano.servico.id = :servicoId ")
-	List<PlanoContratado> findByContratoId(@Param("servicoId") long servicoId);
+			+ "plano.contrato.id = :contratoId "
+			+ "AND plano.ativo = true")
+	List<PlanoContratado> findByContratoId(@Param("contratoId") long contratoId);
 	
 	@Modifying()
 	@Query("UPDATE PlanoContratado plano "

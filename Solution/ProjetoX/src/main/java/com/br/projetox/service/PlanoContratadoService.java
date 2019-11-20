@@ -46,6 +46,10 @@ public class PlanoContratadoService {
 		this.planoContraRepository.deleteLogical(servico.getId(),Long.parseLong(map.get("numeroContrato").toString())
 				, tipo);
 	}
+	
+	public List<PlanoContratado> findAllPlanoContratadoByContratoId(String contratoId){
+		return this.planoContraRepository.findByContratoId(Long.parseLong(contratoId));
+	}
 
 	/*
 	 * Método que mapeia um objeto do tipo PlanoContratado
