@@ -98,7 +98,6 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 		Map<String, Object> map = new HashMap<>();
 		map.put("horarioEntrada", "12:00");
 		map.put("horarioSaida", "13:00");
-		map.put("sessao", "3");
 		map.put("valorPlano", "120.00");
 		List<String> lista = new ArrayList();
 		lista.add("SEG");
@@ -137,7 +136,6 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 		Map<String, Object> map = new HashMap<>();
 		map.put("horarioEntrada", "12:00");
 		map.put("horarioSaida", "13:00");
-		map.put("sessao", "3");
 		map.put("valorPlano", "120.00");
 		List<String> lista = new ArrayList();
 		lista.add("SEG");
@@ -170,7 +168,6 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 		map.put("id", "1");
 		map.put("horarioEntrada", "11:00");
 		map.put("horarioSaida", "13:00");
-		map.put("sessao", "3");
 		map.put("valorPlano", "120.00");
 		List<String> lista = new ArrayList();
 		lista.add("SEG");
@@ -207,7 +204,6 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 		map.put("id", "1");
 		map.put("horarioEntrada", "11:00");
 		map.put("horarioSaida", "14:00");
-		map.put("sessao", "3");
 		map.put("valorPlano", "120.00");
 		List<String> lista = new ArrayList();
 		lista.add("SEG");
@@ -232,40 +228,7 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 		Assert.assertEquals(LocalTime.parse(map.get("horarioSaida").toString()), findPlanoContratado.getHorarioSaida());
 	}
 
-	/* TESTA O METODO UPDATE DO PLANO CONTRATADO PELO CAMPO HORARIO DE SESSAO */
-	@WithUserDetails("henrique_nitatori@hotmail.com")
-	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
-			"/dataset/PlanoContratado.sql" })
-	@Test()
-	public void mapPlanoContratandoMustPassUpdateAtualizandoCampoSessao() throws NotFoundException {
-		Map<String, Object> map = new HashMap<>();
-		map.put("id", "1");
-		map.put("horarioEntrada", "11:00");
-		map.put("horarioSaida", "14:00");
-		map.put("sessao", "5");
-		map.put("valorPlano", "120.00");
-		List<String> lista = new ArrayList();
-		lista.add("SEG");
-		lista.add("TER");
-		map.put("diaConsulta", lista);
-		map.put("numeroContrato", "1");
-		map.put("tipoContrato", "plano");
-		map.put("servico", "Psicologia");
-		map.put("valorTotal", "1000");
-		List<DiaConsulta> dias = new ArrayList<>();
-		DiaConsulta dia1 = new DiaConsulta();
-		dia1.setDiasSemana(DiasSemana.SEGUNDA);
-		DiaConsulta dia2 = new DiaConsulta();
-		dia2.setDiasSemana(DiasSemana.TERCA);
-		dias.add(dia1);
-		dias.add(dia2);
-		this.planoContratoService.updatePlanoContrato(map);
-		Servico servico = this.servicoRepository.findByServicoIgnoreCase(map.get("servico").toString());
-		PlanoContratado findPlanoContratado = this.planoContratoService.findPlanoContratadoAtivo(servico.getId(),
-				Long.parseLong(map.get("numeroContrato").toString()), TipoContrato.PLANO);
-		Assert.assertNotNull(findPlanoContratado);
-		Assert.assertEquals(Integer.parseInt("5"), findPlanoContratado.getSessao());
-	}
+
 
 	/* TESTA O METODO UPDATE DO PLANO CONTRATADO PELO CAMPO TIPO CONTRATO */
 	@WithUserDetails("henrique_nitatori@hotmail.com")
@@ -277,7 +240,6 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 		map.put("id", "1");
 		map.put("horarioEntrada", "11:00");
 		map.put("horarioSaida", "14:00");
-		map.put("sessao", "5");
 		map.put("valorPlano", "150.00");
 		List<String> lista = new ArrayList();
 		lista.add("SEG");
@@ -308,8 +270,8 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 			"/dataset/PlanoContratado.sql" })
 	@Test
 	public void findbyContractIdTestMustPassVerificandoABuscaPorContrato() {
-		final Long contratoId = 1L;
-		List<PlanoContratado> planoContratado = this.planoContratoService.findByContractId(contratoId);
+		final String numeroContrato = "1";
+		List<PlanoContratado> planoContratado = this.planoContratoService.findAllPlanoContratadoByContratoId(numeroContrato);
 
 		Assert.assertNotNull(planoContratado);
 		Assert.assertEquals(1, planoContratado.size());
@@ -337,7 +299,6 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 		Map<String, Object> map = new HashMap<>();
 		map.put("horarioEntrada", "12:00");
 		map.put("horarioSaida", "13:00");
-		map.put("sessao", "3");
 		map.put("valorPlano", "120.00");
 		List<String> lista = new ArrayList();
 		lista.add("SEG");

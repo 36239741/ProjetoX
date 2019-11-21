@@ -40,8 +40,8 @@ public class PlanoContratadoController {
 	  }
 	 
 	 @GetMapping(path = "/find-all")
-	 public ResponseEntity<?> findAllPlanoContratadoByContratoId(@RequestParam("id") String contratoId){
-		 List<PlanoContratado> list = this.planoContratadoService.findAllPlanoContratadoByContratoId(contratoId);
+	 public ResponseEntity<?> findAllPlanoContratadoByContratoId(@RequestParam("numero-contrato") String numeroContrato){
+		 List<PlanoContratado> list = this.planoContratadoService.findAllPlanoContratadoByContratoId(numeroContrato);
 		 return ResponseEntity.ok(list);
 	 }
 
@@ -54,6 +54,7 @@ public class PlanoContratadoController {
 	public void updatePlanoContrato(@RequestBody Map<String, Object> planoContratado) throws NotFoundException {
 		this.planoContratadoService.updatePlanoContrato(planoContratado);
 	}
+	
 	@PutMapping(path = "/delete")
 	public void deleteLogical(@RequestBody String planoContratadoId) {
 		this.planoContratadoService.deleteLogical(planoContratadoId);

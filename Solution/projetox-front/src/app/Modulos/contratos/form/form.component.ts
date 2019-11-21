@@ -17,6 +17,8 @@ export class FormComponent implements OnInit, OnDestroy, AfterViewChecked {
 
 
     checkBox = [];
+    @Input() planoDisable: boolean;
+    @Input() servicoDisable: boolean;
     @Output() event: EventEmitter<any> = new EventEmitter<any>();
     @Input() planoContratado?: FormPlanoContratado;
     @Input() rota:String;
@@ -27,7 +29,7 @@ export class FormComponent implements OnInit, OnDestroy, AfterViewChecked {
     horarioSaida: String;
     diasSemana: String[] = [];
     diasSemanaObject: Object;
-    services: Servico;
+    services: Servico[];
     valorTotal: String;
     detalhesContrato: String[] = [];
    constructor(private formBuilder: FormBuilder,
@@ -62,7 +64,6 @@ export class FormComponent implements OnInit, OnDestroy, AfterViewChecked {
          numeroContrato: [],
          nomePaciente: [],
          tipoContrato: [planoContratado.tipoContrato, [Validators.required]],
-         sessao: [planoContratado.sessao, [Validators.required]],
          servico: [planoContratado.servico, [Validators.required]],
          horarioEntrada: [planoContratado.horarioEntrada, [Validators.required]],
          horarioSaida: [planoContratado.horarioSaida, [Validators.required]],
@@ -86,14 +87,6 @@ export class FormComponent implements OnInit, OnDestroy, AfterViewChecked {
             this.diasSemana = diaConsulta;
         }
     }
-   /*Metodo que calcula o valor total do plano PlanoContratado, depois que o event blur for acionado no form control
-   sessoes ou valorPlano
-   @param event any - variavel que recebe um evento blur*/
-   calculoDoPlano(event) {
-     if(event) {
-         this.calcularValorTotal();
-     }
-   }
    /*Metodo que mapeia uma string para que seja compativel para inserir o valor no campo time do formulario
    @param data HorarioEntradaOrHorarioSaida - variavel que recebe os valores de horario de entrada e horario de horario de saida
    @return horarios String -  retorna o valor ja formatado*/
@@ -103,13 +96,19 @@ export class FormComponent implements OnInit, OnDestroy, AfterViewChecked {
     let horarios: String = ('0' + hour).slice(-2) + ':' + ('0' + minute).slice(-2);
     return horarios;
   }
-   /*Metodo que calcula o valor total do plano PlanoContratado, baseado no campo sessoes e valorPlano
-   @return void*/
-   calcularValorTotal() {
-     let sessoes: any = this.form.get('sessao').value;
-     let valorPlano: any = this.form.get('valorPlano').value;
-     this.form.get('valorTotal').setValue(sessoes * valorPlano);
-   }
+    calcularValorTotal(){
+        let valorTotal = this.diasSemana.length * 4 * this.form.get('valorPlano').value;
+        this.form.get('valorTotal').setValue(valorTotal);
+    }
+    valorSessao(event){
+        if(event){
+            this.services.forEach(data => {
+                if(this.form.get('servico').value === data.servico){
+                    this.form.get('valorPlano').setValue(data.valor);
+                }
+            });
+        }
+    }
 
    /*Metodo que pega o nome do paciente e numero do contrato na pagina detalhes do contrato atraves de behavior subject
    @return void*/
@@ -161,6 +160,7 @@ export class FormComponent implements OnInit, OnDestroy, AfterViewChecked {
          var index = this.diasSemana.indexOf(event.source['value']);
          this.diasSemana.splice(index, 1);
      }
+     this.calcularValorTotal();
    }
    ngOnDestroy(): void {
      this.subscription.unsubscribe();

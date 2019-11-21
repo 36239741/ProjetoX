@@ -69,7 +69,7 @@ public class PlanoContratado extends AbstractEntity implements Serializable{
 	@NotNull
 	private Boolean ativo = true;
 	
-
+	
 	public void calcularValorSessao() {
 		this.valorPlano = this.valorTotal / this.sessao;
 	}

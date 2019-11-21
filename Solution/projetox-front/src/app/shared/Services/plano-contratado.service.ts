@@ -46,8 +46,8 @@ export class PlanoContratadoService {
       updatePlanoContratado(planoContratado: any): Observable<any> {
         return this.httpClient.put<PlanoContratado>(API_URL + '/planos', planoContratado);
       }
-      findAllPlanoContratado(contratoId : any): Observable<any> {
-        return this.httpClient.get<PlanoContratado>(API_URL + '/planos/find-all?id=' + contratoId);
+      findAllPlanoContratado(numeroContrato : any): Observable<any> {
+        return this.httpClient.get<PlanoContratado>(API_URL + '/planos/find-all?numero-contrato=' + numeroContrato);
       }
       deletePlanoContratado(planoContratadoId: String): Observable<any> {
         return this.httpClient.put(API_URL + '/planos/delete' , planoContratadoId);

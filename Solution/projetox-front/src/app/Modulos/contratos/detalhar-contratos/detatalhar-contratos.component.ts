@@ -1,11 +1,12 @@
-import { TabelaServicosComponent } from './tabela-servicos/tabela-servicos.component';
+import { ContratoService } from './../../../shared/Services/contrato.service';
 import { PlanoContratadoService } from './../../../shared/Services/plano-contratado.service';
 import { HorarioEntradaOrHorarioSaida, Contrato } from './../../../shared/model/Contrato';
 import { Component, OnInit} from '@angular/core';
 import { ITdDataTableColumn } from '@covalent/core/data-table';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorInformacoesContratoService } from 'src/app/shared/Services/behavior-informacoes-contrato.service';
 import { BehaviorPlanoContratadoService } from 'src/app/shared/Services/behavior-plano-contratado.service';
+import { Location } from '@angular/common';
 
 
 const DECIMAL_FORMAT: (v: any) => any = (v: number) => new Intl.NumberFormat('pt-BR',{style: 'currency', currency:'BRL'} ).format(v);
@@ -31,7 +32,10 @@ export class DetatalharContratosComponent implements OnInit {
   constructor(private activeRoute: ActivatedRoute,
               private behaviorInformacoesContrato: BehaviorInformacoesContratoService,
               private behaviorPlanoContratado: BehaviorPlanoContratadoService,
-              private planoContratadoService: PlanoContratadoService) { }
+              private planoContratadoService: PlanoContratadoService,
+              private contratoService: ContratoService,
+              private router: Router,
+              private location: Location) { }
 
   ngOnInit() {
     this.lodingTable();
@@ -52,7 +56,6 @@ export class DetatalharContratosComponent implements OnInit {
   lodingTable(): void{
     this.findContrato();
     this.pegarDetalhesContrato();
-
   }
   /*Metodo que recupera o contrato atraves de um snapshot na rota ativa do detalhar-contratos.module
   @return void*/
@@ -87,6 +90,9 @@ export class DetatalharContratosComponent implements OnInit {
         this.planoContratadoService.findAllPlanoContratado(this.contrato.numero).subscribe(data =>{
             this.data = [];
             this.data.push(data);
+        });
+        this.contratoService.findByContrato(parseInt(this.contrato.numero)).subscribe(data =>{
+            this.contrato = data;
         });
     });
   }

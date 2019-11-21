@@ -21,15 +21,15 @@
                 </mat-form-field>
                 <mat-form-field>
                     <mat-label>Tipo do Plano</mat-label>
-                    <mat-select formControlName="tipoContrato" #fontSize value="16px" >
+                    <mat-select formControlName="tipoContrato" #fontSize value="16px"  [disabled]="planoDisable">
                         <mat-option *ngFor="let plano of tipoPlano | keyvalue" [value]="plano.value">{{ plano.key }}</mat-option>
                     </mat-select>
                     <mat-error *ngIf="hasError('tipoContrato' , 'required')">Campo não preenchido</mat-error>
                 </mat-form-field>
                 <mat-form-field>
                     <mat-label>Serviço</mat-label>
-                    <mat-select formControlName="servico" #fontSize value="16px" >
-                        <mat-option *ngFor="let service of services" [value]="service.servico">{{ service.servico }}</mat-option>
+                    <mat-select formControlName="servico" #fontSize value="16px" [disabled]="servicoDisable" (blur)="valorSessao($event)">
+                        <mat-option *ngFor="let service of services" [value]="service.servico" >{{ service.servico }}</mat-option>
                     </mat-select>
                     <mat-error *ngIf="hasError('servico' , 'required')">Campo não preenchido</mat-error>
                 </mat-form-field>
@@ -66,16 +66,7 @@
                         <mat-checkbox  (change)="changeCkeckBox($event)"  [id]="dias.id" [name]="dias.name" [checked]="dias.checked"  color="primary" [value]="dias.value">{{ dias.label }}</mat-checkbox>
                     </div>
                 </div>
-                <mat-form-field>
-                        <input
-                        formControlName="sessao"
-                        matInput
-                        placeholder="Número de sessões"
-                        type="number" 
-                        (blur)="calculoDoPlano($event)"
-                    /> 
-                    <mat-error *ngIf="hasError('sessao' , 'required')">Campo não preenchido</mat-error>
-                </mat-form-field>
+
                 <mat-form-field>
                     <input
                         id="valorPlano"
@@ -86,7 +77,7 @@
                         currencyMask
                         [options]="{ prefix: 'R$ ', thousands: '.', decimal: ',',align: 'left' }"
                         [(ngModel)]="form.get('valorPlano').value"
-                        (blur)="calculoDoPlano($event)"
+                        (blur)="calcularValorTotal()"
                     />
                     <mat-error *ngIf="hasError('valorPlano' , 'required')">Campo não preenchido</mat-error>
                 </mat-form-field>

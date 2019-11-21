@@ -4,10 +4,9 @@ import { DiaConsulta } from './../../../shared/model/dia-consulta';
 import { HorarioEntradaOrHorarioSaida } from './../../../shared/model/Contrato';
 import { FormPlanoContratado } from './../../../shared/model/formPlanoContratado';
 import { Subscription } from 'rxjs';
-import { Component, OnInit, OnDestroy, ViewContainerRef } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { BehaviorPlanoContratadoService } from 'src/app/shared/Services/behavior-plano-contratado.service';
 import { PlanoContratado } from 'src/app/shared/model/plano-contradao';
-import { TdDialogService } from '@covalent/core/dialogs';
 
 @Component({
   selector: 'app-editar-plano-contratado',
@@ -22,9 +21,7 @@ export class EditarPlanoContratadoComponent implements OnInit, OnDestroy {
   constructor(private behaviorPlanoContratado: BehaviorPlanoContratadoService,
               private activeRoute: ActivatedRoute,
               private router: Router,
-              private planoContratadoService: PlanoContratadoService,
-              private _dialogService: TdDialogService,
-              private _viewContainerRef: ViewContainerRef ) { 
+              private planoContratadoService: PlanoContratadoService,) { 
                 this.activeRoute.params.subscribe(data =>{
                     this.rota = '/contratos/' + data.id;
                 });
@@ -87,24 +84,10 @@ export class EditarPlanoContratadoComponent implements OnInit, OnDestroy {
   }
   recuperarForm(event: any){
     this.planoContratadoService.updatePlanoContratado(event).subscribe(data => {
-        this.openAlert('Sucesso', 'Plano Contratado Atualizado com sucesso !!');
-     },
-        err => {
-        this.openAlert(err.error.message, "Error");
-        
-    });
+        this.router.navigate([this.rota]);
+     });
   }
-  
-  openAlert(mensagem: string, titulo: string): void {
-    this._dialogService.openAlert({
-      message: mensagem,
-      disableClose: false, // defaults to false
-      viewContainerRef: this._viewContainerRef, //OPTIONAL
-      title: titulo, //OPTIONAL, hides if not provided
-      closeButton: 'Close', //OPTIONAL, defaults to 'CLOSE'
-      width: '400px', //OPTIONAL, defaults to 400px
-    });
-  }
+
 
   ngOnDestroy(): void {
       this.subscription.unsubscribe();
