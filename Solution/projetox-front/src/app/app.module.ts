@@ -12,6 +12,8 @@ import { CovalentLoadingModule } from '@covalent/core/loading';
 import { BasicInterceptorService } from './core/interceptor/basic-interceptor.service';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { registerLocaleData } from '@angular/common';
+import {MatSnackBarModule} from '@angular/material/snack-bar';
+
 registerLocaleData(localept, 'pt');
 
 @NgModule({
@@ -26,7 +28,8 @@ registerLocaleData(localept, 'pt');
     HomeModule,
     HttpClientModule,
     CovalentLoadingModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatSnackBarModule
 
 
   ],

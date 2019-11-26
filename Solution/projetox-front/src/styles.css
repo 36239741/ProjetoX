@@ -1,5 +1,6 @@
 @import '~material-design-icons/iconfont/material-icons.css';
 
+
     @font-face {
         font-family: 'Material Icons';
         font-style: normal;
@@ -36,3 +37,11 @@
        /* Support for IE. */
        font-feature-settings: 'liga';
      }
+     .toast-error {
+      background-color: #c62828 !important; }
+
+    .toast-warnning {
+      background-color: #f9a825 !important; }
+
+    .toast-success {
+      background-color: #2e7d32 !important; }

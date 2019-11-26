@@ -6,6 +6,7 @@ import { FormGroup, FormBuilder, Validators} from '@angular/forms';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { FormPlanoContratado } from '../../../shared/model/formPlanoContratado';
 import { BehaviorInformacoesContratoService } from '../../../shared/Services/behavior-informacoes-contrato.service';
+import { FormOculto } from './form-campos-ocultos/form-oculto';
 @Component({
   selector: 'app-form',
   templateUrl: './form.component.html',
@@ -15,7 +16,7 @@ export class FormComponent implements OnInit, OnDestroy, AfterViewChecked {
 
 
 
-
+    
     checkBox = [];
     @Input() planoDisable: boolean;
     @Input() servicoDisable: boolean;
@@ -32,6 +33,7 @@ export class FormComponent implements OnInit, OnDestroy, AfterViewChecked {
     services: Servico[];
     valorTotal: String;
     detalhesContrato: String[] = [];
+    formOculto: FormOculto[] = [];
    constructor(private formBuilder: FormBuilder,
                private activedRoute: ActivatedRoute,
                private behaviorInformacoesContrato: BehaviorInformacoesContratoService,
@@ -72,6 +74,10 @@ export class FormComponent implements OnInit, OnDestroy, AfterViewChecked {
          valorTotal: [planoContratado.valorTotal]
      });
      this.mapDiaConsulta(planoContratado.diaConsulta);
+     this.formOculto = [{label: 'No:', value: this.detalhesContrato[0]},
+     {label: 'Nome do paciente:', value: this.detalhesContrato[1]},
+     {label: 'Tipo do plano:', value: this.planoContratado.tipoContrato},
+     {label: 'Serviço:', value: this.planoContratado.servico}];
     }
     /*Metodo marca os checkbox conforme os valores vindo do plano contratado
     @params diaConsulta String[] - recebe os dias da consulta vindo do plano contratado*/

@@ -76,7 +76,9 @@ public class Contrato extends AbstractEntity implements Serializable {
 	public TipoContrato getTipoContratoTransient() {
 		int contratoPlanoParticular = 0;
 		int contratoPlano = 0;
+		
 		for(PlanoContratado planoContratao: this.planoContratado) {
+			if(planoContratao.getAtivo().equals(true)) {
 			if(planoContratao.getTipoContrato().equals(TipoContrato.PLANO)) {
 				this.tipoContratoTransient = TipoContrato.PLANO;
 				contratoPlano = 1;
@@ -85,10 +87,15 @@ public class Contrato extends AbstractEntity implements Serializable {
 				this.tipoContratoTransient = TipoContrato.PARTICULAR;
 				contratoPlanoParticular = 1;
 			}
+			}
 		}
 		if (contratoPlanoParticular == 1 && contratoPlano == 1) {
 			this.tipoContratoTransient = TipoContrato.MISTO;
 		}
+		else if(contratoPlanoParticular == 0 && contratoPlano == 0) {
+			this.tipoContratoTransient = TipoContrato.VAZIO;
+		}
+		
 		return this.tipoContratoTransient;
 	}
 

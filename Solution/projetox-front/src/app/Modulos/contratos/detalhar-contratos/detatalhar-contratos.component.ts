@@ -1,12 +1,14 @@
 import { ContratoService } from './../../../shared/Services/contrato.service';
 import { PlanoContratadoService } from './../../../shared/Services/plano-contratado.service';
 import { HorarioEntradaOrHorarioSaida, Contrato } from './../../../shared/model/Contrato';
-import { Component, OnInit} from '@angular/core';
+import { Component, OnInit, ViewContainerRef} from '@angular/core';
 import { ITdDataTableColumn } from '@covalent/core/data-table';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorInformacoesContratoService } from 'src/app/shared/Services/behavior-informacoes-contrato.service';
 import { BehaviorPlanoContratadoService } from 'src/app/shared/Services/behavior-plano-contratado.service';
-import { Location } from '@angular/common';
+import { ToastService } from 'src/app/shared/Services/toast.service';
+import { TdDialogService } from '@covalent/core/dialogs';
+
 
 
 const DECIMAL_FORMAT: (v: any) => any = (v: number) => new Intl.NumberFormat('pt-BR',{style: 'currency', currency:'BRL'} ).format(v);
@@ -30,12 +32,13 @@ export class DetatalharContratosComponent implements OnInit {
   totalPlanoParticular: number = 0;
   totalPLanoMensal: number = 0;
   constructor(private activeRoute: ActivatedRoute,
+              private _dialogService: TdDialogService,
+              private _viewContainerRef: ViewContainerRef,
+              private toastService: ToastService,
               private behaviorInformacoesContrato: BehaviorInformacoesContratoService,
               private behaviorPlanoContratado: BehaviorPlanoContratadoService,
               private planoContratadoService: PlanoContratadoService,
-              private contratoService: ContratoService,
-              private router: Router,
-              private location: Location) { }
+              private contratoService: ContratoService) { }
 
   ngOnInit() {
     this.lodingTable();
@@ -86,16 +89,40 @@ export class DetatalharContratosComponent implements OnInit {
   @param event any - recebe um evento que contem os dados do plano contratado da linha da tabela
   return void*/
   deletarPlano(event){
-    this.planoContratadoService.deletePlanoContratado(event.id).subscribe(data =>{
-        this.planoContratadoService.findAllPlanoContratado(this.contrato.numero).subscribe(data =>{
-            this.data = [];
-            this.data.push(data);
-        });
-        this.contratoService.findByContrato(parseInt(this.contrato.numero)).subscribe(data =>{
-            this.contrato = data;
-        });
-    });
-  }
+    this._dialogService.openConfirm({
+        message: 'Deseja realmente excluir esse serviço?',
+        disableClose: false, // defaults to false
+        viewContainerRef: this._viewContainerRef, //OPTIONAL
+        title: 'Confirmar', //OPTIONAL, hides if not provided
+        cancelButton: 'Cancelar', //OPTIONAL, defaults to 'CANCEL'
+        acceptButton: 'Aceitar', //OPTIONAL, defaults to 'ACCEPT'
+        width: '500px', //OPTIONAL, defaults to 400px
+      }).afterClosed().subscribe((accept: boolean) => {
+        if (accept) {
+            this.planoContratadoService.deletePlanoContratado(event.id).subscribe(data =>{
+                this.planoContratadoService.findAllPlanoContratado(this.contrato.numero).subscribe(data =>{
+                    this.data = [];
+                    this.data.push(data);
+                    this.contrato.planoContratado = data;
+                    this.totalPLanoMensal = 0;
+                    this.totalPlanoParticular = 0;
+                    this.calcularValorPlanos();
+                    this.toastService.toastSuccess('Serviço deletado com sucesso !!')
+                });
+                this.contratoService.findByContrato(parseInt(this.contrato.numero)).subscribe(data =>{
+                    this.contrato = data;
+                });
+            },
+            error => {
+                this.toastService.toastError(error.error.message);
+            });
+        } else {
+          this._dialogService.closeAll();
+        }
+
+  });
+}
+
   /*Metodo que pega o numero do contrato e o nome do paciente e insere em um objeto behavior
   return void*/
   pegarDetalhesContrato(){

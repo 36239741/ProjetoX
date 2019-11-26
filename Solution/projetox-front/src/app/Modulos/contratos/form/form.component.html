@@ -1,7 +1,11 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
         <div fxLayout="column" fxLayoutGap="50px">
             <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="30px">
-                <mat-form-field>
+
+            <div  *ngIf="planoDisable === true">
+                    <app-form-campos-ocultos fxLayout="row" fxLayoutGap="150px" [formCampos]="formOculto"></app-form-campos-ocultos>
+            </div>
+                <mat-form-field *ngIf="planoDisable === false">
                     <input
                     formControlName="numeroContrato" 
                     matInput placeholder="No:" 
@@ -9,7 +13,9 @@
                     [value]="detalhesContrato[0]" 
                     type="text" />
                 </mat-form-field>
-                <mat-form-field fxFlex="2 1 auto">
+
+
+                <mat-form-field fxFlex="2 1 auto" *ngIf="planoDisable === false">
                     <input
                         formControlName="nomePaciente"
                         matInput
@@ -19,14 +25,14 @@
                         type="text"
                     />
                 </mat-form-field>
-                <mat-form-field>
+                <mat-form-field *ngIf="planoDisable === false">
                     <mat-label>Tipo do Plano</mat-label>
                     <mat-select formControlName="tipoContrato" #fontSize value="16px"  [disabled]="planoDisable">
                         <mat-option *ngFor="let plano of tipoPlano | keyvalue" [value]="plano.value">{{ plano.key }}</mat-option>
                     </mat-select>
                     <mat-error *ngIf="hasError('tipoContrato' , 'required')">Campo não preenchido</mat-error>
                 </mat-form-field>
-                <mat-form-field>
+                <mat-form-field *ngIf="planoDisable === false">
                     <mat-label>Serviço</mat-label>
                     <mat-select formControlName="servico" #fontSize value="16px" [disabled]="servicoDisable" (blur)="valorSessao($event)">
                         <mat-option *ngFor="let service of services" [value]="service.servico" >{{ service.servico }}</mat-option>

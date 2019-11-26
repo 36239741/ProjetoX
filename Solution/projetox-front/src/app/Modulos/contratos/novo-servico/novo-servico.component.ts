@@ -2,8 +2,8 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { PlanoContratadoService } from './../../../shared/Services/plano-contratado.service';
 import { FormPlanoContratado } from './../../../shared/model/formPlanoContratado';
 
-import { Component, OnInit, ViewContainerRef} from '@angular/core';
-import { TdDialogService } from '@covalent/core/dialogs';
+import { Component, OnInit} from '@angular/core';
+import { ToastService } from 'src/app/shared/Services/toast.service';
 
 
 @Component({
@@ -17,8 +17,7 @@ export class NovoServicoComponent implements OnInit {
     constructor(private planoService: PlanoContratadoService,
                 private router: Router,
                 private activedRoute: ActivatedRoute,
-                private _dialogService: TdDialogService,
-                private _viewContainerRef: ViewContainerRef){}
+                private toast: ToastService){}
     ngOnInit(): void {
         this.activedRoute.params.subscribe(data =>{
             this.rota = '/contratos/' + data.id;
@@ -28,21 +27,13 @@ export class NovoServicoComponent implements OnInit {
     let plano: any = event;
     this.planoService.savePlanoContratado(plano).subscribe(data => {
         this.router.navigate(['/contratos/', event.numeroContrato]);
+        this.toast.toastSuccess('Serviços criado com sucesso !!');
         },
         err =>{
-            this.openAlert(err.error.message);
+            this.toast.toastError(err.error.message);
         }
     );
     }
 
-    openAlert(mensagemError: string): void {
-        this._dialogService.openAlert({
-          message: mensagemError,
-          disableClose: false, // defaults to false
-          viewContainerRef: this._viewContainerRef, //OPTIONAL
-          title: 'Error', //OPTIONAL, hides if not provided
-          closeButton: 'Close', //OPTIONAL, defaults to 'CLOSE'
-          width: '400px', //OPTIONAL, defaults to 400px
-        });
-      }
+
 }

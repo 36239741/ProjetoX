@@ -8,10 +8,11 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
 import { ReactiveFormsModule } from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button'; 
 import { NgxCurrencyModule } from "ngx-currency";
+import { FormCamposOcultosComponent } from './form-campos-ocultos/form-campos-ocultos.component';
 
 
 @NgModule({
-  declarations: [FormComponent],
+  declarations: [FormComponent, FormCamposOcultosComponent],
   imports: [
     CommonModule,
     MatInputModule,

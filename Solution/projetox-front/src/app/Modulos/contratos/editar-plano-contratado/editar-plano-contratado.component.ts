@@ -7,6 +7,7 @@ import { Subscription } from 'rxjs';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { BehaviorPlanoContratadoService } from 'src/app/shared/Services/behavior-plano-contratado.service';
 import { PlanoContratado } from 'src/app/shared/model/plano-contradao';
+import { ToastService } from '../../../shared/Services/toast.service'; 
 
 @Component({
   selector: 'app-editar-plano-contratado',
@@ -21,6 +22,7 @@ export class EditarPlanoContratadoComponent implements OnInit, OnDestroy {
   constructor(private behaviorPlanoContratado: BehaviorPlanoContratadoService,
               private activeRoute: ActivatedRoute,
               private router: Router,
+              private toast: ToastService,
               private planoContratadoService: PlanoContratadoService,) { 
                 this.activeRoute.params.subscribe(data =>{
                     this.rota = '/contratos/' + data.id;
@@ -85,6 +87,10 @@ export class EditarPlanoContratadoComponent implements OnInit, OnDestroy {
   recuperarForm(event: any){
     this.planoContratadoService.updatePlanoContratado(event).subscribe(data => {
         this.router.navigate([this.rota]);
+        this.toast.toastSuccess('Plano contratado atualizado com sucesso !!');
+     },
+     error => {
+         this.toast.toastError(error.error.message);
      });
   }
 

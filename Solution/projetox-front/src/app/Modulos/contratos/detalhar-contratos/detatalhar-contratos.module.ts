@@ -6,6 +6,7 @@ import { DetatalharContratosComponent } from './detatalhar-contratos.component';
 import {MatButtonModule} from '@angular/material/button';
 import { TabelaServicosModule } from './tabela-servicos/tabela-servicos.module';
 import {MatIconModule} from '@angular/material/icon';
+import { CovalentDialogsModule } from '@covalent/core/dialogs';
 @NgModule({
   declarations: [DetatalharContratosComponent],
   imports: [
@@ -14,7 +15,8 @@ import {MatIconModule} from '@angular/material/icon';
     MatButtonModule,
     TabelaServicosModule,
     MatIconModule,
-    RouterModule
+    RouterModule,
+    CovalentDialogsModule
 
   ],
 })
