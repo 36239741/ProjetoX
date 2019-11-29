@@ -1,11 +1,7 @@
 .height{
   height: 70%;
 }
-.import{
-  width: 200px;
-  height: 50px;
-  font-family: Verdana, Geneva, Tahoma, sans-serif;
-}
+
 .error{
   color: red;
 }
@@ -13,3 +9,4 @@
   height: 100%;
   position: relative;
 }
+

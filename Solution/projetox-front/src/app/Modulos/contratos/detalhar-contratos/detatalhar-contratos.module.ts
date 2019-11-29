@@ -7,6 +7,8 @@ import {MatButtonModule} from '@angular/material/button';
 import { TabelaServicosModule } from './tabela-servicos/tabela-servicos.module';
 import {MatIconModule} from '@angular/material/icon';
 import { CovalentDialogsModule } from '@covalent/core/dialogs';
+import {MatFormFieldModule} from '@angular/material/form-field'; 
+
 @NgModule({
   declarations: [DetatalharContratosComponent],
   imports: [
@@ -16,7 +18,8 @@ import { CovalentDialogsModule } from '@covalent/core/dialogs';
     TabelaServicosModule,
     MatIconModule,
     RouterModule,
-    CovalentDialogsModule
+    CovalentDialogsModule,
+    MatFormFieldModule
 
   ],
 })

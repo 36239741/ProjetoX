@@ -10,6 +10,7 @@ import { NovoServicoComponent } from './novo-servico/novo-servico.component';
 import { FindAllResolve } from '../../shared/resolvers/find-all-services.resolve';
 import { FindAllPlanoContratadoResolve } from '../../shared/resolvers/find-all-plano-contratado';
 import { EditarPlanoContratadoComponent } from './editar-plano-contratado/editar-plano-contratado.component';
+import { ConfigParametrosResolve } from '../../shared/resolvers/config-parametros-resolve.service';
 
 
 
@@ -30,11 +31,13 @@ const routes: Routes = [
 
     {path: ':id/novo-servico', component: NovoServicoComponent,
     data: {breadcrumb: 'Novo Serviço'},
-     resolve: { findAllService: FindAllResolve }},
+     resolve: { findAllService: FindAllResolve,
+                config: ConfigParametrosResolve }},
 
      {path: ':id/editar-servico', component: EditarPlanoContratadoComponent,
      data: {breadcrumb: 'Editar Serviço'},
-     resolve: { findAllService: FindAllResolve }},
+     resolve: { findAllService: FindAllResolve,
+                config: ConfigParametrosResolve }},
      
   ],
 },

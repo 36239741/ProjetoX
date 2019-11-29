@@ -83,13 +83,13 @@
       class="containerTotalContratos"
     >
       <div fxLayout="column" fxLayoutAlign="center end">
-        <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="6px">
+        <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="6px" class="totalizadores">
           <p><b>Contratos particular ativos:</b></p>
           <span>{{
             valorTotalContratosAtivos.Particular | currency: "BRL"
           }}</span>
         </div>
-        <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="6px">
+        <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="6px" class="totalizadores">
           <p><b>Contratos plano ativos:</b></p>
           <span>{{ valorTotalContratosAtivos.Plano | currency: "BRL" }}</span>
         </div>

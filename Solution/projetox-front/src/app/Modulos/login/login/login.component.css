@@ -9,11 +9,7 @@
   height: 500px;
   position: absolute;
 }
-button{
-  height: 40px;
-  width: 150px;
-  font-size: 1.3em;
-}
+
 #errorLogin{
   padding: 30px;
 }

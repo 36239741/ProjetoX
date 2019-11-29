@@ -1,9 +1,9 @@
 <div fxLayout='row' fxLayoutGap='90px'>
-    <div fxLayout='column' fxLayoutAlign="center center" >
-        <h3>No:</h3><p>{{ contrato.numero }}</p>
+    <div fxLayout='column' >
+        <mat-label><b>No:</b></mat-label><p>{{ contrato.numero }}</p>
     </div>
-    <div fxLayout='column' fxLayoutAlign="center start" class='servicos'>
-      <h3>Nome:</h3><p>{{ contrato.nomePaciente }}</p>
+    <div fxLayout='column' class='servicos'>
+      <mat-label><b>Nome:</b></mat-label><p>{{ contrato.nomePaciente }}</p>
     </div>
     <div fxLayout='row' class='servicos' fxLayoutAlign='end'>
         <div fxLayout='column' fxLayoutAlign='center end' fxLayoutGap="20px" class='servicos'>
@@ -18,23 +18,24 @@
         <app-tabela-servicos  [columns]='columns' [data]='data' (editar)="editarPlano($event)" (deletar)="deletarPlano($event)"></app-tabela-servicos>
       </div>
 </div>
-<div fxLayout='row' fxLayoutAlign='space-between' class='servicos'>
+
+<div fxLayout='row' fxLayoutAlign='space-between' class='row3'>
   <div fxLayout='column' fxLayoutGap='10px' fxLayoutAlign= 'center center'>
-    <h3>Situação Biometria</h3>
+    <mat-label><b>Situação Biometria</b></mat-label>
     <p>Cadastrado</p>
     <br/>
     <button mat-raised-button color="primary"><mat-icon>refresh</mat-icon>Atualizar Biometria</button>
   </div>
   <div fxLayout='column' fxLayoutAlign='center center'>
-    <h3>Total Plano Particular</h3>
+    <mat-label><b>Total Plano Particular</b></mat-label>
     <p>{{ totalPlanoParticular | currency:'BRL'}}</p>
   </div>
   <div fxLayout='column' fxLayoutAlign='center center'>
-      <h3>Total Plano Mensal</h3>
+      <mat-label><b>Total Plano Mensal</b></mat-label>
       <p>{{ totalPLanoMensal  | currency:'BRL'}}</p>
     </div>
     <div fxLayout='column' fxLayoutAlign='center center'>
-        <h3>Total do Contrato</h3>
+        <mat-label><b>Total do Contrato</b></mat-label>
         <p>{{ contrato.valorTotal | currency:'BRL' }}</p>
     </div>
 </div>

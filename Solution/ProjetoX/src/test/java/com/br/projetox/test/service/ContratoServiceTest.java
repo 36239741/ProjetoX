@@ -321,6 +321,7 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 			"/dataset/Usuario.sql",
 			"/dataset/Servico.sql",
 			"/dataset/Contrato.sql",
+			"/dataset/Config.sql",
 			"/dataset/PlanoContratado.sql"})
 	@Test
 	public void ContratoMustPassVerificandoRetornoTipoPlanoCotratadoTransientTipoMisto() throws NotFoundException {

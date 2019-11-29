@@ -1,108 +1,149 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
-        <div fxLayout="column" fxLayoutGap="50px">
-            <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="30px">
-
-            <div  *ngIf="planoDisable === true">
-                    <app-form-campos-ocultos fxLayout="row" fxLayoutGap="150px" [formCampos]="formOculto"></app-form-campos-ocultos>
+    <div fxLayout="column" fxLayoutGap="50px">
+        <div fxLayout="row" fxLayoutGap="30px">
+            <div fxLayout="column" fxFlex="1 1 5%">
+                <mat-label>
+                    <b>No:</b>
+                </mat-label>
+                <span>{{ detalhesContrato[0] }}</span>
             </div>
-                <mat-form-field *ngIf="planoDisable === false">
-                    <input
-                    formControlName="numeroContrato" 
-                    matInput placeholder="No:" 
-                    readonly="true"
-                    [value]="detalhesContrato[0]" 
-                    type="text" />
-                </mat-form-field>
-
-
-                <mat-form-field fxFlex="2 1 auto" *ngIf="planoDisable === false">
-                    <input
-                        formControlName="nomePaciente"
-                        matInput
-                        placeholder="Nome do Paciente:"
-                        [value]="detalhesContrato[1]" 
-                        readonly="true"
-                        type="text"
-                    />
-                </mat-form-field>
-                <mat-form-field *ngIf="planoDisable === false">
-                    <mat-label>Tipo do Plano</mat-label>
-                    <mat-select formControlName="tipoContrato" #fontSize value="16px"  [disabled]="planoDisable">
-                        <mat-option *ngFor="let plano of tipoPlano | keyvalue" [value]="plano.value">{{ plano.key }}</mat-option>
-                    </mat-select>
-                    <mat-error *ngIf="hasError('tipoContrato' , 'required')">Campo não preenchido</mat-error>
-                </mat-form-field>
-                <mat-form-field *ngIf="planoDisable === false">
-                    <mat-label>Serviço</mat-label>
-                    <mat-select formControlName="servico" #fontSize value="16px" [disabled]="servicoDisable" (blur)="valorSessao($event)">
-                        <mat-option *ngFor="let service of services" [value]="service.servico" >{{ service.servico }}</mat-option>
-                    </mat-select>
-                    <mat-error *ngIf="hasError('servico' , 'required')">Campo não preenchido</mat-error>
-                </mat-form-field>
+            <div fxLayout="column" fxFlex="1 1 25%">
+                <mat-label>
+                    <b>Nome paciente:</b>
+                </mat-label>
+                <span>{{ detalhesContrato[1] }}</span>
             </div>
-            <div fxLayout="row" fxLayoutGap="50px">
-                <mat-form-field>
-                    <input
-                        formControlName="horarioEntrada"
-                        matInput
-                        required
-                        placeholder="Horario de entrada padrão"
-                        type="time"
-                    />
-                    <mat-error *ngIf="hasError('horarioEntrada' , 'required')">Campo não preenchido</mat-error>
-                </mat-form-field>
-                <mat-form-field>
-                    <input
-                        formControlName="horarioSaida"
-                        matInput
-                        required
-                        placeholder="Horario de saída padrão"
-                        type="time"
-                    />
-                    <mat-error *ngIf="hasError('horarioSaida' , 'required')">Campo não preenchido</mat-error>
-                </mat-form-field>
+            <div *ngIf="planoDisable === true">
+                <app-form-campos-ocultos
+                    fxLayout="row"
+                    fxLayoutGap="150px"
+                    [formCampos]="formOculto"
+                ></app-form-campos-ocultos>
             </div>
-            <div fxLayout="row" fxLayoutGap="100px">
-                <div fxLayout="column">
-                    <h3>Dias da semana:</h3>
-                    <div
-                        fxLayout="column"
-                        *ngFor="let dias of checkBox"
+            <mat-form-field *ngIf="planoDisable === false">
+                <mat-label>Tipo do Plano</mat-label>
+                <mat-select
+                    formControlName="tipoContrato"
+                    #fontSize
+                    value="16px"
+                    [disabled]="planoDisable"
+                >
+                    <mat-option
+                        *ngFor="let plano of tipoPlano | keyvalue"
+                        [value]="plano.value"
+                        >{{ plano.key }}</mat-option
                     >
-                        <mat-checkbox  (change)="changeCkeckBox($event)"  [id]="dias.id" [name]="dias.name" [checked]="dias.checked"  color="primary" [value]="dias.value">{{ dias.label }}</mat-checkbox>
-                    </div>
-                </div>
-
-                <mat-form-field>
-                    <input
-                        id="valorPlano"
-                        formControlName="valorPlano"
-                        matInput
-                        placeholder="Valor do plano (Por sessão)"
-                        type="text" 
-                        currencyMask
-                        [options]="{ prefix: 'R$ ', thousands: '.', decimal: ',',align: 'left' }"
-                        [(ngModel)]="form.get('valorPlano').value"
-                        (blur)="calcularValorTotal()"
-                    />
-                    <mat-error *ngIf="hasError('valorPlano' , 'required')">Campo não preenchido</mat-error>
-                </mat-form-field>
-                    <mat-form-field>
-                        <input
-                            id="valorTotal"
-                            fromControlName="valorTotal"
-                            matInput
-                            placeholder="Valor total do plano"
-                            readonly="true"
-                            [value]="form.get('valorTotal').value | currency: 'BRL'"
-                            type="text"
-                        />
-                    </mat-form-field>
+                </mat-select>
+                <mat-error *ngIf="hasError('tipoContrato', 'required')"
+                    >Campo não preenchido</mat-error
+                >
+            </mat-form-field>
+            <mat-form-field *ngIf="planoDisable === false">
+                <mat-label>Serviço</mat-label>
+                <mat-select
+                    formControlName="servico"
+                    #fontSize
+                    value="16px"
+                    [disabled]="servicoDisable"
+                    (blur)="valorSessao($event)"
+                >
+                    <mat-option
+                        *ngFor="let service of services"
+                        [value]="service.servico"
+                        >{{ service.servico }}</mat-option
+                    >
+                </mat-select>
+                <mat-error *ngIf="hasError('servico', 'required')"
+                    >Campo não preenchido</mat-error
+                >
+            </mat-form-field>
+        </div>
+        <div fxLayout="row" fxLayoutGap="50px">
+            <mat-form-field>
+                <input
+                    formControlName="horarioEntrada"
+                    matInput
+                    required
+                    (blur)="calcularTempoSessao($event)"
+                    placeholder="Horario de entrada padrão"
+                    type="time"
+                />
+                <mat-error *ngIf="hasError('horarioEntrada', 'required')"
+                    >Campo não preenchido</mat-error
+                >
+            </mat-form-field>
+            <mat-form-field>
+                <input
+                    formControlName="sessao"
+                    matInput
+                    required
+                    (blur)="calcularTempoSessao($event)"
+                    placeholder="Número de sessao"
+                    type="number"
+                />
+                <mat-error *ngIf="hasError('sessao', 'required')"
+                    >Campo não preenchido</mat-error
+                >
+            </mat-form-field>
+            <div fxLayout="column" fxLayoutAlign="center center">
+                <mat-label><b>Horario de saída</b></mat-label>
+                <span>{{ form.get('horarioSaida').value }}</span>
             </div>
+        </div>
+        <div fxLayout="row" fxLayoutGap="100px">
+            <div fxLayout="column">
+                <h3>Dias da semana:</h3>
+                <div fxLayout="column" *ngFor="let dias of checkBox">
+                    <mat-checkbox
+                        (change)="changeCkeckBox($event)"
+                        [id]="dias.id"
+                        [name]="dias.name"
+                        [checked]="dias.checked"
+                        color="primary"
+                        [value]="dias.value"
+                        >{{ dias.label }}</mat-checkbox
+                    >
+                </div>
+                <mat-error *ngIf="diasSemanaValidator === false"
+                >Campo não preenchido</mat-error
+            >
+            </div>
+
+            <mat-form-field>
+                <input
+                    id="valorPlano"
+                    formControlName="valorPlano"
+                    matInput
+                    placeholder="Valor do plano (Por sessão)"
+                    type="text"
+                    currencyMask
+                    [options]="{
+                        prefix: 'R$ ',
+                        thousands: '.',
+                        decimal: ',',
+                        align: 'left'
+                    }"
+                    [(ngModel)]="form.get('valorPlano').value"
+                    (blur)="calcularValorTotal()"
+                />
+                <mat-error *ngIf="hasError('valorPlano', 'required')"
+                    >Campo não preenchido</mat-error
+                >
+            </mat-form-field>
+            <div fxLayout="column" fxFlex="1 1 25%">
+                    <mat-label>
+                        <b>Valor total do plano:</b>
+                    </mat-label>
+                    <span>{{ form.get('valorTotal').value | currency: 'BRL' }}</span>
+            </div>
+        </div>
         <div fxLayour="row" fxLayoutAlign="center center" fxLayoutGap="20px">
-            <button mat-raised-button color="primary" (click)="cancelar()">Cancelar</button>
-            <button mat-raised-button color="primary" (submit)="onSubmit()">Salvar</button>
+            <button mat-raised-button color="primary" (click)="cancelar()">
+                Cancelar
+            </button>
+            <button mat-raised-button color="primary" (submit)="onSubmit()">
+                Salvar
+            </button>
         </div>
-        </div>
-    </form>
-    
+    </div>
+</form>

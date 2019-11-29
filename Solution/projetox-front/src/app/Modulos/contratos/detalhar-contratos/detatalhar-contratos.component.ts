@@ -47,7 +47,7 @@ export class DetatalharContratosComponent implements OnInit {
 
   columns: ITdDataTableColumn[] = [
   { name: 'tipoContrato', label: 'Tipo do Contrato'},
-  { name: 'servico.servico', label: 'Serviço', width: {min:150} },
+  { name: 'servico.servico', label: 'Serviço', width: {min:200} },
   { name: 'sessao', label: 'Sessões', },
   { name: 'horarioEntrada', label: 'Entrada Padrão', format: DATA_FORMAT},
   { name: 'horarioSaida', label: 'Saída Padrão', format: DATA_FORMAT},
@@ -107,7 +107,7 @@ export class DetatalharContratosComponent implements OnInit {
                     this.totalPLanoMensal = 0;
                     this.totalPlanoParticular = 0;
                     this.calcularValorPlanos();
-                    this.toastService.toastSuccess('Serviço deletado com sucesso !!')
+                    this.toastService.toastSuccess('Serviço deletado com sucesso.')
                 });
                 this.contratoService.findByContrato(parseInt(this.contrato.numero)).subscribe(data =>{
                     this.contrato = data;

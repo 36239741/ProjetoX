@@ -1,11 +1,6 @@
 .servicos{
   width: 100%;
 }
-button{
-  width: 200px;
-  height: 40px;
-  font-family: Verdana, Geneva, Tahoma, sans-serif;
-}
 .table{
   height: 100%;
   width: 100%;
@@ -13,4 +8,8 @@ button{
 .divNumeroContrato{
     margin-right: 100px;
     width: 100%;
+}
+.row3{
+    width: 100%;
+    margin-top: 100px;
 }

@@ -87,7 +87,7 @@ export class EditarPlanoContratadoComponent implements OnInit, OnDestroy {
   recuperarForm(event: any){
     this.planoContratadoService.updatePlanoContratado(event).subscribe(data => {
         this.router.navigate([this.rota]);
-        this.toast.toastSuccess('Plano contratado atualizado com sucesso !!');
+        this.toast.toastSuccess('Serviços contratado atualizado com sucesso.');
      },
      error => {
          this.toast.toastError(error.error.message);
