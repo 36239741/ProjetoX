@@ -1,20 +1,29 @@
 <td-layout>
-    <td-navigation-drawer flex sidenavTitle="Projeto X" logo="Logo" >
+    <td-navigation-drawer flex >
       <mat-nav-list fxLayout="column" *ngFor="let menu of listMenu">
-        <a [routerLink]="menu.link" mat-list-item><mat-icon matListIcon svgIcon="{{ menu.menuIcon }}"></mat-icon><span matLine>{{ menu.menuName }}</span></a>
+        <a [routerLink]="menu.link" mat-list-item [matTooltip]="menu.toolTip"><mat-icon matListIcon >{{ menu.menuIcon }}</mat-icon><span matLine>{{ menu.menuName }}</span></a>
       </mat-nav-list>
     </td-navigation-drawer>
     <td-layout-nav >
         <div td-toolbar-content fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px"  id="toolbar-content" >
-          <button mat-icon-button td-menu-button tdLayoutToggle>
-            <mat-icon svgIcon="menu-icon" aria-hidden="false" aria-label="Icone do Menu"></mat-icon>
+          <button mat-icon-button td-menu-button tdLayoutToggle  matTooltip="Abrir menu">
+            <mat-icon  aria-hidden="false" aria-label="Icone do Menu">menu</mat-icon>
           </button>
-          <span>Logo</span>
+          <img src="../../../assets/img/logo-simbolo.png" class="logo">
           <span>{{ title }}</span>
           <span id="space"></span>
-          <a (click)="logout()" >Sair</a>
+          <a (click)="logout()" matTooltip="Sair da aplicação">Sair</a>
         </div>
-        <ng-content></ng-content>
+            <mat-card fxLayout='column' [class.mat-elevation-z8]="true">
+                <mat-card-header class="header">
+                  <mat-card-title>
+                  </mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                    <router-outlet></router-outlet>
+                </mat-card-content>
+              </mat-card>
+
         <td-layout-footer color="primary" fxLayout="row" fxLayoutAlign="center center">
            <span>Todos Direitos Resevados</span>
         </td-layout-footer>

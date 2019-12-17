@@ -4,26 +4,21 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+@Entity
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@Entity
-@Data
 public class Registro extends AbstractEntity implements Serializable {
 	
 	/*
@@ -43,10 +38,10 @@ public class Registro extends AbstractEntity implements Serializable {
 	@Enumerated(EnumType.ORDINAL)
 	private Situacao situacao;
 	
-	@ManyToOne(targetEntity = Contrato.class,cascade = {CascadeType.MERGE,CascadeType.PERSIST,CascadeType.PERSIST},fetch = FetchType.LAZY)
+	@ManyToOne(targetEntity = Contrato.class,fetch = FetchType.LAZY)
 	private Contrato contrato;
 	
-	@ManyToOne(targetEntity = PlanoContratado.class,cascade = {CascadeType.MERGE,CascadeType.PERSIST,CascadeType.REMOVE},fetch = FetchType.LAZY,optional = false)
+	@ManyToOne(targetEntity = PlanoContratado.class,fetch = FetchType.EAGER,optional = false)
 	private PlanoContratado planoContratado;
 
 	

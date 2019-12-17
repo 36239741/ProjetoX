@@ -5,7 +5,7 @@ import { Injectable } from '@angular/core';
 import { throwError, Observable } from 'rxjs';
 
 
-const API_URL = 'http://localhost:8080';
+const API_URL = 'http://localhost:4200/v1';
 
 @Injectable({
   providedIn: 'root'

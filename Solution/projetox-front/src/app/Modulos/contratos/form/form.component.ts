@@ -147,7 +147,7 @@ export class FormComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
     calcularValorTotal() {
         let valorTotal =
-            this.diasSemana.length * 4 * this.form.get("valorPlano").value;
+            this.diasSemana.length * 4 * this.form.get("valorPlano").value * this.form.get("sessao").value;
         this.form.get("valorTotal").setValue(valorTotal);
     }
     valorSessao(event) {

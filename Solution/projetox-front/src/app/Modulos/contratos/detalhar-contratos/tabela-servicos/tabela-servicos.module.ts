@@ -7,6 +7,7 @@ import { TabelaServicosComponent } from './tabela-servicos.component';
 import { MatSelectModule } from '@angular/material/select';
 import {MatIconModule} from '@angular/material/icon';
 import { RouterModule } from '@angular/router';
+import { MatTooltipModule } from '@angular/material';
 
 
 
@@ -18,7 +19,8 @@ import { RouterModule } from '@angular/router';
     MatSelectModule,
     FlexLayoutModule,
     MatIconModule,
-    RouterModule
+    RouterModule,
+    MatTooltipModule
     ],
   exports:[
     TabelaServicosComponent

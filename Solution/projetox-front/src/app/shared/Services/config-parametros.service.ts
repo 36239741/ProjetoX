@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ConfigParametro } from '../model/config-parametros';
 
-const API_URL = 'http://localhost:8080';
+const API_URL = 'http://localhost:4200/v1';
 @Injectable({
   providedIn: 'root'
 })

@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -36,5 +37,11 @@ public interface ContratoRepository extends JpaRepository<Contrato, Long> {
 			@Param("nomePaciente") String nomePaciente,
 			Pageable pageable, @Param("ativo") Boolean ativo);
 	
+	@Modifying
+	@Query("UPDATE Contrato contrato SET contrato.biometria = :biometria WHERE contrato.numero = :numeroContrato ")
+	public void saveBiometria(@Param("numeroContrato") String numeroContrato,
+							   @Param("biometria") byte[] biometria);
+	
+
 
 }

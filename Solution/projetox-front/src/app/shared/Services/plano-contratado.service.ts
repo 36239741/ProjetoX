@@ -5,7 +5,7 @@ import { map, catchError } from 'rxjs/operators';
 import { PlanoContratado } from '../model/plano-contradao';
 
 
-const API_URL = 'http://localhost:8080';
+const API_URL = 'http://localhost:4200/v1';
 @Injectable({
   providedIn: 'root'
 })

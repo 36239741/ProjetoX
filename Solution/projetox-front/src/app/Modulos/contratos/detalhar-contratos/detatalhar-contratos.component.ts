@@ -8,6 +8,9 @@ import { BehaviorInformacoesContratoService } from 'src/app/shared/Services/beha
 import { BehaviorPlanoContratadoService } from 'src/app/shared/Services/behavior-plano-contratado.service';
 import { ToastService } from 'src/app/shared/Services/toast.service';
 import { TdDialogService } from '@covalent/core/dialogs';
+import { MatSnackBar } from '@angular/material';
+import { ClockBiometriaComponent } from '../../../shared/components/clock-biometria/clock-biometria.component';
+
 
 
 
@@ -28,6 +31,9 @@ export class DetatalharContratosComponent implements OnInit {
 
   contrato: Contrato = new Contrato();
   data: any[] = [];
+  situacaoBiometria: String;
+  buttonBiometria: String;
+  biometriaClock: number = 30;
   numeroContrato: number = 0;
   totalPlanoParticular: number = 0;
   totalPLanoMensal: number = 0;
@@ -38,10 +44,14 @@ export class DetatalharContratosComponent implements OnInit {
               private behaviorInformacoesContrato: BehaviorInformacoesContratoService,
               private behaviorPlanoContratado: BehaviorPlanoContratadoService,
               private planoContratadoService: PlanoContratadoService,
-              private contratoService: ContratoService) { }
+              private contratoService: ContratoService,
+              private snackBar: MatSnackBar,
+              private router: Router
+              ) { }
 
   ngOnInit() {
     this.lodingTable();
+    this.situacaoDaBiometria();
 
   }
 
@@ -52,7 +62,7 @@ export class DetatalharContratosComponent implements OnInit {
   { name: 'horarioEntrada', label: 'Entrada Padrão', format: DATA_FORMAT},
   { name: 'horarioSaida', label: 'Saída Padrão', format: DATA_FORMAT},
   { name: 'diaConsulta', label: 'Dias da Semana',width: {min: 300} ,format: DIAS_FORMAT},
-  { name: 'valorPlano',label: 'Valor do Plano',numeric: true, format: DECIMAL_FORMAT},
+  { name: 'valorTotal',label: 'Valor do Plano',numeric: true, format: DECIMAL_FORMAT},
   { name: 'acoes', label: 'Ações'}
   ];
 
@@ -68,6 +78,21 @@ export class DetatalharContratosComponent implements OnInit {
     this.data.push(this.contrato.planoContratado);
     this.calcularValorPlanos();
   }
+  openSnackBarClockBiometria() {
+    this.snackBar.openFromComponent(ClockBiometriaComponent, {
+        duration: this.biometriaClock * 1000
+    });
+  }
+  saveBiometria() {
+    this.contratoService.saveBiometria(this.contrato.numero).subscribe(() =>{
+        this.snackBar.dismiss();
+        this.toastService.toastSuccess('Biometria cadastrada com sucesso.');
+    },
+    error =>{
+        this.snackBar.dismiss();
+        this.toastService.toastError(error.error.message);
+    });
+  }
 
   /*Metodo que calcula o valor total dos planos
   @return void*/
@@ -81,6 +106,17 @@ export class DetatalharContratosComponent implements OnInit {
        }
      });
   }
+  situacaoDaBiometria() {
+    if(this.contrato.biometria === null) {
+        this.situacaoBiometria = 'Cadastrar';
+        this.buttonBiometria = 'Cadastrar Biometria';
+    }
+    else {
+        this.situacaoBiometria = 'Cadastrado';
+        this.buttonBiometria = 'Atualizar Biometria';
+    }
+
+  }
 
   editarPlano(event){
     this.behaviorPlanoContratado.setBehaviorView(event);
@@ -88,7 +124,7 @@ export class DetatalharContratosComponent implements OnInit {
   /*Metodo que faz o delete logico de um plano contratado e atualiza os dados da tabela
   @param event any - recebe um evento que contem os dados do plano contratado da linha da tabela
   return void*/
-  deletarPlano(event){
+  deletarPlano(event) {
     this._dialogService.openConfirm({
         message: 'Deseja realmente excluir esse serviço?',
         disableClose: false, // defaults to false

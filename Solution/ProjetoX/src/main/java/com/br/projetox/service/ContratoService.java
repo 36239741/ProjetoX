@@ -1,5 +1,6 @@
 package com.br.projetox.service;
 
+import java.io.UnsupportedEncodingException;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,7 +27,10 @@ import com.br.projetox.entity.Servico;
 import com.br.projetox.entity.TipoContrato;
 import com.br.projetox.exception.ImportPlanilhaException;
 import com.br.projetox.repository.ContratoRepository;
+import com.br.projetox.util.FingerPrintUtil;
 
+import CIDBio.ImageAndTemplate;
+import CIDBio.Template;
 import javassist.NotFoundException;
 
 @Service
@@ -41,6 +45,9 @@ public class ContratoService {
 
 	@Autowired
 	private ContratoRepository repository;
+
+	@Autowired
+	private FingerPrintUtil fingerPrint;
 
 	private static final Integer NUM_CONTRATO = 0;
 	private static final Integer NOME_PACIENTE = 1;
@@ -78,6 +85,7 @@ public class ContratoService {
 	public void saveContrato(Contrato contrato) {
 		this.repository.save(contrato);
 	}
+
 	/*
 	 * Método de busca que utiliza o campo numero , nomePaciente aonde pode ser
 	 * utilizados em conjunto ou separados
@@ -115,6 +123,8 @@ public class ContratoService {
 		return this.repository.findByFiltersParamActive(numero, nomePaciente, pageable, ativo);
 
 	}
+
+
 
 	/*
 	 * Método para busca de contratos atraves do numero do contrato cadastrado
@@ -337,6 +347,50 @@ public class ContratoService {
 			}
 
 		}
+	}
+
+	/*
+	 * Metodo captura tres vezes a digital, realiza um merge nas tres imagens e
+	 * salva no banco em forma de bytes o template da biometria
+	 * 
+	 * @param String contractNumber - Numero do contrato, que sera cadastrado a
+	 * biometria
+	 * 
+	 * @return void
+	 * 
+	 * @throws FingerPrintException
+	 */
+	public void saveFingerprint(String contractNumber) throws NotFoundException {
+		Template templateMerge = this.fingerPrint.captureThreeFingerPrint();
+		byte[] binary;
+		binary = templateMerge.getTemplate().getBytes();
+		this.repository.saveBiometria(contractNumber, binary);
+	}
+
+	/*
+	 * Metodo verifica se uma digital lida corresponde a salva no banco
+	 * 
+	 * @Param String numeroContrato - numero do contrato a ser consultado
+	 * 
+	 * @return Boolean - retorna true se sucesso e false se falhar
+	 */
+	public Contrato findByBiometria() throws UnsupportedEncodingException {
+		ImageAndTemplate imgAndTemplate = null;
+		List<Contrato>  listContrato = null;
+		Contrato returnContrato = null;
+			listContrato = this.repository.findAll();
+			imgAndTemplate = this.fingerPrint.captureFingerPrint();
+			for(Contrato contrato: listContrato) {
+				Boolean match = this.fingerPrint.verifyFingerprint(contrato.getBiometria(), imgAndTemplate);
+				if(Boolean.TRUE.equals(match)) {
+					returnContrato = contrato;
+				}
+			}
+		return returnContrato;
+	}
+	
+	public void cancelCaptureFingerPrint() {
+		this.fingerPrint.cancelCapture();
 	}
 
 }

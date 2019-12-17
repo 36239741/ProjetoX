@@ -1,13 +1,14 @@
+<div class="container">
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
     <div fxLayout="column" fxLayoutGap="50px">
-        <div fxLayout="row" fxLayoutGap="30px">
-            <div fxLayout="column" fxFlex="1 1 5%">
+        <div fxLayout="row"  fxLayoutAlign="space-between">
+            <div fxLayout="column" fxLayoutAlign="center center">
                 <mat-label>
                     <b>No:</b>
                 </mat-label>
                 <span>{{ detalhesContrato[0] }}</span>
             </div>
-            <div fxLayout="column" fxFlex="1 1 25%">
+            <div fxLayout="column" fxLayoutAlign="center center">
                 <mat-label>
                     <b>Nome paciente:</b>
                 </mat-label>
@@ -20,7 +21,7 @@
                     [formCampos]="formOculto"
                 ></app-form-campos-ocultos>
             </div>
-            <mat-form-field *ngIf="planoDisable === false">
+            <mat-form-field *ngIf="planoDisable === false" fxFlex="1 1 25%">
                 <mat-label>Tipo do Plano</mat-label>
                 <mat-select
                     formControlName="tipoContrato"
@@ -38,7 +39,7 @@
                     >Campo não preenchido</mat-error
                 >
             </mat-form-field>
-            <mat-form-field *ngIf="planoDisable === false">
+            <mat-form-field *ngIf="planoDisable === false" fxFlex="1 1 25%">
                 <mat-label>Serviço</mat-label>
                 <mat-select
                     formControlName="servico"
@@ -58,8 +59,8 @@
                 >
             </mat-form-field>
         </div>
-        <div fxLayout="row" fxLayoutGap="50px">
-            <mat-form-field>
+        <div fxLayout="row"  fxLayoutAlign="space-between">
+            <mat-form-field fxFlex="1 1 25%">
                 <input
                     formControlName="horarioEntrada"
                     matInput
@@ -72,12 +73,13 @@
                     >Campo não preenchido</mat-error
                 >
             </mat-form-field>
-            <mat-form-field>
+            <mat-form-field fxFlex="1 1 25%">
                 <input
                     formControlName="sessao"
                     matInput
                     required
                     (blur)="calcularTempoSessao($event)"
+                    (blur)="calcularValorTotal()"
                     placeholder="Número de sessao"
                     type="number"
                 />
@@ -90,7 +92,7 @@
                 <span>{{ form.get('horarioSaida').value }}</span>
             </div>
         </div>
-        <div fxLayout="row" fxLayoutGap="100px">
+        <div fxLayout="row" fxLayoutAlign="space-between">
             <div fxLayout="column">
                 <h3>Dias da semana:</h3>
                 <div fxLayout="column" *ngFor="let dias of checkBox">
@@ -109,7 +111,7 @@
             >
             </div>
 
-            <mat-form-field>
+            <mat-form-field fxFlex="1 1 25%">
                 <input
                     id="valorPlano"
                     formControlName="valorPlano"
@@ -147,3 +149,4 @@
         </div>
     </div>
 </form>
+</div>

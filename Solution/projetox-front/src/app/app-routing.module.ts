@@ -1,17 +1,14 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import { HomeComponent } from './Modulos/home/home.component';
 import { LoginComponent } from './Modulos/login/login/login.component';
 
 
 
 const routes: Routes = [
   {path: '', component: LoginComponent},
-  {path: 'home', component: HomeComponent},
-  {path: 'contratos', loadChildren: () => import('./Modulos/contratos/contratos.module').then(m => m.ContratosModule),
-  data: {breadcrumb: 'Contratos'}},
-  {path: 'relatorios', loadChildren: () => import('./Modulos/relatorios/relatorios.module').then(m => m.RelatoriosModule)}
+  {path: 'home', loadChildren: () => import('./Modulos/Layout/layout.module').then(m => m.LayoutModule)},
+  {path: 'contratos', loadChildren: () => import('../app/Modulos/contratos/contratos.module').then(m => m.ContratosModule)},
 ];
 
 @NgModule({

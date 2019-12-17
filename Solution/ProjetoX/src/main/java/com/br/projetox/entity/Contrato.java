@@ -14,7 +14,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -49,7 +48,7 @@ public class Contrato extends AbstractEntity implements Serializable {
 	@NotNull
 	private Double valorTotal;
 	
-	private Byte[] biometria;
+	private byte[] biometria;
 	
 	@JsonIgnoreProperties("contrato")
 	@OneToMany(targetEntity = PlanoContratado.class,cascade = {CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.MERGE}, fetch = FetchType.LAZY,mappedBy = "contrato")

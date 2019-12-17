@@ -21,7 +21,8 @@ import { FormCamposOcultosComponent } from './form-campos-ocultos/form-campos-oc
     MatCheckboxModule,
     MatButtonModule,
     ReactiveFormsModule,
-    NgxCurrencyModule
+    NgxCurrencyModule,
+    
   ],
   exports: [FormComponent]
 })

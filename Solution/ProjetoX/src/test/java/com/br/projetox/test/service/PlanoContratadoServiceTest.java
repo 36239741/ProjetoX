@@ -19,6 +19,7 @@ import com.br.projetox.entity.PlanoContratado;
 import com.br.projetox.entity.Servico;
 import com.br.projetox.entity.TipoContrato;
 import com.br.projetox.exception.DuplicatePlanoContratadoException;
+import com.br.projetox.exception.FingerPrintException;
 import com.br.projetox.exception.MapPlanoContratadoException;
 import com.br.projetox.repository.ContratoRepository;
 import com.br.projetox.repository.PlanoContratoRepository;
@@ -286,6 +287,19 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 		;
 
 	}
+	
+		/*TESTE QUE VERIFICA A DIGITAL E RETORNA TODOS PLANOS CONTRATADOS*/
+		@Sql({"/dataset/truncate.sql",
+			"/dataset/Servico.sql",
+			"/dataset/Contrato.sql",
+			"/dataset/Usuario.sql",
+			"/dataset/PlanoContratado.sql",
+			"/dataset/DiaConsulta.sql"})
+	@Test
+	public void findByBiometriaTestMustPassVerificaABiometriaERetornaOsTodosPlanosContratados() throws Exception  {
+			List<PlanoContratado> list = this.planoContratoService.findByBiometria();
+			Assert.assertNotNull(list);
+	}
 
 
 	/* MUST FAIL */
@@ -342,6 +356,19 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 		dias.add(dia2);
 		Servico servico = this.servicoRepository.findByServicoIgnoreCase(map.get("servico").toString());
 		PlanoContratado planoContratado = this.planoContratoService.mapPlanoContratado(map);
+	}
+	
+		/*TESTE QUE VERIFICA A DIGITAL E RETORNA TODOS PLANOS CONTRATADOS*/
+		@Sql({"/dataset/truncate.sql",
+			"/dataset/Servico.sql",
+			"/dataset/Contrato.sql",
+			"/dataset/Usuario.sql",
+			"/dataset/PlanoContratado.sql",
+			"/dataset/DiaConsulta.sql"})
+	@Test(expected = FingerPrintException.class)
+	public void findByBiometriaTestMustFailVerificaABiometriaERetornaOsTodosPlanosContratados() throws Exception  {
+			List<PlanoContratado> list = this.planoContratoService.findByBiometria();
+			Assert.assertNotNull(list);
 	}
 
 }

@@ -7,8 +7,7 @@ import { Contrato, PageContrato } from '../model/Contrato';
 import { FeedBack } from '../model/feedBack';
 
 
-const API_URL = 'http://localhost:8080';
-
+const API_URL = 'http://localhost:4200/v1';
 @Injectable({
   providedIn: 'root'
 })
@@ -47,10 +46,21 @@ export class ContratoService {
       catchError(this.handleError)
     );
   }
-  findByFilters(nome: String, numero: String, page: number, size: number, statusContrato: boolean): Observable<PageContrato>{
+  findByFilters(nome: String, numero: String, page: number, size: number, statusContrato: boolean,sort: String,
+    atributo: String): Observable<PageContrato>{
     return this.httpClient.get<PageContrato>(API_URL + '/contratos/filter?nomePaciente=' + nome +
-    '&numero=' + numero + '&ativo=' + statusContrato + '&page=' + page + '&size=' + size ).pipe(map((data: PageContrato) => data),
+    '&numero=' + numero + '&ativo=' + statusContrato + '&page=' + page + '&size=' + size + "&sort="+ sort + "&atributo=" + atributo).pipe(map((data: PageContrato) => data),
     catchError(this.handleError));
+  }
+  findByBiometria(): Observable<Contrato>{
+    return this.httpClient.get<Contrato>(API_URL + '/contratos/find-by-biometria');
+  }
+  saveBiometria(numeroContrato: String) {
+    return this.httpClient.post(API_URL + '/contratos/save-biometria', numeroContrato);
+  }
+
+  cancelCapture(){
+    return this.httpClient.get(API_URL + '/contratos/cancel-capture');
   }
 
   importContratos(xlsx: FormData): Observable<FeedBack>{

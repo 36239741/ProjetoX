@@ -22,7 +22,7 @@ import com.br.projetox.service.PlanoContratadoService;
 import javassist.NotFoundException;
 
 @RestController
-@RequestMapping(path = "/planos")
+@RequestMapping(path = "v1/planos")
 public class PlanoContratadoController {
 	@Autowired
 	private PlanoContratadoService planoContratadoService;

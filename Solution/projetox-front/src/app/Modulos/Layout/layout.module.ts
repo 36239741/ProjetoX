@@ -1,14 +1,13 @@
+import { HomeModule } from './../home/home.module';
 import { RouterModule } from '@angular/router';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { CovalentLayoutModule } from '@covalent/core/layout';
-import { MatListModule } from '@angular/material/list';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { FlexLayoutModule } from '@angular/flex-layout';
+
 import { LayoutComponent } from './layout.component';
 import { HttpClientModule } from '@angular/common/http';
+import { LayoutRoutingModule } from './layout.routing';
+import { MaterialModule } from 'src/app/core/material/material.module';
 
 @NgModule({
   declarations: [
@@ -16,13 +15,11 @@ import { HttpClientModule } from '@angular/common/http';
   ],
   imports: [
     CommonModule,
-    CovalentLayoutModule,
-    MatListModule,
-    MatButtonModule,
-    MatIconModule,
-    FlexLayoutModule,
     RouterModule,
-    HttpClientModule
+    HttpClientModule,
+    LayoutRoutingModule,
+    MaterialModule,
+    HomeModule
   ],
   exports:[
     LayoutComponent

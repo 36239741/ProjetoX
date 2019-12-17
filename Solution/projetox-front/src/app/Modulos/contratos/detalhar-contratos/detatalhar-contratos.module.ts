@@ -8,6 +8,8 @@ import { TabelaServicosModule } from './tabela-servicos/tabela-servicos.module';
 import {MatIconModule} from '@angular/material/icon';
 import { CovalentDialogsModule } from '@covalent/core/dialogs';
 import {MatFormFieldModule} from '@angular/material/form-field'; 
+import { MatTooltipModule } from '@angular/material';
+import { ClockBiometriaModule } from '../../../shared/components/clock-biometria/clock-biometria.module';
 
 @NgModule({
   declarations: [DetatalharContratosComponent],
@@ -19,8 +21,11 @@ import {MatFormFieldModule} from '@angular/material/form-field';
     MatIconModule,
     RouterModule,
     CovalentDialogsModule,
-    MatFormFieldModule
+    MatFormFieldModule,
+    MatTooltipModule,
+    ClockBiometriaModule
 
   ],
+
 })
 export class DetatalharContratosModule { }

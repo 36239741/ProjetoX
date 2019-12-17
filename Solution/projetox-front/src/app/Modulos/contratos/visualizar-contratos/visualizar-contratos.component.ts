@@ -84,7 +84,7 @@ export class VisualizarContratosComponent implements OnInit, OnDestroy {
   contratos e assim atualizando o total de contratos e a primeira page do pagiable
   @return void*/
   findByFilter() {
-    this.contratoService.findByFilters(this.nomePaciente, this.numero, this.page , this.pageSize, this.statusContrato)
+    this.contratoService.findByFilters(this.nomePaciente, this.numero, this.page , this.pageSize, this.statusContrato, 'ASC', 'numero')
     .subscribe(pageFilter => {
       this.total = pageFilter.totalElements;
       this.contratos = pageFilter['content'];
@@ -157,8 +157,8 @@ export class VisualizarContratosComponent implements OnInit, OnDestroy {
   @void*/
   openModalImport($event) {
     this._dialogService.open(ImportComponent, {
-      width: ' 500px ',
-      height: ' 500px ',
+      width: ' 700px ',
+      height: ' 700px ',
       disableClose: false
     });
   }

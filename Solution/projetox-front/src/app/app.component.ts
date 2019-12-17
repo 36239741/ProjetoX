@@ -1,5 +1,5 @@
 import { Router, NavigationStart, NavigationEnd, NavigationCancel, NavigationError } from '@angular/router';
-import { Component, OnInit, AfterViewChecked } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import 'hammerjs';
 import { HttpInterceptor, HttpRequest, HttpHandler } from '@angular/common/http';

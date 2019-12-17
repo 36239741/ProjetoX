@@ -1,0 +1,36 @@
+
+<div
+    fxLayout="row"
+    fxLayoutAlign="center center"
+    fxLayoutGap="20px"
+    class="row1"
+>
+    <button
+        mat-flat-button
+        color="accent"
+        (click)="openClockBiometria()"
+        (click)="saveEntrada()"
+    >
+        Salvar registro entrada
+    </button>
+    <button mat-flat-button color="accent"
+    (click)="openClockBiometria()"
+    (click)="saveSaida()">Salvar registro saída</button>
+</div>
+<br />
+<br />
+<div *ngIf="hideTable">
+<app-table
+    [columns]="columns"
+    [data]="data"
+    [clickable]="true"
+    [message]="noDataMessage"
+    (eventRowClick)="rowClick($event)"
+>
+</app-table>
+<br/>
+<br/>
+<div fxLayout="row" fxLayoutAlign="center center" class="div-btn">
+        <button mat-flat-button color="primary" (click)="hideTable = false">Cancelar</button>
+</div>
+</div>

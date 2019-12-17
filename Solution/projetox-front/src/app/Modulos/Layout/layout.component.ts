@@ -21,24 +21,30 @@ export class LayoutComponent implements OnInit {
     private route: Router
     )
     {
-    iconRegistry.addSvgIcon('menu-icon', sanitizer.bypassSecurityTrustResourceUrl('assets/icons/menu-icon.svg'));
-    iconRegistry.addSvgIcon('contratos-icon', sanitizer.bypassSecurityTrustResourceUrl('assets/icons/contratos.svg'));
-    iconRegistry.addSvgIcon('relatorios-icon', sanitizer.bypassSecurityTrustResourceUrl('assets/icons/relatorios.svg'));
 
   }
 
-  listMenu: MenuList[] = [{
-    menuIcon: 'contratos-icon',
+  listMenu: MenuList[] = [
+    {
+        menuIcon: 'home',
+        menuName: 'Página incial',
+        link: '/home',
+        toolTip: 'Voltar a página inicial.'
+      },
+    {
+    menuIcon: 'description',
     menuName: 'Contratos',
-    link: '/contratos'
+    link: '/contratos',
+    toolTip: 'Visualizar contratos cadastrados.'
   },
 {
-  menuIcon: 'relatorios-icon',
+  menuIcon: 'assessment',
   menuName: 'Relatorios',
-  link: '/relatorios'
+  link: '/relatorios',
+  toolTip: 'Visualizar relatorios'
 }];
 
-  @Input() title: string = '';
+  @Input() title: string = 'Espaço especializado Gene Gouveia';
 
 
   ngOnInit() {

@@ -1,7 +1,10 @@
 <div fxLayout="row" fxLayoutGap="30px" class="filter">
-  <app-filter (filtro)="filterContrato($event)" placeholder="No. Contrato">
+  <app-filter (filtro)="filterContrato($event)" 
+  placeholder="No. Contrato"
+  matTooltip="Filtrar pelo número do contrato">
   </app-filter>
   <app-filter
+    matTooltip="Filtar por nome do paciente"
     (filtro)="filterNomePaciente($event)"
     placeholder="Nome do Paciente"
   >
@@ -9,6 +12,7 @@
   <mat-form-field fxLayoutAlign="center">
     <mat-label>Status do contrato</mat-label>
     <mat-select
+        matTooltip="Filtrar pelo status do contrato"
       ([value])="(statusContrato)"
       (selectionChange)="filterContratoStatusContrato($event)"
 
@@ -25,8 +29,8 @@
     <app-import-button (click)="openModalImport($event)"></app-import-button>
   </div>
 </div>
-<div>
   <td-data-table
+  matTooltip="Visualizar detalhes do contrato"
     #dataTable
     [data]="contratos"
     [columns]="columns"
@@ -96,4 +100,3 @@
       </div>
     </div>
   </div>
-</div>

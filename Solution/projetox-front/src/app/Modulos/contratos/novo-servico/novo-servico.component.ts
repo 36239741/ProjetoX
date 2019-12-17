@@ -27,7 +27,7 @@ export class NovoServicoComponent implements OnInit {
     let plano: any = event;
     this.planoService.savePlanoContratado(plano).subscribe(data => {
         this.router.navigate(['/contratos/', event.numeroContrato]);
-        this.toast.toastSuccess('Serviços criado com sucesso. ');
+        this.toast.toastSuccess('Serviço criado com sucesso. ');
         },
         err =>{
             this.toast.toastError(err.error.message);

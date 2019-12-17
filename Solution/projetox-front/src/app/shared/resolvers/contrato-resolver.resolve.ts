@@ -14,6 +14,6 @@ export class ContratoResolverResolve implements Resolve< Observable<PageContrato
   constructor(private contratoService: ContratoService) { }
 
   resolve(route: import("@angular/router").ActivatedRouteSnapshot, state: import("@angular/router").RouterStateSnapshot): Observable<PageContrato> | Observable<Observable<PageContrato>> | Promise<Observable<PageContrato>> {
-    return this.contratoService.findAllContratos(0, 10, 'DESC', 'ativo');
+    return this.contratoService.findAllContratos(0, 10, 'ASC', 'numero');
   }
 }

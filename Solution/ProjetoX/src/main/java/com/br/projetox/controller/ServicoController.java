@@ -12,7 +12,7 @@ import com.br.projetox.entity.Servico;
 import com.br.projetox.service.ServicoService;
 
 @RestController
-@RequestMapping(path = "servicos")
+@RequestMapping(path = "v1/servicos")
 public class ServicoController {
 	@Autowired
 	private ServicoService servicoService;

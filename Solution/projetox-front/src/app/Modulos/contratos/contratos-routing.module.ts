@@ -1,7 +1,7 @@
+import { LayoutComponent } from './../Layout/layout.component';
 import { VisualizarContratosComponent } from './visualizar-contratos/visualizar-contratos.component';
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { ContratosComponent } from './contratos.component';
 import { DetatalharContratosComponent } from './detalhar-contratos/detatalhar-contratos.component';
 import { ContratoResolverResolve } from '../../shared/resolvers/contrato-resolver.resolve';
 import { ContratoResolveFindByNumeroResolve } from '../../shared/resolvers/contrato-resolve-find-by-numero';
@@ -16,7 +16,8 @@ import { ConfigParametrosResolve } from '../../shared/resolvers/config-parametro
 
 
 const routes: Routes = [
-  {path: '', component: ContratosComponent,
+  
+  {path: '', component: LayoutComponent,
   children: [
     {path: '', component: VisualizarContratosComponent,
     data: {breadcrumb: 'Visualizar Contratos', },
@@ -38,7 +39,6 @@ const routes: Routes = [
      data: {breadcrumb: 'Editar Serviço'},
      resolve: { findAllService: FindAllResolve,
                 config: ConfigParametrosResolve }},
-     
   ],
 },
 ];

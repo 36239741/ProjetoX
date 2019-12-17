@@ -12,7 +12,7 @@ import com.br.projetox.entity.ConfiguracaoParametro;
 import com.br.projetox.service.ConfigParametroService;
 @Component
 @RestController()
-@RequestMapping(path = "/config-parametros")
+@RequestMapping(path = "v1/config-parametros")
 public class ConfigParametroController {
 	@Autowired
 	private ConfigParametroService configService;

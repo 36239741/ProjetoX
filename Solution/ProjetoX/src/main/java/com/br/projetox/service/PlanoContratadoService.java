@@ -1,5 +1,6 @@
 package com.br.projetox.service;
 
+import java.io.UnsupportedEncodingException;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.Collection;
@@ -37,7 +38,12 @@ public class PlanoContratadoService {
 
 	@Autowired
 	private PlanoContratoRepository planoContraRepository;
+
 	
+	public PlanoContratado findById(Long id) throws NotFoundException {
+		return this.planoContraRepository.findById(id).orElseThrow(() -> 
+		new NotFoundException("Nenhum plano encontrado com esse id: " + id) );
+	}
 	public void deleteLogical(String planoContratadoId) {
 		this.planoContraRepository.deleteLogical(Long.parseLong(planoContratadoId));
 		PlanoContratado planoContratado = this.planoContraRepository.findById(Long.parseLong(planoContratadoId)).get();
@@ -54,13 +60,13 @@ public class PlanoContratadoService {
 	 * @return List<PlanoContratado>
 	 */
 	public List<PlanoContratado> findAllPlanoContratadoByContratoId(String numeroContrato) {
-		List<PlanoContratado> listPlanos =  this.planoContraRepository.findByContratoId(numeroContrato);
-		for(PlanoContratado planos : listPlanos) {
+		List<PlanoContratado> listPlanos = this.planoContraRepository.findByContratoId(numeroContrato);
+		for (PlanoContratado planos : listPlanos) {
 			Collections.sort(planos.getDiaConsulta(), new Comparator<DiaConsulta>() {
 				@Override
 				public int compare(DiaConsulta o1, DiaConsulta o2) {
 					return o1.getDiasSemana().compareTo(o2.getDiasSemana());
-					
+
 				}
 			});
 		}
@@ -144,12 +150,14 @@ public class PlanoContratadoService {
 	 */
 	private void contractUpdateValor(Map<String, Object> mapPlanoContratado) throws NotFoundException {
 		Double totalContral = 0.0;
-		
-		List<PlanoContratado> list = this.planoContraRepository.findByContratoId(mapPlanoContratado.get("numeroContrato").toString());
-		for(PlanoContratado planoContratado: list) {
+
+		List<PlanoContratado> list = this.planoContraRepository
+				.findByContratoId(mapPlanoContratado.get("numeroContrato").toString());
+		for (PlanoContratado planoContratado : list) {
 			totalContral += planoContratado.getValorTotal();
 		}
-		Contrato contrato = this.contratoService.findByContractNumber(mapPlanoContratado.get("numeroContrato").toString());
+		Contrato contrato = this.contratoService
+				.findByContractNumber(mapPlanoContratado.get("numeroContrato").toString());
 		contrato.setValorTotal(totalContral);
 		this.contratoService.saveContrato(contrato);
 	}
@@ -213,10 +221,6 @@ public class PlanoContratadoService {
 	}
 
 	/*
-	 * ==================== TESTES DE BUSCAR PLANOS CONTRATADOS ATIVOS
-	 * ==============================
-	 */
-	/*
 	 * Método que busca os plano contratado ativos de um determinado contrato
 	 * 
 	 * @param tipoContrato TipoContrato - parametro que mostra tipo do contrato
@@ -231,6 +235,17 @@ public class PlanoContratadoService {
 	public PlanoContratado findPlanoContratadoAtivo(long servicoId, long contratoId, TipoContrato tipoContrato) {
 		return this.planoContraRepository.findPlanoContratadoAtivoByContratoAndServicoAndTipoContrato(servicoId,
 				contratoId, tipoContrato);
+	}
+
+	/*
+	 * Método que busca os planos contratados atraves da biometria cadastrada no
+	 * contrato
+	 * 
+	 * @return List<PlanoContratado> - retorna todos os planosContratados
+	 */
+	public List<PlanoContratado> findByBiometria() throws NotFoundException, UnsupportedEncodingException {
+		Contrato contrato = this.contratoService.findByBiometria();
+		return this.planoContraRepository.findByContratoId(contrato.getNumero());
 	}
 
 }

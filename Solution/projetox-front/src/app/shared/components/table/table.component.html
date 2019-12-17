@@ -1,0 +1,12 @@
+<td-data-table
+  #dataTable
+  [data]="data"
+  [clickable]="clickable"
+  [columns]="columns"
+  (rowClick)="rowClick($event)"
+  >
+  <ng-content></ng-content>
+</td-data-table>
+<div class="md-padding" *ngIf="!dataTable.hasData"  layout="row" layout-align="center center">
+    <h3>{{ message }}</h3>
+</div>

@@ -1,6 +1,6 @@
 import { TdLoadingService, LoadingType, LoadingMode } from '@covalent/core/loading';
 import { ContratoService } from './../../../../shared/Services/contrato.service';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { TdDialogService } from '@covalent/core/dialogs';
 import { FeedBack } from '../../../../shared/model/feedBack';
 import { BehaviorMessageFeedBackService } from '../../../../shared/Services/behavior-message-feed-back.service';

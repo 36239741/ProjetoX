@@ -1,6 +1,6 @@
 <div class="container-form" fxLayout="column" fxLayoutAlign="center center">
     <div class="form" [class.mat-elevation-z8]="true" fxLayout="column" fxLayoutAlign="center center" >
-      <h1>Login</h1>
+      <img src="../../../../assets/img/logo.png" class="logo">
       <td-dynamic-forms #form [elements]="elements" (submit)="login()" >
         <ng-template let-element ngFor [ngForOf]="elements">
           <ng-template let-control="control" [tdDynamicFormsError]="element.name">

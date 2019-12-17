@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
 import { RelatoriosComponent } from './relatorios.component';
+import { LayoutComponent } from '../Layout/layout.component';
 
 
 
@@ -9,7 +10,9 @@ import { RelatoriosComponent } from './relatorios.component';
 
 
 const routes: Routes = [
-  {path: '', component: RelatoriosComponent},
+    {path: '', component: LayoutComponent,
+    children: [ {path: '', component: RelatoriosComponent}]},
+ 
 
 ];
 

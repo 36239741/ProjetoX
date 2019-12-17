@@ -1,5 +1,6 @@
 package com.br.projetox.controller;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
 import javax.annotation.processing.FilerException;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,14 +29,29 @@ import javassist.NotFoundException;
 
 @Component
 @RestController
-@RequestMapping(path = "/contratos")
+@RequestMapping(path = "v1/contratos")
 public class ContratoController {
 	@Autowired
 	private ContratoService service;
 	
 	
+	@GetMapping(path = "/find-by-biometria")
+	public ResponseEntity<Contrato> findByBiometria() throws UnsupportedEncodingException{
+		Contrato contrato = this.service.findByBiometria();
+		return ResponseEntity.ok(contrato);
+	}
 	
-
+	@GetMapping(path = "/cancel-capture")
+	public void cancelCapture() {
+		this.service.cancelCaptureFingerPrint();
+		
+	}
+	
+	@PostMapping(path = "/save-biometria")
+	public void saveFingerprint(@RequestBody String numeroContrato) throws NotFoundException {
+		this.service.saveFingerprint(numeroContrato);
+	}
+	
 	@GetMapping
 	public ResponseEntity<Page<Contrato>> findAll(@RequestParam(name = "page" , required = true) Integer page ,
 			@RequestParam(name = "size",required = true)Integer size, @RequestParam(name = "sort") String sort,
@@ -56,16 +73,19 @@ public class ContratoController {
 	@GetMapping(path = "/filter")
 	public ResponseEntity<Page<Contrato>> findByFilters(@RequestParam(name = "numero") String numero,
 			@RequestParam(name = "nomePaciente") String nomePaciente, @RequestParam(name = "page") int page,
-			@RequestParam(name = "size") int size, @RequestParam(name = "ativo") String ativo){
+			@RequestParam(name = "size") int size, @RequestParam(name = "ativo") String ativo, @RequestParam(name = "sort") String sort,
+			@RequestParam(name = "atributo") String atributo){
 		Page<Contrato> pageable = null;
+		Direction direction =null;
+		direction = sort.trim().equals("ASC")? Direction.ASC : Direction.DESC;
 		if(ativo.equals("true") || ativo.equals("false")) {
 			pageable = this.service.findByFiltersParamActive(numero,
 					nomePaciente, 
-					PageRequest.of(page, size), 
+					PageRequest.of(page, size,direction, atributo), 
 					Boolean.parseBoolean(ativo));	
 		}
 		else {
-			pageable = this.service.findByFilters(numero, nomePaciente, PageRequest.of(page, size));
+			pageable = this.service.findByFilters(numero, nomePaciente, PageRequest.of(page, size, org.springframework.data.domain.Sort.by(direction, atributo)));
 		}
 		return ResponseEntity.ok(pageable);
 	}

@@ -1,12 +1,10 @@
 package com.br.projetox.test.service;
 
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.apache.poi.util.IOUtils;
@@ -109,6 +107,31 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 		Assert.assertEquals(map.get("save").intValue(), saveContrato);
 
 	}
+		/*TESTE QUE VERIFICA O CADASTRAMENTO DA BIOMETRIA*/
+		@Sql({"/dataset/truncate.sql",
+			"/dataset/Servico.sql",
+			"/dataset/Contrato.sql",
+			"/dataset/Usuario.sql",
+			"/dataset/PlanoContratado.sql"})
+	@Test
+	public void capturandoDigitalTestMustPassCapturarDigital() throws Exception  {
+		this.service.saveFingerprint("1");
+		Contrato contrato = this.contratoRepository.findByNumero("1").get();
+		Assert.assertNotNull(contrato.getBiometria());
+	}
+
+	/*TESTE QUE BUSCA CONTRATO COM A BIOMETRIA*/
+		@Sql({"/dataset/truncate.sql",
+			"/dataset/Servico.sql",
+			"/dataset/Contrato.sql",
+			"/dataset/Usuario.sql",
+			"/dataset/PlanoContratado.sql"})
+	@Test
+	public void capturandoDigitalTestMustPassBuscaContratosPelaBiometria() throws Exception  {
+	Contrato contrato = this.service.findByBiometria();
+	Assert.assertNotNull(contrato);
+	}
+		
 		/*TESTE QUE VERIFICA QUANTOS CONTRATOS FORAM ATUALIZADOS*/
 		@Sql({"/dataset/truncate.sql",
 			"/dataset/Servico.sql",})
@@ -356,7 +379,7 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 
 	
 														/*MUST FAIL*/
-	
+
 		/* TESTE PARA VERIFICAR A FALHA QUE OCORRE QUANDO A PLANILHA ESTA INCOMPLETA FALTANDO DIAS DA SEMANA */
 	@Sql({	"/dataset/truncate.sql",
 	"/dataset/Servico.sql",

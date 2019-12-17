@@ -7,8 +7,8 @@
     </div>
     <div fxLayout='row' class='servicos' fxLayoutAlign='end'>
         <div fxLayout='column' fxLayoutAlign='center end' fxLayoutGap="20px" class='servicos'>
-           <button mat-raised-button color="primary" >Registros E/S</button>
-         <button mat-raised-button color="primary"  routerLink="novo-servico">Novo Serviço</button>
+           <button mat-raised-button color="accent" matTooltip="Registrar entrada e saída">Registros E/S</button>
+         <button mat-raised-button color="accent"  routerLink="novo-servico" matTooltip="Inserir novo serviço no contrato">Novo Serviço</button>
         </div>
       </div>
 </div>
@@ -22,9 +22,9 @@
 <div fxLayout='row' fxLayoutAlign='space-between' class='row3'>
   <div fxLayout='column' fxLayoutGap='10px' fxLayoutAlign= 'center center'>
     <mat-label><b>Situação Biometria</b></mat-label>
-    <p>Cadastrado</p>
+    <p>{{ situacaoBiometria }}</p>
     <br/>
-    <button mat-raised-button color="primary"><mat-icon>refresh</mat-icon>Atualizar Biometria</button>
+    <button mat-raised-button color="accent" (click)="openSnackBarClockBiometria()" (click)="saveBiometria()" matTooltip="Cadastrar ou atualizar biometria">{{ buttonBiometria }}</button>
   </div>
   <div fxLayout='column' fxLayoutAlign='center center'>
     <mat-label><b>Total Plano Particular</b></mat-label>

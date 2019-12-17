@@ -155,6 +155,12 @@ public class ExceptionHandlerAspect
 	}
 	
 	@AfterThrowing(pointcut = "within(@org.springframework.stereotype.Service *)", throwing = "exception")
+	public void handleException( JoinPoint joinPoint, FingerPrintException exception )
+	{
+		throw new FingerPrintException(exception.getMessage());
+	}
+	
+	@AfterThrowing(pointcut = "within(@org.springframework.stereotype.Service *)", throwing = "exception")
 	public void handleException( JoinPoint joinPoint, DuplicatePlanoContratadoException exception )
 	{
 		throw new DuplicatePlanoContratadoException(exception.getMessage());
