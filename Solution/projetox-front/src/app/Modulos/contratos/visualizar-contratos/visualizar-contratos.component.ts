@@ -1,4 +1,5 @@
-import { Subscription } from 'rxjs';
+import { ConfigParametro } from 'src/app/shared/model/config-parametros';
+import { Subscription} from 'rxjs';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ContratoService } from './../../../shared/Services/contrato.service';
 import { Component, OnInit, OnDestroy} from '@angular/core';
@@ -15,6 +16,7 @@ import { Contrato, PageContrato } from 'src/app/shared/model/Contrato';
 import { BehaviorSubjectContratoRefreshService } from 'src/app/shared/Services/behavior-subject-contrato-refresh.service';
 import { MatSelectChange } from '@angular/material/select';
 import { PlanoContratadoService } from 'src/app/shared/Services/plano-contratado.service';
+import { ConfigParametrosService } from 'src/app/shared/Services/config-parametros.service';
 
 const DECIMAL_FORMAT: (v: any) => any = (v: number) => new Intl.NumberFormat('pt-BR',{style: 'currency', currency: 'BRL'} ).format(v);
 const INT_FORMAT: (v: any) => any = (v: string) => parseInt(v);
@@ -29,11 +31,11 @@ export class VisualizarContratosComponent implements OnInit, OnDestroy {
 
 
   columns: ITdDataTableColumn[] = [
-    { name: 'numero', label: 'No. Contrato', format: INT_FORMAT  },
-    { name: 'nomePaciente', label: 'Nome do Paciente'},
+    { name: 'numero', label: 'No. Contrato', format: INT_FORMAT, sortable: true  },
+    { name: 'nomePaciente', label: 'Nome do Paciente', sortable: true},
     { name: 'tipoContratoTransient', label: 'Tipo do Contrato'},
     { name: 'ativo', label: 'Status do contrato', sortable: true},
-    { name: 'valorTotal', label: 'Valor Contratado', numeric: true, format: DECIMAL_FORMAT},
+    { name: 'valorTotal', label: 'Valor Contratado', numeric: true, format: DECIMAL_FORMAT, sortable: true},
   ];
   statuContrato: any[] = [
     {value: null, viewValue: ''},
@@ -47,6 +49,8 @@ export class VisualizarContratosComponent implements OnInit, OnDestroy {
   excludedColumnsFilterContrato: string[] = ['nomePaciente', 'valorTotal', 'id'];
   excludedColumnsFilterNomePaciente: string[] = ['valorTotal', 'numero', 'id'];
   total: number;
+  configParametro: ConfigParametro;
+  hoursByService: Map<String, String>;
   sortBy: string = '';
   statusContrato: boolean ;
   sortOrder: TdDataTableSortingOrder = TdDataTableSortingOrder.Ascending;
@@ -62,6 +66,7 @@ export class VisualizarContratosComponent implements OnInit, OnDestroy {
   constructor(
     private _dialogService: TdDialogService,
     private contratoService: ContratoService,
+    private configParametrosService: ConfigParametrosService,
     private activeRoute: ActivatedRoute,
     private behaviorRefreshTableContrato: BehaviorSubjectContratoRefreshService,
     private route: Router,
@@ -69,9 +74,22 @@ export class VisualizarContratosComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.startTable();
+    this.findServiceAndPlanoContratado();
     this.refreshTableContratoAfterImport();
     this.valorTotalContratosAtivos = this.activeRoute.snapshot.data[ 'contratosAtivos'];
   }
+  findServiceAndPlanoContratado(){
+      this.configParametrosService.findCofigParametros('1').subscribe(config => {
+          this.configParametro = config;            
+      });
+      this.planoContratadoService.hoursByService().subscribe(data => {
+        this.hoursByService = data;
+        });
+
+  }
+
+
+
   /*Metodo que projeta uma tabela inicial buscando os dados do banco atraves do contrato-resolver.resolve,
   pegando os dados do contrato-routing atraves de snapshot
   @return void*/

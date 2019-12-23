@@ -6,9 +6,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.br.projetox.entity.PlanoContratado;
+import com.br.projetox.entity.Servico;
 import com.br.projetox.service.PlanoContratadoService;
 
 import javassist.NotFoundException;
@@ -35,14 +34,19 @@ public class PlanoContratadoController {
 
 	
 	 @GetMapping(path = "/find-plano-contratado")
-	 public void findPlanoContratado(@RequestBody Map<String, Object> planoContratado){
-		 System.out.println(planoContratado.toString());
+	 public void findPlanoContratado(@RequestBody Map<String, Object> planoContratado) throws NotFoundException{
+		 this.planoContratadoService.mapPlanoContratado(planoContratado);
 	  }
 	 
 	 @GetMapping(path = "/find-all")
 	 public ResponseEntity<?> findAllPlanoContratadoByContratoId(@RequestParam("numero-contrato") String numeroContrato){
 		 List<PlanoContratado> list = this.planoContratadoService.findAllPlanoContratadoByContratoId(numeroContrato);
 		 return ResponseEntity.ok(list);
+	 }
+	 
+	 @GetMapping(path = "/hours-by-service")
+	 public Map<String,String> findAllPlanos() throws NumberFormatException, NotFoundException {
+		 return this.planoContratadoService.countSessionByPlan();
 	 }
 
 	@PostMapping

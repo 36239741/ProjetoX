@@ -98,5 +98,11 @@
           <span>{{ valorTotalContratosAtivos.Plano | currency: "BRL" }}</span>
         </div>
       </div>
+
     </div>
   </div>
+<div fxLayout="column" fxLayoutAlign="center start" *ngFor="let hours of hoursByService | keyvalue">
+    <div fxLayout="row" >
+        <p><b>{{ hours.key }}:</b> </p><p>{{ hours.value * configParametro.tempoSessao['minute'] | TimePipe }}h</p>
+    </div >
+</div>

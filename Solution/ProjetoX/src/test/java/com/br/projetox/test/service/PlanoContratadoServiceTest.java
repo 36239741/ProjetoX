@@ -9,6 +9,7 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -56,7 +57,14 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 		Assert.assertNotNull(plano);
 		Assert.assertNotNull(plano.getId());
 	}
-
+	/* VERIFICA A BUSCA DE UM PLANO CONTRATADO */
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql" })
+	@Test
+	public void findPlan() throws NotFoundException {
+		this.planoContratoService.countSessionByPlan();
+	}
 	/*
 	 * DELETA UM PLANO CONTRATADO
 	 */
@@ -72,6 +80,28 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 		 PlanoContratado plano = this.planoContratadoRepository.findById(Long.parseLong("1")).get();
 		 Assert.assertEquals(false, plano.getAtivo());
 	  }
+	 
+		/*
+		 * BUSCA TODOS OS PLANOS DE UM DIA DA SEMANA
+		 */
+		 @WithUserDetails("henrique_nitatori@hotmail.com")
+		  @Profile("dev")
+		  @Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql",
+		  "/dataset/Servico.sql", "/dataset/Contrato.sql",
+		  "/dataset/PlanoContratado.sql",
+		  "/dataset/DiaConsulta.sql",
+		  "/dataset/DiaConsulta-PlanoContratado.sql"})
+		  
+		  @Test public void findByDiasSemanaTestMustPassBuscaTodosPlanosPeloDiaDaSemana()
+		  { 
+			 DiasSemana returnDiasSemana = null;
+			 List<PlanoContratado> plano = this.planoContratoService.findByDiaConsulta(DiasSemana.QUINTA);
+			 for(PlanoContratado planos : plano) {
+				 returnDiasSemana = planos.getDiaConsulta().get(0).getDiasSemana();
+			 }
+			 Assert.assertNotNull(plano);
+			 Assert.assertEquals(DiasSemana.QUINTA, returnDiasSemana);
+		  }
 	 
 
 	/*

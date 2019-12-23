@@ -2,8 +2,6 @@ package com.br.projetox.service;
 
 import java.io.UnsupportedEncodingException;
 import java.time.LocalTime;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -38,6 +36,8 @@ public class PlanoContratadoService {
 
 	@Autowired
 	private PlanoContratoRepository planoContraRepository;
+	
+
 
 	
 	public PlanoContratado findById(Long id) throws NotFoundException {
@@ -179,7 +179,17 @@ public class PlanoContratadoService {
 	}
 
 	public List<PlanoContratado> findAll() {
-		return this.planoContraRepository.findAll();
+		return this.planoContraRepository.findAllAtivo();
+	}
+	public Map<String,String> countSessionByPlan() throws NumberFormatException, NotFoundException {
+		List<Map<String,String>> map =this.planoContraRepository.countSessionByPlan();
+		Map<String, String> mapServico = new HashMap<>();;
+		Servico servico = null;
+		for(Map<String,String> maps: map) {
+			servico = this.servicoService.findById(Long.parseLong(maps.get("id")));
+			mapServico.put(servico.getServico(), maps.get("sessao"));
+		}
+		return mapServico;
 	}
 
 	/*
@@ -246,6 +256,10 @@ public class PlanoContratadoService {
 	public List<PlanoContratado> findByBiometria() throws NotFoundException, UnsupportedEncodingException {
 		Contrato contrato = this.contratoService.findByBiometria();
 		return this.planoContraRepository.findByContratoId(contrato.getNumero());
+	}
+	
+	public List<PlanoContratado> findByDiaConsulta(DiasSemana diasSemana){
+		return this.planoContraRepository.findByDiaConsulta(diasSemana);
 	}
 
 }

@@ -1,3 +1,4 @@
+import { TableModule } from './../../shared/components/table/table.module';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -13,9 +14,11 @@ import { FilterComponent } from './visualizar-contratos/filter/filter.component'
 import { ImportFeedBackComponent } from './visualizar-contratos/import/importFeedBack/import-feed-back.component';
 import { ImportButtonComponent } from './visualizar-contratos/import/importButton/import-button.component';
 import { ImportComponent } from './visualizar-contratos/import/import.component';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FormModule } from './form/form.module';
 import {MaterialModule} from '../../core/material/material.module';
+import {RegistrosComponent} from './registros/registros.component';
+import { PipeTimeModule } from '../../shared/Pipe/time-pipe.module';
 
 
 
@@ -26,8 +29,10 @@ import {MaterialModule} from '../../core/material/material.module';
     FilterComponent, 
     ImportFeedBackComponent, 
     ImportButtonComponent, 
-    ImportComponent,],
+    ImportComponent,
+    RegistrosComponent],
   imports: [
+    PipeTimeModule,
     CommonModule,
     ContratosRoutingModule,
     LayoutModule,
@@ -36,11 +41,13 @@ import {MaterialModule} from '../../core/material/material.module';
     RouterModule,
     EditarPlanoContratadoModule,
     FormsModule,
+    ReactiveFormsModule,
     FormModule,
+    TableModule,
     MaterialModule,
     LayoutModule
-    
   ],
+
   entryComponents: [
     ImportComponent
   ],

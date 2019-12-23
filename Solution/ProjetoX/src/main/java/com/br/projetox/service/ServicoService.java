@@ -10,6 +10,8 @@ import org.springframework.util.Assert;
 import com.br.projetox.entity.Servico;
 import com.br.projetox.repository.ServicoRepository;
 
+import javassist.NotFoundException;
+
 @Service
 @Transactional
 public class ServicoService {
@@ -23,5 +25,8 @@ public class ServicoService {
 	}
 	public List<Servico> findAll(){
 		return this.repository.findAll();
+	}
+	public Servico findById(Long id) throws NotFoundException {
+		return this.repository.findById(id).orElseThrow(() -> new NotFoundException("Não foi encontrado o servico com o id: " + id));
 	}
 }

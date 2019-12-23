@@ -11,6 +11,7 @@ import { FindAllResolve } from '../../shared/resolvers/find-all-services.resolve
 import { FindAllPlanoContratadoResolve } from '../../shared/resolvers/find-all-plano-contratado';
 import { EditarPlanoContratadoComponent } from './editar-plano-contratado/editar-plano-contratado.component';
 import { ConfigParametrosResolve } from '../../shared/resolvers/config-parametros-resolve.service';
+import { RegistrosComponent } from './registros/registros.component';
 
 
 
@@ -24,7 +25,7 @@ const routes: Routes = [
     resolve: {contratos : ContratoResolverResolve,
              contratosAtivos : findActiveContractNumberResolve},
             },
-
+    {path: ':id/registros', component: RegistrosComponent},
     {path: ':id', component: DetatalharContratosComponent,
     data: {breadcrumb: 'Detalhar Contrato'},
     resolve: {findByContrato: ContratoResolveFindByNumeroResolve, 

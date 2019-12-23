@@ -16,4 +16,5 @@ public interface RegistroRepository extends JpaRepository<Registro, Long>{
 	@Query("FROM Registro registro WHERE registro.contrato.numero = :numeroContrato AND registro.id = "
 			+ "(SELECT max(registro.id) FROM Registro registro)")
 	Registro findByMaxId(@Param("numeroContrato") String contratoId);
+	
 }

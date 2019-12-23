@@ -381,9 +381,11 @@ public class ContratoService {
 			listContrato = this.repository.findAll();
 			imgAndTemplate = this.fingerPrint.captureFingerPrint();
 			for(Contrato contrato: listContrato) {
-				Boolean match = this.fingerPrint.verifyFingerprint(contrato.getBiometria(), imgAndTemplate);
-				if(Boolean.TRUE.equals(match)) {
-					returnContrato = contrato;
+				if(contrato.getBiometria() != null) {
+					Boolean match = this.fingerPrint.verifyFingerprint(contrato.getBiometria(), imgAndTemplate);
+					if(Boolean.TRUE.equals(match)) {
+						returnContrato = contrato;
+					}
 				}
 			}
 		return returnContrato;

@@ -18,4 +18,14 @@ public enum DiasSemana {
 	public int getDiasSemana() {
 		return daysOfWeek;
 	}
+	
+	public static DiasSemana diasSemanaByOrdinal(int diasSemanaOrdinal) {
+		DiasSemana diasSemana = null;
+		for(DiasSemana dias: values()) {
+			if(dias.getDiasSemana() == diasSemanaOrdinal) {
+				diasSemana = dias;
+			}
+		}
+		return diasSemana;
+	}
 }

@@ -87,6 +87,7 @@ export class DetatalharContratosComponent implements OnInit {
     this.contratoService.saveBiometria(this.contrato.numero).subscribe(() =>{
         this.snackBar.dismiss();
         this.toastService.toastSuccess('Biometria cadastrada com sucesso.');
+        this.situacaoDaBiometria();
     },
     error =>{
         this.snackBar.dismiss();
@@ -107,9 +108,10 @@ export class DetatalharContratosComponent implements OnInit {
      });
   }
   situacaoDaBiometria() {
-    if(this.contrato.biometria === null) {
+    if(this.contrato.biometria == null) {
         this.situacaoBiometria = 'Cadastrar';
         this.buttonBiometria = 'Cadastrar Biometria';
+        console.log(this.buttonBiometria);
     }
     else {
         this.situacaoBiometria = 'Cadastrado';
@@ -132,7 +134,7 @@ export class DetatalharContratosComponent implements OnInit {
         title: 'Confirmar', //OPTIONAL, hides if not provided
         cancelButton: 'Cancelar', //OPTIONAL, defaults to 'CANCEL'
         acceptButton: 'Aceitar', //OPTIONAL, defaults to 'ACCEPT'
-        width: '500px', //OPTIONAL, defaults to 400px
+        width: '600px', //OPTIONAL, defaults to 400px
       }).afterClosed().subscribe((accept: boolean) => {
         if (accept) {
             this.planoContratadoService.deletePlanoContratado(event.id).subscribe(data =>{

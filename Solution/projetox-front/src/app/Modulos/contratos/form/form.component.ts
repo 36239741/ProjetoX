@@ -18,7 +18,6 @@ import { FormPlanoContratado } from "../../../shared/model/formPlanoContratado";
 import { BehaviorInformacoesContratoService } from "../../../shared/Services/behavior-informacoes-contrato.service";
 import { FormOculto } from "./form-campos-ocultos/form-oculto";
 import { ConfigParametro } from 'src/app/shared/model/config-parametros';
-import { isEmpty } from 'rxjs/operators';
 @Component({
     selector: "app-form",
     templateUrl: "./form.component.html",
@@ -222,6 +221,7 @@ export class FormComponent implements OnInit, OnDestroy, AfterViewChecked {
                     .get("nomePaciente")
                     .setValue(this.detalhesContrato[1]);
                 this.event.emit(this.form.value);
+
             }
         }
         else {

@@ -9,12 +9,15 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.br.projetox.ProjetoXApplication;
 import com.br.projetox.ProjetoXApplicationTests;
 
-@ActiveProfiles("henrique")
+@ActiveProfiles("dev")
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {ProjetoXApplicationTests.class, ProjetoXApplication.class })
 public abstract class AbstractIntegrationTest {
+
+
 	@Before
 	public void before() {
 		
 	}
+	
 }
