@@ -15,6 +15,7 @@ import {
   CovalentLayoutModule,
    } from '@covalent/core';
 
+
 import {
     MatSelectModule,
     MatButtonModule,
@@ -26,7 +27,9 @@ import {
     MatSnackBarModule,
     MatRadioModule,
     MatProgressSpinnerModule,
-    MatListModule} from '@angular/material';
+    MatListModule,
+    MatSidenavModule,
+    MatToolbarModule} from '@angular/material';
 
 
 
@@ -46,6 +49,8 @@ import {
     MatListModule,
     MatButtonModule,
     MatSnackBarModule,
+    MatToolbarModule,
+    MatSidenavModule,
 
     /*Teradata Covalent*/
 
@@ -80,7 +85,9 @@ import {
        MatSnackBarModule,
        MatRadioModule,
        MatListModule,
+       MatToolbarModule,
        MatProgressSpinnerModule,
+       MatSidenavModule,
 
        /*Teradata Covalent*/
 

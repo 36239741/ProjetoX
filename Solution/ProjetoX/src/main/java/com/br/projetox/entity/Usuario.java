@@ -11,6 +11,7 @@ import javax.validation.constraints.NotBlank;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -52,7 +53,8 @@ public class Usuario extends AbstractEntity  implements UserDetails, Serializabl
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return null;
+		Collection<GrantedAuthority> authority = AuthorityUtils.createAuthorityList(this.getAuthorityType().toString());
+		return authority;
 	}
 	
 	@JsonProperty(access = Access.WRITE_ONLY)

@@ -63,6 +63,11 @@ public class ContratoController {
 		return ResponseEntity.ok(returnPage);
 	}
 	
+	@PostMapping(path = "/desconto")
+	public Contrato gerarDesconto(@RequestBody String valorDesconto, @RequestParam(name = "numeroContrato") String numeroContrato) throws NumberFormatException, Exception {
+		return this.service.calcularDesconto(numeroContrato, Double.parseDouble(valorDesconto));
+	}
+	
 	@GetMapping(path = "/{numeroContrato}")
 	public ResponseEntity<Contrato> findBynumeroContrato(@Valid @PathVariable String numeroContrato) throws NotFoundException{
 		Contrato contrato = null;

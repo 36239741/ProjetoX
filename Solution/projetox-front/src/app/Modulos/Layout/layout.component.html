@@ -1,31 +1,47 @@
-<td-layout>
-    <td-navigation-drawer flex >
-      <mat-nav-list fxLayout="column" *ngFor="let menu of listMenu">
-        <a [routerLink]="menu.link" mat-list-item [matTooltip]="menu.toolTip"><mat-icon matListIcon >{{ menu.menuIcon }}</mat-icon><span matLine>{{ menu.menuName }}</span></a>
-      </mat-nav-list>
-    </td-navigation-drawer>
-    <td-layout-nav >
-        <div td-toolbar-content fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px"  id="toolbar-content" >
-          <button mat-icon-button td-menu-button tdLayoutToggle  matTooltip="Abrir menu">
-            <mat-icon  aria-hidden="false" aria-label="Icone do Menu">menu</mat-icon>
-          </button>
-          <img src="../../../assets/img/logo-simbolo.png" class="logo">
-          <span>{{ title }}</span>
-          <span id="space"></span>
-          <a (click)="logout()" matTooltip="Sair da aplicação">Sair</a>
-        </div>
-            <mat-card fxLayout='column' [class.mat-elevation-z8]="true">
-                <mat-card-header class="header">
-                  <mat-card-title>
-                  </mat-card-title>
-                </mat-card-header>
-                <mat-card-content>
-                    <router-outlet></router-outlet>
-                </mat-card-content>
-              </mat-card>
-        <td-layout-footer color="primary" fxLayout="row" fxLayoutAlign="center center">
-           <span>Todos Direitos Resevados</span>
-        </td-layout-footer>
-    </td-layout-nav>
-</td-layout>
 
+    <mat-drawer-container class="drawer-container">
+        <mat-drawer mode="over"  class="drawer" #drawer>
+            <div *ngFor="let itens of listMenu">
+                <button mat-stroked-button 
+                isIconButton="true"
+                [routerLink]="itens.link"
+                [matTooltip]="itens.toolTip"
+                >
+                    <mat-icon>{{ itens.menuIcon }}</mat-icon>
+                    <span>{{ itens.menuName }}</span>
+                </button>
+            </div>
+        </mat-drawer>
+        <mat-drawer-content class="drawer-content">
+            <mat-toolbar color="primary" class="mat-toolbar">
+                <mat-toolbar-row class="toolbar-row"> 
+                    <section class="menu">
+                        <button mat-icon-button (click)="drawer.toggle()"><mat-icon>menu</mat-icon></button>
+                        <img src="../../../assets/img/logo-simbolo.png" class="logo">
+                        <h3>{{ title }}</h3>
+                    </section>
+                    <section class="sair">
+                        <a (click)="logout()" >Sair</a>
+                    </section>
+                </mat-toolbar-row>
+            </mat-toolbar>
+
+            <mat-card class="card">
+                <mat-card-header class="card-header">
+                    <mat-card-title>
+                        <h1>titulo</h1>
+                    </mat-card-title> 
+                </mat-card-header>
+                    <mat-card-content class="card-content">
+                        <router-outlet></router-outlet>
+                    </mat-card-content>
+            </mat-card>
+
+
+        </mat-drawer-content>
+
+      </mat-drawer-container>
+
+      <footer>
+        <span>Todos direitor reservados</span>
+    </footer> 

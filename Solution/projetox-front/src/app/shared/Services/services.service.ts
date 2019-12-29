@@ -30,9 +30,9 @@ export class ServicesService {
             'Something bad happened; please try again later.');
         };
 
-  findAll(): Observable<Servico[]>{
-    return this.http.get<Servico[]>(API_URL + '/servicos').pipe(
-      map((data: Servico[]) => data),
+  findAll(): Observable<Servico>{
+    return this.http.get<Servico>(API_URL + '/servicos').pipe(
+      map((data: Servico) => data),
       catchError(this.handleError)
     );
   }

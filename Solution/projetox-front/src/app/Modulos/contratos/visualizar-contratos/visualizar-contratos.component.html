@@ -1,108 +1,117 @@
-<div fxLayout="row" fxLayoutGap="30px" class="filter">
-  <app-filter (filtro)="filterContrato($event)" 
-  placeholder="No. Contrato"
-  matTooltip="Filtrar pelo número do contrato">
-  </app-filter>
-  <app-filter
-    matTooltip="Filtar por nome do paciente"
-    (filtro)="filterNomePaciente($event)"
-    placeholder="Nome do Paciente"
-  >
-  </app-filter>
-  <mat-form-field fxLayoutAlign="center">
-    <mat-label>Status do contrato</mat-label>
-    <mat-select
-        matTooltip="Filtrar pelo status do contrato"
-      ([value])="(statusContrato)"
-      (selectionChange)="filterContratoStatusContrato($event)"
+<div class="container-visualizar-contratos">
+    <section class="filter-import">
+        <div class="filters">
+            <app-filter
+                (filtro)="filterContrato($event)"
+                placeholder="No. Contrato"
+                matTooltip="Filtrar pelo número do contrato"
+            >
+            </app-filter>
+            <app-filter
+                matTooltip="Filtar por nome do paciente"
+                (filtro)="filterNomePaciente($event)"
+                placeholder="Nome do Paciente"
+            >
+            </app-filter>
+            <mat-form-field fxLayoutAlign="center">
+                <mat-label>Status do contrato</mat-label>
+                <mat-select
+                    matTooltip="Filtrar pelo status do contrato"
+                    ([value])="(statusContrato)"
+                    (selectionChange)="filterContratoStatusContrato($event)"
+                >
+                    <mat-option
+                        *ngFor="let statusContrato of statuContrato"
+                        [value]="statusContrato.value"
+                    >
+                        {{ statusContrato.viewValue }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
 
-    >
-      <mat-option
-        *ngFor="let statusContrato of statuContrato"
-        [value]="statusContrato.value"
-      >
-        {{ statusContrato.viewValue }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-  <div fxLayoutAlign="end center" class="import">
-    <app-import-button (click)="openModalImport($event)"></app-import-button>
-  </div>
-</div>
-  <td-data-table
-  matTooltip="Visualizar detalhes do contrato"
+        <section>
+            <app-import-button
+                (click)="openModalImport($event)"
+            ></app-import-button>
+        </section>
+    </section>
+    <app-table
+    matTooltip="Visualizar detalhes do contrato"
     #dataTable
+    message="Nenhum contrato encontrado"
     [data]="contratos"
     [columns]="columns"
     [style.height.%]="100"
-    (rowClick)="rowClick($event)"
+    (eventRowClick)="rowClick($event)"
     [clickable]="true"
-    (sortChange)="sort($event)"
+    (eventSort)="sort($event)"
     [sortOrder]="sortOrder"
-    [sortBy]="sortBy"
-  >
-    <ng-template
-      tdDataTableTemplate="ativo"
-      let-value="value"
-      let-row="row"
-      let-column="column"
-    >
-      <div fxLayout="row">
-        <span flex [style.color]="value === true ? 'green' : 'red'">{{
-          value === true ? "Ativo" : "Inativo"
-        }}</span>
-      </div>
-    </ng-template>
-  </td-data-table>
-  <div
-    class="md-padding"
-    *ngIf="!dataTable.hasData"
-    fxLayout="row"
-    fxLayoutAlign="center center"
-  >
-    <h3>Nenhum contrato encontrado</h3>
-  </div>
-  <div fxLayout="row" fxLayoutAlign="center start">
-    <td-paging-bar
-      #pagingBarPageSize
-      [pageSize]="pageSize"
-      [total]="total"
-      (change)="changePageSize($event)"
-      [style.width.%]="100"
-    >
-      <span hide-xs>Linhas por linha:</span>
-      <mat-select [style.width.px]="50" [(value)]="pageSize">
-        <mat-option *ngFor="let size of [10, 20, 30]" [value]="size">
-          {{ size }}
-        </mat-option>
-      </mat-select>
-      <span
-        >{{ pagingBarPageSize.range }}
-        <span hide-xs>of {{ pagingBarPageSize.total }}</span></span
-      >
-    </td-paging-bar>
-    <div
-      fxLayout="row"
-      fxLayoutAlign="end center"
-      class="containerTotalContratos"
-    >
-      <div fxLayout="column" fxLayoutAlign="center end">
-        <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="6px" class="totalizadores">
-          <p><b>Contratos particular ativos:</b></p>
-          <span>{{
-            valorTotalContratosAtivos.Particular | currency: "BRL"
-          }}</span>
-        </div>
-        <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="6px" class="totalizadores">
-          <p><b>Contratos plano ativos:</b></p>
-          <span>{{ valorTotalContratosAtivos.Plano | currency: "BRL" }}</span>
-        </div>
-      </div>
+    [sortBy]="sortBy">
 
+    </app-table >
+
+    <div class="paging-total-contratos">
+        <section class="paging">
+            <div class="paging">
+                <td-paging-bar
+                    #pagingBarPageSize
+                    [pageSize]="pageSize"
+                    [total]="total"
+                    (change)="changePageSize($event)"
+                    [style.width.%]="100"
+                >
+                    <span hide-xs>Linhas por linha:</span>
+                    <mat-select [style.width.px]="50" [(value)]="pageSize">
+                        <mat-option
+                            *ngFor="let size of [10, 20, 30]"
+                            [value]="size"
+                        >
+                            {{ size }}
+                        </mat-option>
+                    </mat-select>
+                    <span
+                        >{{ pagingBarPageSize.range }}
+                        <span hide-xs
+                            >of {{ pagingBarPageSize.total }}</span
+                        ></span
+                    >
+                </td-paging-bar>
+            </div>
+        </section>
+
+        <div class="total-contratos">
+            <section>
+                <p><b>Contratos particular ativos:</b></p>
+                <span>{{
+                    valorTotalContratosAtivos.Particular | currency: "BRL"
+                }}</span>
+            </section>
+
+            <section>
+                <p><b>Contratos plano ativos:</b></p>
+                <span>{{
+                    valorTotalContratosAtivos.Plano | currency: "BRL"
+                }}</span>
+            </section>
+        </div>
     </div>
-  </div>
-<div fxLayout="column" fxLayoutAlign="center start" *ngFor="let hours of hoursByService | keyvalue">
-    <div fxLayout="row" >
-        <p><b>{{ hours.key }}:</b> </p><p>{{ hours.value * configParametro.tempoSessao['minute'] | TimePipe }}h</p>
-    </div >
+    <section class="total-horas-servico">
+        <h3>
+            Número total de horas por serviço
+        </h3>
+        <div
+            *ngFor="let hours of hoursByService | keyvalue"
+        >
+            <p>
+                <b>{{ hours.key }}:</b>
+            </p>
+            <span>
+                {{
+                    hours.value * configParametro.tempoSessao["minute"]
+                        | TimePipe
+                }}h
+            </span>
+        </div>
+    </section>
 </div>

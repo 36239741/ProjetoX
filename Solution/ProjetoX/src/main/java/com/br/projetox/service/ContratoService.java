@@ -1,11 +1,15 @@
 package com.br.projetox.service;
 
 import java.io.UnsupportedEncodingException;
+import java.text.DecimalFormat;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -25,6 +29,7 @@ import com.br.projetox.entity.DiasSemana;
 import com.br.projetox.entity.PlanoContratado;
 import com.br.projetox.entity.Servico;
 import com.br.projetox.entity.TipoContrato;
+import com.br.projetox.exception.ContratoException;
 import com.br.projetox.exception.ImportPlanilhaException;
 import com.br.projetox.repository.ContratoRepository;
 import com.br.projetox.util.FingerPrintUtil;
@@ -82,9 +87,6 @@ public class ContratoService {
 		return page;
 	}
 
-	public void saveContrato(Contrato contrato) {
-		this.repository.save(contrato);
-	}
 
 	/*
 	 * Método de busca que utiliza o campo numero , nomePaciente aonde pode ser
@@ -124,8 +126,6 @@ public class ContratoService {
 
 	}
 
-
-
 	/*
 	 * Método para busca de contratos atraves do numero do contrato cadastrado
 	 * 
@@ -139,7 +139,7 @@ public class ContratoService {
 	public Contrato findByContractNumber(String numeroContrato) throws NotFoundException {
 		Optional<Contrato> contrato = this.repository.findByNumero(numeroContrato);
 		contrato.get().getPlanoContratado().clear();
-		return contrato.orElseThrow(() -> new NotFoundException(
+		return contrato.orElseThrow(() -> new ContratoException(
 				"Nenhum contrato encontrado com esse número de contrato:" + numeroContrato));
 
 	}
@@ -271,7 +271,7 @@ public class ContratoService {
 				} else if (diasSemana[i].equals("SAB")) {
 					diaConsulta.setDiasSemana(DiasSemana.SABADO);
 				} else {
-					throw new NullPointerException("Nenhum dia da Consulta informado");
+					throw new ContratoException("Nenhum dia da Consulta informado");
 				}
 
 				listDiasConsulta.add(diaConsulta);
@@ -310,6 +310,31 @@ public class ContratoService {
 		map.put("update", update);
 		map.put("save", save);
 		return map;
+	}
+
+	public Contrato calcularDesconto(String numeroContrato, Double desconto) throws Exception {
+		List<PlanoContratado> plano = this.planoContratadoService.findAllPlanoContratadoByContratoId(numeroContrato);
+		Double valorDesconto = 0.0;
+		Double valorTotalContrato = 0.0;
+		if (plano.isEmpty()) {
+			throw new ContratoException("Esse contrato nao possui nenhum plano");
+		} else {
+			if (desconto != null && desconto != 0.0) {
+				valorDesconto = desconto / plano.size();
+				for (PlanoContratado planos : plano) {
+					planos.setValorTotal(planos.getValorTotal() - valorDesconto);
+					valorTotalContrato += planos.getValorTotal();
+				}
+				Contrato contrato = this.findByContractNumber(numeroContrato);
+				contrato.setDesconto(desconto);
+				contrato.setValorTotal(valorTotalContrato);
+				return this.repository.save(contrato);
+			} else {
+				throw new ContratoException("O valor de desconto é nullo");
+			}
+
+		}
+
 	}
 
 	/*
@@ -376,23 +401,29 @@ public class ContratoService {
 	 */
 	public Contrato findByBiometria() throws UnsupportedEncodingException {
 		ImageAndTemplate imgAndTemplate = null;
-		List<Contrato>  listContrato = null;
+		List<Contrato> listContrato = null;
 		Contrato returnContrato = null;
-			listContrato = this.repository.findAll();
-			imgAndTemplate = this.fingerPrint.captureFingerPrint();
-			for(Contrato contrato: listContrato) {
-				if(contrato.getBiometria() != null) {
-					Boolean match = this.fingerPrint.verifyFingerprint(contrato.getBiometria(), imgAndTemplate);
-					if(Boolean.TRUE.equals(match)) {
-						returnContrato = contrato;
-					}
+		listContrato = this.repository.findAll();
+		imgAndTemplate = this.fingerPrint.captureFingerPrint();
+		for (Contrato contrato : listContrato) {
+			if (contrato.getBiometria() != null) {
+				Boolean match = this.fingerPrint.verifyFingerprint(contrato.getBiometria(), imgAndTemplate);
+				if (Boolean.TRUE.equals(match)) {
+					returnContrato = contrato;
 				}
 			}
+		}
 		return returnContrato;
 	}
-	
+
 	public void cancelCaptureFingerPrint() {
 		this.fingerPrint.cancelCapture();
+	}
+
+
+	public void saveContrato(Contrato contrato) {
+		this.repository.save(contrato);
+		
 	}
 
 }

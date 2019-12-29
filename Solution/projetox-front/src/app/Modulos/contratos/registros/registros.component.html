@@ -1,32 +1,56 @@
-<div fxLayout="row">
-    <form [formGroup]="formGorup" fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="40px">
-        <mat-form-field >
-            <input matInput type="date" formControlName="afterDate" matTooltip="Filtra os registros pela data inicial">
-          </mat-form-field>
-          <mat-form-field >
-            <input matInput type="date" formControlName="beforeDate" matTooltip="Filtra os registros pela data final">
-          </mat-form-field>
+<div class="form-button">
+    <form [formGroup]="formGorup" fxLayoutGap="40px" class="form">
+        <mat-form-field>
+            <input
+                matInput
+                type="date"
+                formControlName="afterDate"
+                matTooltip="Filtra os registros pela data"
+            />
+        </mat-form-field>
+        <mat-form-field>
+            <input
+                matInput
+                type="date"
+                formControlName="beforeDate"
+                matTooltip="Filtra os registros pela data "
+            />
+        </mat-form-field>
     </form>
-    <section fxLayout="row" fxLayoutAlign="end center" class="button-container">
-        <button mat-raised-button color="accent" matTooltip="Exporta em uma planilha os reigstro de entrada e saída">Exportar registro</button>
+    <section>
+        <button
+            mat-raised-button
+            color="accent"
+            matTooltip="Exporta em uma planilha os reigstro de entrada e saída"
+        >
+            Exportar registro
+        </button>
     </section>
 </div>
-<app-table [columns]="columns" matTooltip="Informações dos registros dos pacientes"></app-table>
-<td-paging-bar
-#pagingBarPageSize
-[pageSize]="pageSize"
-[total]="total"
-(change)="changePageSize($event)"
-[style.width.%]="100"
->
-<span hide-xs>Linhas por linha:</span>
-<mat-select [style.width.px]="50" [(value)]="pageSize">
-  <mat-option *ngFor="let size of [10, 20, 30]" [value]="size">
-    {{ size }}
-  </mat-option>
-</mat-select>
-<span
-  >{{ pagingBarPageSize.range }}
-  <span hide-xs>of {{ pagingBarPageSize.total }}</span></span
->
-</td-paging-bar>
+
+<app-table
+    [columns]="columns"
+    [data]="data"
+    (eventTrocaServico)="trocaServico($event)"
+    (eventAusenciaProfissional)= "trocaProfissional($event)"
+    matTooltip="Informações dos registros dos pacientes"
+></app-table>
+
+    <td-paging-bar
+        #pagingBarPageSize
+        [pageSize]="pageSize"
+        [total]="totalElements"
+        (change)="changePageSize($event)"
+        [style.width.%]="100"
+    >
+        <span hide-xs>Linhas por linha:</span>
+        <mat-select [style.width.px]="50" [(value)]="pageSize">
+            <mat-option *ngFor="let size of [10, 20, 30]" [value]="size">
+                {{ size }}
+            </mat-option>
+        </mat-select>
+        <span
+            >{{ pagingBarPageSize.range }}
+            <span hide-xs>of {{ pagingBarPageSize.total }}</span></span
+        >
+    </td-paging-bar>

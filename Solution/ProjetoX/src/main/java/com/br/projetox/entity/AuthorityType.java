@@ -1,6 +1,6 @@
 package com.br.projetox.entity;
 
 public enum AuthorityType {
-	ADMIN,
-	USER;
+	ROLE_ADMIN,
+	ROLE_USER;
 }

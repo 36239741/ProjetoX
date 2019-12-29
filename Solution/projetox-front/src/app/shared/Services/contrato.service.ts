@@ -55,6 +55,9 @@ export class ContratoService {
   findByBiometria(): Observable<Contrato>{
     return this.httpClient.get<Contrato>(API_URL + '/contratos/find-by-biometria');
   }
+  gerarDesconto(numeroContrato: String, valorDesconto: number): Observable<Contrato>{
+    return this.httpClient.post<Contrato>(API_URL + '/contratos/desconto?numeroContrato='+ numeroContrato, valorDesconto);
+  }
   saveBiometria(numeroContrato: String) {
     return this.httpClient.post(API_URL + '/contratos/save-biometria', numeroContrato);
   }

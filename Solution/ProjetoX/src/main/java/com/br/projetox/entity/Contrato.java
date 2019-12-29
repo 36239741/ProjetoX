@@ -1,6 +1,7 @@
 package com.br.projetox.entity;
 
 import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +14,8 @@ import javax.persistence.Transient;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.envers.Audited;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.AllArgsConstructor;
@@ -21,6 +24,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
+@Audited
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -50,6 +54,8 @@ public class Contrato extends AbstractEntity implements Serializable {
 	
 	private byte[] biometria;
 	
+	private Double desconto;
+	
 	@JsonIgnoreProperties("contrato")
 	@OneToMany(targetEntity = PlanoContratado.class,cascade = {CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.MERGE}, fetch = FetchType.LAZY,mappedBy = "contrato")
 	private List<PlanoContratado> planoContratado = new ArrayList<PlanoContratado>();
@@ -66,6 +72,7 @@ public class Contrato extends AbstractEntity implements Serializable {
 			this.valorTotal += plano.getValorTotal();
 		}
 	}
+
 	
 	public void clearToList() {
 		this.planoContratado.clear();

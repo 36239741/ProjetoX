@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
+import javax.validation.ConstraintViolationException;
+
 import org.apache.poi.util.IOUtils;
 import org.directwebremoting.io.FileTransfer;
 import org.junit.Assert;
@@ -86,6 +88,8 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 		Assert.assertEquals(map.get("save").intValue(), saveContrato);
 	}
 		
+		
+		
 		/*TESTE QUE VERIFICA QUANTOS CONTRATOS FORAM ATUALIZADOS*/
 		@Sql({"/dataset/truncate.sql",
 			"/dataset/Servico.sql",
@@ -131,6 +135,20 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	Contrato contrato = this.service.findByBiometria();
 	Assert.assertNotNull(contrato);
 	}
+
+		/*TESTE CALCULA O VALOR DO DESCONTO E DISTRIBUI ENTRE OS PLANOS*/
+			@Sql({"/dataset/truncate.sql",
+				"/dataset/Servico.sql",
+				"/dataset/Contrato.sql",
+				"/dataset/Usuario.sql",
+				"/dataset/PlanoContratado.sql"})
+		@Test
+		public void calcularValorDescontoMustPassCalculaOValorDoDescontoEDistribuiNosPlanosContratados() throws Exception  {
+		final Double desconto = 10.0;
+		this.service.calcularDesconto("1", desconto);
+		Contrato contrato = this.contratoRepository.findById(1L).get();
+		Assert.assertEquals(desconto ,contrato.getDesconto());
+		}
 		
 		/*TESTE QUE VERIFICA QUANTOS CONTRATOS FORAM ATUALIZADOS*/
 		@Sql({"/dataset/truncate.sql",
@@ -439,5 +457,32 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 		Assert.assertEquals(constraintError, constraintViolaton);
 		
 		 
+	}
+		/*TESTE CALCULA O VALOR DO DESCONTO SEM PLANO */
+		@Sql({"/dataset/truncate.sql",
+			"/dataset/Servico.sql",
+			"/dataset/Contrato.sql",
+			"/dataset/Usuario.sql",
+			"/dataset/PlanoContratado.sql"})
+	@Test(expected = NotFoundException.class)
+	public void calcularValorDescontoMustFailContratoSemPlano() throws Exception  {
+	final Double desconto = 10.0;
+	this.service.calcularDesconto("3", desconto);
+	Contrato contrato = this.contratoRepository.findById(1L).get();
+	Assert.assertEquals(desconto ,contrato.getDesconto());
+	}
+		
+		/*TESTE CALCULA O VALOR DO DESCONTO E DISTRIBUI ENTRE OS PLANOS*/
+		@Sql({"/dataset/truncate.sql",
+			"/dataset/Servico.sql",
+			"/dataset/Contrato.sql",
+			"/dataset/Usuario.sql",
+			"/dataset/PlanoContratado.sql"})
+	@Test(expected = Exception.class)
+	public void calcularValorDescontoMustFailComDescontoValorNulo() throws Exception  {
+	final Double desconto = 0.0;
+	this.service.calcularDesconto("1", desconto);
+	Contrato contrato = this.contratoRepository.findById(1L).get();
+	Assert.assertEquals(desconto ,contrato.getDesconto());
 	}
 }

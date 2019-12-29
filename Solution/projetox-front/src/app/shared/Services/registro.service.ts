@@ -1,3 +1,4 @@
+import { Registro } from './../model/registro';
 import { Observable } from 'rxjs';
 import { Contrato } from './../model/Contrato';
 import { HttpClient } from '@angular/common/http';
@@ -16,5 +17,8 @@ export class RegistroService {
   }
   saveHoraSaida(numeroContrato: String){
     this.http.post('/registros/save-saida', numeroContrato);
+  }
+  findAllRegistro(numeroContrato: String, page: Number, size: Number): Observable<Registro>{
+    return this.http.get<Registro>(API_URL + '/registros/find-all?numeroContrato='+ numeroContrato + '&page=' + page + '&size=' + size);
   }
 }

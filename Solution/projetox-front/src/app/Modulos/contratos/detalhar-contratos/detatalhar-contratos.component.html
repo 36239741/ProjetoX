@@ -1,43 +1,49 @@
-<div fxLayout='row' fxLayoutGap='90px'>
-    <div fxLayout='column' >
-        <mat-label><b>No:</b></mat-label><p>{{ contrato.numero }}</p>
-    </div>
-    <div fxLayout='column' class='servicos'>
-      <mat-label><b>Nome:</b></mat-label><p>{{ contrato.nomePaciente }}</p>
-    </div>
-    <div fxLayout='row' class='servicos' fxLayoutAlign='end'>
-        <div fxLayout='column' fxLayoutAlign='center end' fxLayoutGap="20px" class='servicos'>
-           <button mat-raised-button color="accent" matTooltip="Registrar entrada e saída" routerLink="registros">Registros E/S</button>
-         <button mat-raised-button color="accent"  routerLink="novo-servico" matTooltip="Inserir novo serviço no contrato">Novo Serviço</button>
+<div class="container">
+    <div class="informacoes-contratos-buttons">
+
+
+    <section class="informacoes-contrato">
+        <div>
+            <mat-label><b>No:</b></mat-label><p>{{ contrato.numero }}</p>
+
         </div>
-      </div>
-</div>
-<div>
-      <div fxLayout='column' class='table' fxLayoutAlign='center'>
-        <h3>Serviços Contratados</h3>
-        <app-tabela-servicos  [columns]='columns' [data]='data' (editar)="editarPlano($event)" (deletar)="deletarPlano($event)"></app-tabela-servicos>
-      </div>
+        <div>
+            <mat-label><b>Nome:</b></mat-label><p>{{ contrato.nomePaciente }}</p>
+        </div>
+    </section>
+
+    <section class="buttons">
+        <button mat-raised-button color="accent" matTooltip="Registrar entrada e saída" routerLink="registros">Registros de entrada e saída</button>
+        <button mat-raised-button color="accent" matTooltip="Gerar desconto no contrato" (click)="gerarDesconto($event)">Gerar desconto</button>
+        <button mat-raised-button color="accent"  routerLink="novo-servico" matTooltip="Inserir novo serviço no contrato">Novo Serviço</button>
+    </section>
 </div>
 
-<div fxLayout='row' fxLayoutAlign='space-between' class='row3'>
-  <div fxLayout='column' fxLayoutGap='10px' fxLayoutAlign= 'center center'>
-    <mat-label><b>Situação Biometria</b></mat-label>
-    <p>{{ situacaoBiometria }}</p>
-    <br/>
-    <button mat-raised-button color="accent" (click)="openSnackBarClockBiometria()" (click)="saveBiometria()" matTooltip="Cadastrar ou atualizar biometria">{{ buttonBiometria }}</button>
-  </div>
-  <div fxLayout='column' fxLayoutAlign='center center'>
-    <mat-label><b>Total Plano Particular</b></mat-label>
-    <p>{{ totalPlanoParticular | currency:'BRL'}}</p>
-  </div>
-  <div fxLayout='column' fxLayoutAlign='center center'>
-      <mat-label><b>Total Plano Mensal</b></mat-label>
-      <p>{{ totalPLanoMensal  | currency:'BRL'}}</p>
-    </div>
-    <div fxLayout='column' fxLayoutAlign='center center'>
-        <mat-label><b>Total do Contrato</b></mat-label>
-        <p>{{ contrato.valorTotal | currency:'BRL' }}</p>
-    </div>
-</div>
+<section class="table">
+    <h3>Serviços Contratados</h3>
+    <app-tabela-servicos  [columns]='columns' [data]='data' (editar)="editarPlano($event)" (deletar)="deletarPlano($event)"></app-tabela-servicos>
+</section>
+     
 
+    <section class="informacoes-total-servicos">
+        <div >
+            <mat-label><b>Situação Biometria</b></mat-label>
+            <p>{{ situacaoBiometria }}</p>
+            <br/>
+            <button mat-raised-button color="accent" (click)="openSnackBarClockBiometria()" (click)="saveBiometria()" matTooltip="Cadastrar ou atualizar biometria">{{ buttonBiometria }}</button>
+          </div>
+          <div >
+            <mat-label><b>Total Plano Particular</b></mat-label>
+            <p>{{ totalPlanoParticular | currency:'BRL'}}</p>
+          </div>
+          <div >
+              <mat-label><b>Total Plano Mensal</b></mat-label>
+              <p>{{ totalPLanoMensal  | currency:'BRL'}}</p>
+            </div>
+            <div >
+                <mat-label><b>Total do Contrato</b></mat-label>
+                <p>{{ contrato.valorTotal | currency:'BRL' }}</p>
+            </div>        
+    </section>
+ 
 

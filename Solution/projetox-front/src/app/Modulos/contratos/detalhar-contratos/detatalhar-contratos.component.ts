@@ -10,6 +10,7 @@ import { ToastService } from 'src/app/shared/Services/toast.service';
 import { TdDialogService } from '@covalent/core/dialogs';
 import { MatSnackBar } from '@angular/material';
 import { ClockBiometriaComponent } from '../../../shared/components/clock-biometria/clock-biometria.component';
+import { GerarDescontoComponent } from '../visualizar-contratos/gerar-desconto/gerar-desconto.component';
 
 
 
@@ -168,5 +169,14 @@ export class DetatalharContratosComponent implements OnInit {
     detalhesContrato.push(this.contrato.numero);
     detalhesContrato.push(this.contrato.nomePaciente);
     this.behaviorInformacoesContrato.setBehaviorView(detalhesContrato);
+  }
+
+  gerarDesconto($event) {
+    this._dialogService.open(GerarDescontoComponent, {
+      width: '40%',
+      height: ' 80%',
+      data: this.contrato,
+      disableClose: false
+    });
   }
 }

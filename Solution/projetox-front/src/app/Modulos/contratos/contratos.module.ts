@@ -16,9 +16,12 @@ import { ImportButtonComponent } from './visualizar-contratos/import/importButto
 import { ImportComponent } from './visualizar-contratos/import/import.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FormModule } from './form/form.module';
-import {MaterialModule} from '../../core/material/material.module';
-import {RegistrosComponent} from './registros/registros.component';
+import { MaterialModule } from '../../core/material/material.module';
+import { RegistrosComponent } from './registros/registros.component';
 import { PipeTimeModule } from '../../shared/Pipe/time-pipe.module';
+import { AlterarServicoComponent } from './registros/alterar-servico/alterar-servico.component';
+import { GerarDescontoComponent } from './visualizar-contratos/gerar-desconto/gerar-desconto.component';
+import { NgxCurrencyModule } from 'ngx-currency';
 
 
 
@@ -30,8 +33,11 @@ import { PipeTimeModule } from '../../shared/Pipe/time-pipe.module';
     ImportFeedBackComponent, 
     ImportButtonComponent, 
     ImportComponent,
-    RegistrosComponent],
+    RegistrosComponent,
+    AlterarServicoComponent,
+    GerarDescontoComponent],
   imports: [
+    NgxCurrencyModule,
     PipeTimeModule,
     CommonModule,
     ContratosRoutingModule,
@@ -49,7 +55,9 @@ import { PipeTimeModule } from '../../shared/Pipe/time-pipe.module';
   ],
 
   entryComponents: [
-    ImportComponent
+    ImportComponent,
+    AlterarServicoComponent,
+    GerarDescontoComponent
   ],
 })
 export class ContratosModule { }

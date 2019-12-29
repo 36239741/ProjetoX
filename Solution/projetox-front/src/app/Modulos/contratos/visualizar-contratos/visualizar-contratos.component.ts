@@ -3,6 +3,7 @@ import { Subscription} from 'rxjs';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ContratoService } from './../../../shared/Services/contrato.service';
 import { Component, OnInit, OnDestroy} from '@angular/core';
+import { GerarDescontoComponent } from './gerar-desconto/gerar-desconto.component'; 
 
 
 
@@ -35,8 +36,7 @@ export class VisualizarContratosComponent implements OnInit, OnDestroy {
     { name: 'nomePaciente', label: 'Nome do Paciente', sortable: true},
     { name: 'tipoContratoTransient', label: 'Tipo do Contrato'},
     { name: 'ativo', label: 'Status do contrato', sortable: true},
-    { name: 'valorTotal', label: 'Valor Contratado', numeric: true, format: DECIMAL_FORMAT, sortable: true},
-  ];
+    { name: 'valorTotal', label: 'Valor Contratado', numeric: true, format: DECIMAL_FORMAT, sortable: true},  ];
   statuContrato: any[] = [
     {value: null, viewValue: ''},
     {value: true, viewValue: 'Ativo'},
@@ -175,8 +175,8 @@ export class VisualizarContratosComponent implements OnInit, OnDestroy {
   @void*/
   openModalImport($event) {
     this._dialogService.open(ImportComponent, {
-      width: ' 700px ',
-      height: ' 700px ',
+      width: '40%',
+      height: ' 80%',
       disableClose: false
     });
   }

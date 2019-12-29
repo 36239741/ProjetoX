@@ -1,0 +1,23 @@
+<div class="alterar-servico-container">
+    <section class="title">
+        <h3>Troca de serviço</h3>
+    </section>
+
+    <mat-form-field>
+        <h4>
+            Novo serviço
+           </h4>
+      <mat-select>
+        <mat-option *ngFor="let servico of servicos[0]" [value]="servico.servico">
+            {{servico.servico}}
+          </mat-option>     
+         </mat-select>
+    </mat-form-field>
+
+    <section class="buttons">
+        <button mat-flat-button color="accent">Aceitar</button>
+        <button mat-flat-button color="accent" (click)="cancelar($event)">Cancelar</button>
+    </section>
+</div>
+
+

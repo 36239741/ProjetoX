@@ -12,6 +12,8 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.envers.Audited;
+
 import com.br.projetox.security.RequestContext;
 
 import lombok.AllArgsConstructor;

@@ -15,15 +15,13 @@ import { Router } from '@angular/router';
 export class LayoutComponent implements OnInit {
 
   constructor(
-    iconRegistry: MatIconRegistry,
-    sanitizer: DomSanitizer,
     private logoutService: LogoutService,
     private route: Router
     )
     {
 
   }
-
+  opened: boolean = false;
   listMenu: MenuList[] = [
     {
         menuIcon: 'home',
@@ -44,8 +42,7 @@ export class LayoutComponent implements OnInit {
   toolTip: 'Visualizar relatorios'
 }];
 
-  @Input() title: string = 'Espaço especializado Gene Gouveia';
-
+title: string = 'Espaço especializado Gene Gouveia';
 
   ngOnInit() {
 

@@ -6,10 +6,13 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
+import org.hibernate.envers.Audited;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
+@Audited
 @Entity
 @EqualsAndHashCode(callSuper = true)
 public class DiaConsulta extends AbstractEntity implements Serializable {

@@ -4,8 +4,33 @@
   [clickable]="clickable"
   [columns]="columns"
   (rowClick)="rowClick($event)"
+  (sortChange)="sort($event)"
+  [sortOrder]="sortOrder"
+  [sortBy]="sortBy"
+  [clickable]="true"
   >
-  <ng-content></ng-content>
+  <ng-template tdDataTableTemplate="acoes" let-value="value" let-row="row" let-column="column" >
+    <div class="row">
+      <a matTooltip="Desclarar ausência de um profissional." (click)="ausenciaProfissional(row)">
+        <mat-icon>person</mat-icon>
+      </a>
+      <a matTooltip="Fazer troca de serviço." (click)="trocaServico(row)">
+        <mat-icon>description</mat-icon>
+      </a>
+    </div>
+  </ng-template>
+  <ng-template
+  tdDataTableTemplate="ativo"
+  let-value="value"
+  let-row="row"
+  let-column="column"
+>
+  <div fxLayout="row">
+      <span flex [style.color]="value === true ? 'green' : 'red'">{{
+          value === true ? "Ativo" : "Inativo"
+      }}</span>
+  </div>
+</ng-template>
 </td-data-table>
 <div class="md-padding" *ngIf="!dataTable.hasData"  layout="row" layout-align="center center">
     <h3>{{ message }}</h3>
