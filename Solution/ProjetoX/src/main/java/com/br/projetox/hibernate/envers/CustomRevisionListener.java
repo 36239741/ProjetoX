@@ -1,4 +1,4 @@
-package com.br.projetox.entity;
+package com.br.projetox.hibernate.envers;
 
 import java.util.Calendar;
 import java.util.TimeZone;

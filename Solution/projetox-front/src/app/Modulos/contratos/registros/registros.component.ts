@@ -1,3 +1,4 @@
+import { ToastService } from './../../../shared/Services/toast.service';
 import { ActivatedRoute } from '@angular/router';
 import { RegistroService } from './../../../shared/Services/registro.service';
 import { FormBuilder } from '@angular/forms';
@@ -7,8 +8,8 @@ import { ITdDataTableColumn, IPageChangeEvent, TdDialogService } from '@covalent
 import { AlterarServicoComponent } from './alterar-servico/alterar-servico.component';
 import {Situacao} from '../../../shared/Enum/Situacao';
 import { MatDialogConfig } from '@angular/material';
-import { ServicesService } from 'src/app/shared/Services/services.service';
-import { Servico } from 'src/app/shared/model/Contrato';
+import { Registro } from 'src/app/shared/model/registro';
+
 
 
 const DECIMAL_FORMAT: (v: any) => any = (v: number) => new Intl.NumberFormat('pt-BR',{style: 'currency', currency:'BRL'} ).format(v);
@@ -41,16 +42,15 @@ export class RegistrosComponent implements OnInit {
   constructor(private formBuilder: FormBuilder,
               private registroService: RegistroService,
               private activatedRoute : ActivatedRoute,
+              private toastService : ToastService,
               private _dialogService: TdDialogService,
-              private servicoService: ServicesService,
-              private _viewContainerRef: ViewContainerRef
+                private _viewContainerRef: ViewContainerRef
     ) { }
 formGorup: FormGroup;
   pageSize: number = 10;
   totalElements: number = 0;
   page: number = 0;
   data: any; 
-  servico:Servico[] = [];
   columns: ITdDataTableColumn[] = [
     { name: 'dataHoraEntrada', label: 'Entrada', format: DATA_FORMAT},
     { name: 'dataHoraSaida', label: 'Saída', format: DATA_FORMAT},
@@ -83,15 +83,14 @@ formGorup: FormGroup;
 
   trocaServico(trocaServico: any){
     this.openTrocaServico(trocaServico);
-    this.findAllService();
   }
 
   openTrocaServico(tableRow: any){
 
     let dialogConfig: MatDialogConfig<any> = {
-        width: '50%',
-        height: '70%',
-        data: this.servico
+        width: '60%',
+        height: '80%',
+        data: tableRow
     };
 
     if(tableRow) {
@@ -99,17 +98,12 @@ formGorup: FormGroup;
     }
   }
 
-  findAllService(){
-    this.servicoService.findAll().subscribe(servicos => {
-      this.servico.push(servicos);
-    });
-}
 
-  trocaProfissional(trocaProfissional: any) {
+  trocaProfissional(trocaProfissional: Registro) {
     this.confirmTrocaDeProfissional(trocaProfissional);
   }
 
-  confirmTrocaDeProfissional(tableRow: any): void {
+  confirmTrocaDeProfissional(tableRow: Registro): void {
     this._dialogService.openConfirm({
       message: 'Tem certeza que deseja registrar a ausência do profissional? \n Sua ação não poderá ser desfeita.',
       disableClose:  false, // defaults to false
@@ -120,7 +114,12 @@ formGorup: FormGroup;
       width: '50%', //OPTIONAL, defaults to 400px
     }).afterClosed().subscribe((accept: boolean) => {
       if (accept) {
-        // DO SOMETHING
+        this.registroService.trocaServico('AUSENCIA_DO_PROFISSIONAL',tableRow.id,tableRow.planoContratado.servico.servico,0).subscribe(response => {
+            this.toastService.toastSuccess('Troca do profissional executada com sucesso.');
+        },
+        error => {
+            this.toastService.toastError(error.error.message);
+        });
       } else {
         // DO SOMETHING ELSE
       }

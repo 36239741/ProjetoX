@@ -24,7 +24,9 @@ import com.br.projetox.entity.Contrato;
 import com.br.projetox.entity.DiasSemana;
 import com.br.projetox.entity.PlanoContratado;
 import com.br.projetox.entity.Registro;
+import com.br.projetox.entity.Servico;
 import com.br.projetox.entity.Situacao;
+import com.br.projetox.entity.TipoContrato;
 import com.br.projetox.exception.RegistroException;
 import com.br.projetox.repository.RegistroRepository;
 
@@ -46,6 +48,9 @@ public class RegistroService {
 
 	@Autowired
 	private PlanoContratadoService planoContratadoService;
+
+	@Autowired
+	private ServicoService servicoService;
 
 	@Autowired
 	private TaskScheduler taskScheduler;
@@ -152,6 +157,17 @@ public class RegistroService {
 
 	}
 
+	/*
+	 * Metodo busca todos registros de um contrato
+	 * 
+	 * @param numeroContrato String - numero do contratado cadastrado
+	 * 
+	 * @param page int - numero da pagina (Pageable)
+	 * 
+	 * @param size int - tamanho do pageable
+	 * 
+	 * @return Page<Registro>
+	 */
 	public Page<Registro> findAllRegistro(String numeroContrato, int page, int size) {
 		List<Registro> registros = this.registroRepository.findAllRegistro(numeroContrato);
 		for (Registro registro : registros) {
@@ -159,6 +175,54 @@ public class RegistroService {
 		}
 		PageRequest pageable = PageRequest.of(page, size);
 		return new PageImpl<Registro>(registros, pageable, registros.size());
+	}
+
+	/*
+	 * Metodo que troca a situacao do registro para troca do profisional
+	 * 
+	 * @param situacaoRegistro String - situacao do registro
+	 * 
+	 * @param registroId Long - id do registro
+	 * 
+	 * @return Registro
+	 * 
+	 * @throws RegistroException - lanca a essecao quando nao encontrar nenhum
+	 * registro com esse id
+	 */
+	public Registro exchangeOfContractStatus(String situacaoRegistro, Long registroId, String servico,
+			Double valorSessao) {
+		Situacao situacao = Situacao.valueOf(situacaoRegistro);
+		Registro registro = this.registroRepository.findById(registroId).orElseThrow(
+				() -> new RegistroException("Nenhum registro com esse id: " + registroId + "foi encontrado"));
+		if (registro.getPlanoContratado().getTipoContrato().equals(TipoContrato.PLANO)
+				|| registro.getPlanoContratado().getTipoContrato().equals(TipoContrato.PARTICULAR)) {
+
+			if (Situacao.AUSENCIA_DO_PROFISSIONAL == situacao) {
+				registro.getPlanoContratado().setValorTotal(
+						registro.getPlanoContratado().getValorTotal() - registro.getPlanoContratado().getValorPlano());
+			}
+
+			else if (Situacao.TROCA_DE_SERVICO == situacao && valorSessao != null && valorSessao != 0.0) {
+				Servico findServico = this.servicoService.findServico(servico);
+					Double diferenca = registro.getPlanoContratado().getValorPlano() - valorSessao;
+					registro.getPlanoContratado().setServico(findServico);
+					if (diferenca > 0) {
+
+						registro.getPlanoContratado()
+								.setValorTotal(registro.getPlanoContratado().getValorTotal() - diferenca);
+					} else {
+						registro.getPlanoContratado()
+								.setValorTotal(registro.getPlanoContratado().getValorTotal() + Math.abs(diferenca));
+					}
+			}
+			else {
+				throw new RegistroException("O valor da sessão esta com valor nulo");
+			}
+		}
+		registro.getContrato().calcularValorTotal();
+		registro.setSituacao(situacao);
+		return this.registroRepository.save(registro);
+
 	}
 
 	public void scheduleWork(List<PlanoContratado> planoContratado) {

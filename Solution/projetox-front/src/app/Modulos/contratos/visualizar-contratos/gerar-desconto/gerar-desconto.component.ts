@@ -18,7 +18,7 @@ export class GerarDescontoComponent implements OnInit, AfterViewInit {
 
   constructor(private dialogService: TdDialogService,
     @Inject(MAT_DIALOG_DATA) public contrato: Contrato,
-    @ViewChild('valorDesconto',null) private inputValorDesconto: ElementRef,
+    @ViewChild('valorSessao',null) private inputValorSessao: ElementRef,
     private formBuilder: FormBuilder,
     private contratoService: ContratoService,
     private message: ToastService) { }
@@ -32,7 +32,7 @@ export class GerarDescontoComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    fromEvent(this.inputValorDesconto.nativeElement,'keyup')
+    fromEvent(this.inputValorSessao.nativeElement,'keyup')
     .pipe(
         filter(Boolean),
         debounceTime(600),
@@ -46,7 +46,7 @@ export class GerarDescontoComponent implements OnInit, AfterViewInit {
 
 form() {
     this.formGroup = this.formBuilder.group({
-        valorDesconto: ['']
+        valorSessao: ['']
     });
 }
 

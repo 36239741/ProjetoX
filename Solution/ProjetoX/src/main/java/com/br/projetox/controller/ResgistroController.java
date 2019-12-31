@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.br.projetox.entity.Registro;
+import com.br.projetox.exception.RegistroException;
 import com.br.projetox.service.RegistroService;
 
 import javassist.NotFoundException;
@@ -37,5 +38,16 @@ public class ResgistroController {
 	public Page<Registro> findAllRegistro(@RequestParam(name = "page" , required = true) Integer page ,
 			@RequestParam(name = "size",required = true)Integer size, @RequestParam(name= "numeroContrato") String numeroContrato){
 		return this.registroService.findAllRegistro(numeroContrato, page, size);
+	}
+	
+	@PostMapping(path = "/trocar-servico")
+	public Registro findAllRegistro(@RequestParam(name = "situacaoRegistro") String situacaoRegistro,@RequestParam(name = "registroId") String registroId,
+			@RequestParam(name = "servico") String servico,@RequestParam(name = "valorSessao") String valorSessao){
+		if(servico != null && valorSessao != null) {
+			return this.registroService.exchangeOfContractStatus(situacaoRegistro, Long.parseLong(registroId), servico, Double.parseDouble(valorSessao));
+		}
+		else {
+			throw new RegistroException("Existem valores nulos");
+		}
 	}
 }

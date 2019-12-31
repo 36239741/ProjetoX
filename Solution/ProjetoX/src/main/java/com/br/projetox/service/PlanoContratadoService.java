@@ -258,6 +258,7 @@ public class PlanoContratadoService {
 		return this.planoContraRepository.findByContratoId(contrato.getNumero());
 	}
 	
+
 	public List<PlanoContratado> findByDiaConsulta(DiasSemana diasSemana){
 		return this.planoContraRepository.findByDiaConsulta(diasSemana);
 	}

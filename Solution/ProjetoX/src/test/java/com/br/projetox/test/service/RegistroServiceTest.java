@@ -12,6 +12,7 @@ import org.springframework.test.context.jdbc.Sql;
 
 import com.br.projetox.entity.ConfiguracaoParametro;
 import com.br.projetox.entity.Registro;
+import com.br.projetox.entity.Situacao;
 import com.br.projetox.exception.RegistroException;
 import com.br.projetox.repository.ConfigParametrosRepository;
 import com.br.projetox.repository.RegistroRepository;
@@ -48,6 +49,52 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 		Assert.assertNotNull(registro);
 
 	}
+	/* TESTA A TROCA DA SITUACAO DO CONTRATO PARA AUSENCIA DO PROFISSIONAL */
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
+	@Test
+	public void exchangeOfContractStatusTestMustPassTestaATrocaDeSituacaoAusenciaProfissional() throws NotFoundException {
+		final Double valorTotalPlano = 1000.00;
+		Registro registro = this.registroService.exchangeOfContractStatus("AUSENCIA_DO_PROFISSIONAL", 3L, null,null);
+		Assert.assertNotNull(registro);
+		Assert.assertEquals(Situacao.AUSENCIA_DO_PROFISSIONAL, registro.getSituacao());
+		Assert.assertEquals(valorTotalPlano, registro.getPlanoContratado().getValorTotal());
+
+	}
+	/* TESTA A TROCA DA SITUACAO DO CONTRATO PARA TROCA DE SERVICO */
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
+	@Test
+	public void exchangeOfContractStatusTestMustPasstTestaATrocaDeServicoTipoContratoPlanoServicoValorMenorDoQueADoPlano() throws NotFoundException {
+		final Double valorPlano = 45.00;
+		final Double valorTotal = 2035.00;
+
+		Registro registro = this.registroService.exchangeOfContractStatus("TROCA_DE_SERVICO", 4L, "Terapia Ocupacional",valorPlano);
+		
+		Assert.assertNotNull(registro);
+		Assert.assertEquals(Situacao.TROCA_DE_SERVICO, registro.getSituacao());
+		Assert.assertEquals(valorTotal, registro.getPlanoContratado().getValorTotal());
+
+	}
+	
+	/* TESTA A TROCA DA SITUACAO DO CONTRATO PARA AUSENCIA DO PROFISSIONAL */
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
+	@Test
+	public void exchangeOfContractStatusTestMustPasstTestaATrocaDeServicoTipoContratoPlanoServicoValorMaiorDoQueADoPlano() throws NotFoundException {
+		final Double valorPlano = 45.00;
+		final Double valorTotal = 1045.00;
+		Registro registro = this.registroService.exchangeOfContractStatus("TROCA_DE_SERVICO", 3L, "Terapia Ocupacional",valorPlano);
+		
+		Assert.assertNotNull(registro);
+		Assert.assertEquals(Situacao.TROCA_DE_SERVICO, registro.getSituacao());
+		Assert.assertEquals(valorTotal, registro.getPlanoContratado().getValorTotal());
+
+	}
+	
 	
 	/* SALVA UM HORARIO DE SAIDA E TESTA O VALOR DO ACRESCIMO DO VALOR TOTAL */
 	@WithUserDetails("henrique_nitatori@hotmail.com")
@@ -137,5 +184,35 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 	@Test(expected = RegistroException.class)
 	public void saveHorarioEntradaAtivoTestMustFaillTentaSalvarUmHorarioDeSaidaSemHorarioEmAberto() throws NotFoundException {
 		this.registroService.saveHorarioSaida("2");
+	}
+	
+	/* TESTA A TROCA DA SITUACAO DO CONTRATO COM ID DO REGISTRO INVALIDO */
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
+	@Test(expected = RegistroException.class)
+	public void exchangeOfContractStatusTestMustFailtTestaComIdRegistroInvalido() throws NotFoundException {
+		final Double valorPlano = 45.00;
+		Registro registro = this.registroService.exchangeOfContractStatus("TROCA_DE_SERVICO", 10L, "Terapia Ocupacional",45.0);
+		
+		Assert.assertNotNull(registro);
+		Assert.assertEquals(Situacao.TROCA_DE_SERVICO, registro.getSituacao());
+		Assert.assertEquals(valorPlano, registro.getPlanoContratado().getValorPlano());
+
+	}
+	
+	/* TESTA A TROCA DA SITUACAO DO CONTRATO COM O VALOR DA SESSAO NULO */
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
+	@Test(expected = RegistroException.class)
+	public void exchangeOfContractStatusTestMustFailtTestaComValorDaSessaoNulo() throws NotFoundException {
+		final Double valorPlano = 45.00;
+		Registro registro = this.registroService.exchangeOfContractStatus("TROCA_DE_SERVICO", 3L, "Terapia Ocupacional",0.0);
+		
+		Assert.assertNotNull(registro);
+		Assert.assertEquals(Situacao.TROCA_DE_SERVICO, registro.getSituacao());
+		Assert.assertEquals(valorPlano, registro.getPlanoContratado().getValorPlano());
+
 	}
 }

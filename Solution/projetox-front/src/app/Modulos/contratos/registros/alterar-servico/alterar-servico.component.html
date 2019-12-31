@@ -1,23 +1,75 @@
-<div class="alterar-servico-container">
+<div class="alterar-servico-container" *ngIf="trocaServicoSucesso == false">
     <section class="title">
         <h3>Troca de serviço</h3>
     </section>
-
+    <form [formGroup]="formGroup" class="form">
+        
     <mat-form-field>
-        <h4>
-            Novo serviço
-           </h4>
-      <mat-select>
-        <mat-option *ngFor="let servico of servicos[0]" [value]="servico.servico">
+        <mat-label>Novo serviço</mat-label>
+      <mat-select [(value)]="selected" required [formControl]="formGroup.controls['servico']">
+        <mat-option *ngFor="let servico of servicos[0]" [value]="servico.servico" >
             {{servico.servico}}
           </mat-option>     
          </mat-select>
-    </mat-form-field>
+         <mat-error *ngIf="formGroup.controls['servico'].hasError('required')">Selecione um novo serviço</mat-error>    
+        </mat-form-field>
 
+            <mat-form-field >
+                <input
+                    [formControl]="formGroup.controls['valorSessao']"
+                    matInput
+                    required
+                    placeholder="Valor da Sessão"
+                    type="text"
+                    currencyMask
+                    [options]="{
+                        prefix: 'R$ ',
+                        thousands: '.',
+                        decimal: ',',
+                        align: 'left'
+                    }"
+                />
+                <mat-error *ngIf="formGroup.controls['valorSessao'].hasError('required')">O campo valor do desconto requer que seja preenchido</mat-error>
+            </mat-form-field>
+<div class="container-buttons">
     <section class="buttons">
-        <button mat-flat-button color="accent">Aceitar</button>
-        <button mat-flat-button color="accent" (click)="cancelar($event)">Cancelar</button>
+        <button mat-flat-button color="accent" type="submit" (click)="trocarServico()" >Aceitar</button>
+        <button mat-flat-button color="accent" (click)="closeModal($event)">Cancelar</button>
     </section>
+</div>
+</form>
+</div>
+
+<div class="alterar-servico-container"  *ngIf="trocaServicoSucesso == true">
+    <section class="title">
+        <h3>Troca de serviço</h3>
+    </section>  
+    <section class="dados-contratos">
+        <article>
+            <p><b>Nº contrato</b></p>
+            <p>{{ returnRegistro.contrato.numero }}</p>
+        </article>
+
+        <article>
+            <p><b>Nome paciente</b></p>
+            <p>{{ returnRegistro.contrato.nomePaciente }}</p>
+        </article>
+    </section>
+    <section class="novo-servico">
+        <p><b>Novo serviço</b></p>
+        <p>{{ returnRegistro.planoContratado.servico.servico }}</p>
+    </section>
+
+    <Section>
+        <p><b>Valor total do plano atualizado</b></p>
+        <p>{{ returnRegistro.planoContratado.valorTotal | currency: 'BRL' }}</p>
+    </Section>
+
+    <div class="container-buttons">
+        <section class="buttons">
+            <button mat-flat-button color="accent" (click)="closeModal($event)" >Ok</button>
+        </section>
+    </div>
 </div>
 
 

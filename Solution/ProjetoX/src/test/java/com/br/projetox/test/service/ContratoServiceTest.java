@@ -30,10 +30,14 @@ import com.br.projetox.repository.ContratoRepository;
 import com.br.projetox.repository.PlanoContratoRepository;
 import com.br.projetox.repository.ServicoRepository;
 import com.br.projetox.service.ContratoService;
+import com.br.projetox.service.HibernateEnversService;
 
 import javassist.NotFoundException;
 
 public class ContratoServiceTest extends AbstractIntegrationTest {
+	
+	@Autowired
+	private HibernateEnversService hibernateEnversService;
 	
 	@Autowired
 	private ContratoService service;
@@ -71,6 +75,11 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 		
 		Assert.assertNotNull(contratos);
 		Assert.assertEquals(2, contratos.size());
+	}
+
+	@Test
+	public void importPla() throws Exception  {
+		this.hibernateEnversService.findRevisionContrato();
 	}
 	
 					/*TESTE PARA VERIFICAR O RETORNO DO MAP ,VERIFICANDO O NUMERO DE CONTRATOS SALVOS*/
