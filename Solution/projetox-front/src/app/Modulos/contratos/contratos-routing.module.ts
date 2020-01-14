@@ -18,26 +18,27 @@ import { RegistrosComponent } from './registros/registros.component';
 
 const routes: Routes = [
   
-  {path: '', component: LayoutComponent,
+  {path: '', component: LayoutComponent,data: {breadCrumb: 'Visualizar Contratos'},
   children: [
     {path: '', component: VisualizarContratosComponent,
-    data: {breadcrumb: 'Visualizar Contratos', },
+    data: {breadCrumb: null},
     resolve: {contratos : ContratoResolverResolve,
              contratosAtivos : findActiveContractNumberResolve},
             },
-    {path: ':id/registros', component: RegistrosComponent},
+    {path: ':id/registros', component: RegistrosComponent, 
+    data: {breadCrumb: 'Registros do Contrato'}},
     {path: ':id', component: DetatalharContratosComponent,
-    data: {breadcrumb: 'Detalhar Contrato'},
+    data: {breadCrumb: 'Detalhar Contrato'},
     resolve: {findByContrato: ContratoResolveFindByNumeroResolve, 
               planoContratado: FindAllPlanoContratadoResolve}},
 
     {path: ':id/novo-servico', component: NovoServicoComponent,
-    data: {breadcrumb: 'Novo Serviço'},
+    data: {breadCrumb: 'Novo Serviço'},
      resolve: { findAllService: FindAllResolve,
                 config: ConfigParametrosResolve }},
 
      {path: ':id/editar-servico', component: EditarPlanoContratadoComponent,
-     data: {breadcrumb: 'Editar Serviço'},
+     data: {breadCrumb: 'Editar Serviço'},
      resolve: { findAllService: FindAllResolve,
                 config: ConfigParametrosResolve }},
   ],

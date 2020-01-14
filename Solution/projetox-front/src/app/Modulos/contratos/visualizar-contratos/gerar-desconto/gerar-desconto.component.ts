@@ -46,7 +46,7 @@ export class GerarDescontoComponent implements OnInit, AfterViewInit {
 
 form() {
     this.formGroup = this.formBuilder.group({
-        valorSessao: ['']
+        valorDesconto: ['']
     });
 }
 

@@ -1,3 +1,4 @@
+import { BreadCrumbsModule } from './../../shared/components/bread-crumbs/bread-crumbs.module';
 import { HomeModule } from './../home/home.module';
 import { RouterModule } from '@angular/router';
 import { NgModule } from '@angular/core';
@@ -19,7 +20,8 @@ import { MaterialModule } from 'src/app/core/material/material.module';
     HttpClientModule,
     LayoutRoutingModule,
     MaterialModule,
-    HomeModule
+    HomeModule,
+    BreadCrumbsModule
   ],
   exports:[
     LayoutComponent

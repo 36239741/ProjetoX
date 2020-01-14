@@ -3,7 +3,7 @@ import { PlanoContratadoService } from './../../../shared/Services/plano-contrat
 import { HorarioEntradaOrHorarioSaida, Contrato } from './../../../shared/model/Contrato';
 import { Component, OnInit, ViewContainerRef} from '@angular/core';
 import { ITdDataTableColumn } from '@covalent/core/data-table';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute} from '@angular/router';
 import { BehaviorInformacoesContratoService } from 'src/app/shared/Services/behavior-informacoes-contrato.service';
 import { BehaviorPlanoContratadoService } from 'src/app/shared/Services/behavior-plano-contratado.service';
 import { ToastService } from 'src/app/shared/Services/toast.service';
@@ -47,7 +47,6 @@ export class DetatalharContratosComponent implements OnInit {
               private planoContratadoService: PlanoContratadoService,
               private contratoService: ContratoService,
               private snackBar: MatSnackBar,
-              private router: Router
               ) { }
 
   ngOnInit() {
@@ -88,7 +87,11 @@ export class DetatalharContratosComponent implements OnInit {
     this.contratoService.saveBiometria(this.contrato.numero).subscribe(() =>{
         this.snackBar.dismiss();
         this.toastService.toastSuccess('Biometria cadastrada com sucesso.');
-        this.situacaoDaBiometria();
+        this.contratoService.findByContrato(this.activeRoute.snapshot.params.id).subscribe(contrato => {
+            this.contrato = contrato;
+            this.situacaoDaBiometria();
+        });
+        
     },
     error =>{
         this.snackBar.dismiss();

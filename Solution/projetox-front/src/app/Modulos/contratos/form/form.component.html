@@ -125,7 +125,7 @@
                         decimal: ',',
                         align: 'left'
                     }"
-                    [(ngModel)]="form.get('valorPlano').value"
+                    [(ngModel)]="form.controls['valorPlano'].value"
                     (blur)="calcularValorTotal()"
                 />
                 <mat-error *ngIf="hasError('valorPlano', 'required')"

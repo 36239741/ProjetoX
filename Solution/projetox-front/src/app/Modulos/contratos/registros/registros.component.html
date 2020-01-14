@@ -1,22 +1,30 @@
 <div class="form-button">
-    <form [formGroup]="formGorup" fxLayoutGap="40px" class="form">
+    <section class="form">
         <mat-form-field>
             <input
                 matInput
                 type="date"
-                formControlName="afterDate"
                 matTooltip="Filtra os registros pela data"
+                [formControl]="formGroup.controls['beforeDate']"
             />
         </mat-form-field>
         <mat-form-field>
             <input
                 matInput
                 type="date"
-                formControlName="beforeDate"
                 matTooltip="Filtra os registros pela data "
+                [formControl]="formGroup.controls['afterDate']"
+                (blur)="filterByData()"
             />
         </mat-form-field>
-    </form>
+        <button
+        mat-raised-button
+        color="accent"
+        matTooltip="Faz a busca dos registros"
+    >
+        Buscar
+    </button>
+    </section>
     <section>
         <button
             mat-raised-button

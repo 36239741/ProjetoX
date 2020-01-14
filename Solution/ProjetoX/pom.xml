@@ -17,6 +17,16 @@
 	<properties>
 		<java.version>1.8</java.version>
 	</properties>
+	<repositories>
+	
+    <!--other repositories if any-->
+    <repository>
+        <id>project.local</id>
+        <name>project</name>
+        <url>file:${project.basedir}/src/main/resources/lib</url>
+    </repository>
+</repositories>
+	
 	
 	<dependencies>
 		<dependency>
@@ -106,6 +116,16 @@
     		<groupId>org.hibernate</groupId>
     		<artifactId>hibernate-envers</artifactId>
 			<version>5.3.11.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>cidbio</groupId>
+			<artifactId>CIDBIo</artifactId>
+			<version>1</version>
+		</dependency>
+		<dependency>
+			<groupId>jna</groupId>
+			<artifactId>jna</artifactId>
+			<version>4.5.1</version>
 		</dependency>
 	</dependencies>
 

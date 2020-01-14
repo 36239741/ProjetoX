@@ -1,8 +1,7 @@
 import { ToastService } from './../../../shared/Services/toast.service';
 import { ActivatedRoute } from '@angular/router';
 import { RegistroService } from './../../../shared/Services/registro.service';
-import { FormBuilder } from '@angular/forms';
-import { FormGroup } from '@angular/forms';
+import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
 import { Component, OnInit, ViewContainerRef } from '@angular/core';
 import { ITdDataTableColumn, IPageChangeEvent, TdDialogService } from '@covalent/core';
 import { AlterarServicoComponent } from './alterar-servico/alterar-servico.component';
@@ -21,7 +20,7 @@ const DATA_FORMAT: (v: any) => any = (v: any) =>
     + ':' + ('0' + v['minute']).slice(-2)
 }else{
     return v = '';
-}}
+}};
 const TIME_FORMAT: (v: any) => any = (v: any) => {
     if(v != null){
         return ('0' + v['hour']).slice(-2) + ':' + ('0' + v['minute']).slice(-2)
@@ -39,14 +38,14 @@ const SITUACAO_FORMAT: (v: any) => any = (v: any) => {return Situacao[v]};
 })
 export class RegistrosComponent implements OnInit {
 
-  constructor(private formBuilder: FormBuilder,
-              private registroService: RegistroService,
+  constructor(private registroService: RegistroService,
               private activatedRoute : ActivatedRoute,
               private toastService : ToastService,
+              private formBuilder: FormBuilder,
               private _dialogService: TdDialogService,
                 private _viewContainerRef: ViewContainerRef
     ) { }
-formGorup: FormGroup;
+    formGroup: FormGroup;
   pageSize: number = 10;
   totalElements: number = 0;
   page: number = 0;
@@ -60,8 +59,8 @@ formGorup: FormGroup;
     { name: 'acoes', label: 'Ações', width: 150, numeric: true}
   ]
   ngOnInit() {
-    this.form();
     this.startTable();
+    this.form();
   }
   startTable() {
     this.registroService.findAllRegistro( this.activatedRoute.snapshot.params.id, this.page , this.pageSize).subscribe(data => {
@@ -69,16 +68,20 @@ formGorup: FormGroup;
         this.totalElements = data ['totalElements'];
     });
   }
-  form(){
-      this.formGorup = this.formBuilder.group({
-        afterDate: [],
-        beforeDate: []
-      });
-  }
+
   changePageSize(event: IPageChangeEvent) {
     this.pageSize = event.pageSize;
     this.page = event.page - 1;
     this.startTable();
+  }
+  form() {
+      this.formGroup = this.formBuilder.group({
+        beforeDate: [''],
+        afterDate: ['']
+      });
+  }
+  filterByData() {
+     console.log(this.formGroup.get('beforeDate').value  + this.formGroup.get('afterDate').value);
   }
 
   trocaServico(trocaServico: any){

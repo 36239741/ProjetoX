@@ -1,6 +1,7 @@
 package com.br.projetox.test.service;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalTime;
 
 import org.junit.Assert;
@@ -60,6 +61,17 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 		Assert.assertNotNull(registro);
 		Assert.assertEquals(Situacao.AUSENCIA_DO_PROFISSIONAL, registro.getSituacao());
 		Assert.assertEquals(valorTotalPlano, registro.getPlanoContratado().getValorTotal());
+
+	}
+	/* TESTA A BUSCA DE REGISTROS ATRAVES DE DATAS */
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
+	@Test
+	public void findByDataMustPassBuscandoRegistroAtravesDeData() throws NotFoundException {
+		Page<Registro> page = this.registroService.findByData("2019-12-05","2019-12-06","1", 0, 1);
+		Assert.assertNotNull(page.getContent());
+		Assert.assertEquals(1, page.getTotalElements());
 
 	}
 	/* TESTA A TROCA DA SITUACAO DO CONTRATO PARA TROCA DE SERVICO */
@@ -200,6 +212,35 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 		Assert.assertEquals(valorPlano, registro.getPlanoContratado().getValorPlano());
 
 	}
+	/* TESTA A TROCA DE SITUACAO DO CONTRATO COM HORA DE SAIDA PREENCHIDA */
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
+	@Test(expected = RegistroException.class)
+	public void exchangeOfContractStatusTestMustFailtTestaComHoraDeSaidaPreenchida() throws NotFoundException {
+		final Double valorPlano = 45.00;
+		Registro registro = this.registroService.exchangeOfContractStatus("TROCA_DE_SERVICO", 5L, "Terapia Ocupacional",45.0);
+		
+		Assert.assertNotNull(registro);
+		Assert.assertEquals(Situacao.TROCA_DE_SERVICO, registro.getSituacao());
+		Assert.assertEquals(valorPlano, registro.getPlanoContratado().getValorPlano());
+
+	}
+	
+	/* TESTA A TROCA DE SITUACAO DO CONTRATO COM SITUACAO INVALIDA */
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
+	@Test(expected = RegistroException.class)
+	public void exchangeOfContractStatusTestMustFailtTestaComSituacaoInvalida() throws NotFoundException {
+		final Double valorPlano = 45.00;
+		Registro registro = this.registroService.exchangeOfContractStatus("TROCA_DE_SERVICO", 6L, "Terapia Ocupacional",45.0);
+		
+		Assert.assertNotNull(registro);
+		Assert.assertEquals(Situacao.TROCA_DE_SERVICO, registro.getSituacao());
+		Assert.assertEquals(valorPlano, registro.getPlanoContratado().getValorPlano());
+
+	}
 	
 	/* TESTA A TROCA DA SITUACAO DO CONTRATO COM O VALOR DA SESSAO NULO */
 	@WithUserDetails("henrique_nitatori@hotmail.com")
@@ -213,6 +254,41 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 		Assert.assertNotNull(registro);
 		Assert.assertEquals(Situacao.TROCA_DE_SERVICO, registro.getSituacao());
 		Assert.assertEquals(valorPlano, registro.getPlanoContratado().getValorPlano());
+
+	}
+	
+	/* TESTA A BUSCA DE REGISTROS ATRAVES DE DATAS SEM O CAMPO DATA INICIAL */
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
+	@Test(expected = RegistroException.class)
+	public void findByDataMustFaillBuscandoRegistroSemOCampoDeDataInicial() throws NotFoundException {
+		Page<Registro> page = this.registroService.findByData("","2019-12-06","1", 0, 1);
+		Assert.assertNotNull(page.getContent());
+		Assert.assertEquals(1, page.getTotalElements());
+
+	}
+	
+	/* TESTA A BUSCA DE REGISTROS ATRAVES DE DATAS SEM O CAMPO DATA FINAL */
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
+	@Test(expected = RegistroException.class)
+	public void findByDataMustFaillBuscandoRegistroSemOCampoDeDataFinal() throws NotFoundException {
+		Page<Registro> page = this.registroService.findByData("2019-12-04","","1", 0, 1);
+		Assert.assertNotNull(page.getContent());
+		Assert.assertEquals(1, page.getTotalElements());
+
+	}
+	/* TESTA A BUSCA DE REGISTROS ATRAVES DE DATAS SEM O CAMPO CONTRATO ID */
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
+	@Test(expected = RegistroException.class)
+	public void findByDataMustFaillBuscandoRegistroSemOCampoContratoId() throws NotFoundException {
+		Page<Registro> page = this.registroService.findByData("2019-12-04","2019-12-06","", 0, 1);
+		Assert.assertNotNull(page.getContent());
+		Assert.assertEquals(1, page.getTotalElements());
 
 	}
 }

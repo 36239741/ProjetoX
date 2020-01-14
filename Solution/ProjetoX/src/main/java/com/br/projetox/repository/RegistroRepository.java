@@ -1,8 +1,11 @@
 package com.br.projetox.repository;
 
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -22,5 +25,12 @@ public interface RegistroRepository extends JpaRepository<Registro, Long>{
 	
 	@Query("FROM Registro registro WHERE registro.contrato.numero = :numeroContrato")
 	public List<Registro> findAllRegistro(@Param("numeroContrato") String numeroContrato);
+	
+	@Query("FROM Registro registro WHERE registro.contrato.id = :contratoId AND registro.dataHoraEntrada "
+			+ "BETWEEN :dataInicial AND :dataFinal")
+	public Page<Registro> findByDate(@Param("dataInicial") LocalDateTime dataInicial,
+			@Param("dataFinal") LocalDateTime dataFinal,
+			@Param("contratoId") Long contratoId,
+			Pageable pagebale);
 	
 }

@@ -92,12 +92,7 @@ public class FingerPrintUtil {
 					MatchResult score = cidbio.MatchTemplates(stringTemplate ,imgAndTemplate.getTemplateString());
 					if(score.getRetCode() == RetCode.SUCCESS) {
 						returnValue = true;
-					}else {
-						throw new FingerPrintException(this.returnErrorException(score.getRetCode().name()));
-					}
-				}else {
-					throw new FingerPrintException(this.returnErrorException(imgAndTemplate.getRetCode().name()));
-				}
+					}}
 			return returnValue;
 		}
 		
