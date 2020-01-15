@@ -50,4 +50,10 @@ public class ResgistroController {
 			throw new RegistroException("Existem valores nulos");
 		}
 	}
+	@GetMapping(path = "/find-by-date")
+	public Page<Registro> findByDate(@RequestParam(name = "dataInicial") String dataInicial, @RequestParam(name = "dataFinal") String dataFinal,
+			@RequestParam(name = "contratoId") String contratoId, @RequestParam(name = "page") int page, @RequestParam(name = "size") int size){
+		return this.registroService.findByDate(dataInicial, dataFinal, contratoId, page, size);
+	}
+	
 }

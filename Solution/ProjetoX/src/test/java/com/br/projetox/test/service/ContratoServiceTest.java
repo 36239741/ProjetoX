@@ -24,6 +24,7 @@ import com.br.projetox.entity.DiasSemana;
 import com.br.projetox.entity.PlanoContratado;
 import com.br.projetox.entity.Servico;
 import com.br.projetox.entity.TipoContrato;
+import com.br.projetox.exception.ContratoException;
 import com.br.projetox.exception.ImportPlanilhaException;
 import com.br.projetox.repository.ContratoRepository;
 import com.br.projetox.repository.PlanoContratoRepository;
@@ -105,13 +106,15 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	@Test
 	public void importPlanilhaContratosTestMustPassVerificandoContratosAtualizados() throws Exception {
 		String basePath = new File("").getAbsolutePath();
-		FileInputStream fileInputStream = new FileInputStream(basePath+ "/src/test/resources/PlanilhasDeTeste/importPlanilhaContratosTestMustPassVerificandoContratosAtualizados.xlsx");
+		FileInputStream fileInputStream = new FileInputStream(basePath
+				+ "/src/test/resources/PlanilhasDeTeste/importPlanilhaContratosTestMustPassVerificandoContratosAtualizados.xlsx");
 		byte[] arquivoBytes = IOUtils.toByteArray(fileInputStream);
 		HashMap<String, Integer> map = null;
+
 		map = this.service.importPlanilhaContratos(new FileTransfer(
 				"importPlanilhaContratosTestMustPassVerificandoContratosAtualizados.xlsx", "xls", arquivoBytes));
-		final int updateContrato = 1;
-		final int saveContrato = 1;
+		final int updateContrato = 2;
+		final int saveContrato = 0;
 
 		Assert.assertNotNull(map);
 		Assert.assertEquals(map.get("update").intValue(), updateContrato);
@@ -154,7 +157,8 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	@Test
 	public void importPlanilhaContratosTestMustPassVerificandoPlanosContratados() throws Exception {
 		String basePath = new File("").getAbsolutePath();
-		FileInputStream fileInputStream = new FileInputStream(basePath+ "/src/test/resources/PlanilhasDeTeste/importPlanilhaContratosTestMustPassVerificandoPlanosContratados.xlsx");
+		FileInputStream fileInputStream = new FileInputStream(basePath
+				+ "/src/test/resources/PlanilhasDeTeste/importPlanilhaContratosTestMustPassVerificandoPlanosContratados.xlsx");
 		byte[] arquivoBytes = IOUtils.toByteArray(fileInputStream);
 		final int numerosPlanosContratados = 14;
 		this.service.importPlanilhaContratos(new FileTransfer(
@@ -175,7 +179,8 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	@Test
 	public void importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratado() throws Exception {
 		String basePath = new File("").getAbsolutePath();
-		FileInputStream fileInputStream = new FileInputStream(basePath+ "/src/test/resources/PlanilhasDeTeste/importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratado.xlsx");
+		FileInputStream fileInputStream = new FileInputStream(basePath
+				+ "/src/test/resources/PlanilhasDeTeste/importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratado.xlsx");
 		byte[] arquivoBytes = IOUtils.toByteArray(fileInputStream);
 		this.service.importPlanilhaContratos(new FileTransfer(
 				"importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratado.xlsx", "xls", arquivoBytes));
@@ -208,7 +213,8 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	public void importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoPeloCampoEntradaESaida()
 			throws Exception {
 		String basePath = new File("").getAbsolutePath();
-		FileInputStream fileInputStream = new FileInputStream(basePath+ "/src/test/resources/PlanilhasDeTeste/importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoPeloCampoEntradaESaida.xlsx");
+		FileInputStream fileInputStream = new FileInputStream(basePath
+				+ "/src/test/resources/PlanilhasDeTeste/importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoPeloCampoEntradaESaida.xlsx");
 		byte[] arquivoBytes = IOUtils.toByteArray(fileInputStream);
 		this.service.importPlanilhaContratos(new FileTransfer(
 				"importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoPeloCampoEntradaESaida.xlsx",
@@ -236,7 +242,7 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	}
 
 	/*
-	 * TESTE PARA VERIFICAR A ATUALIZACAO DO PLANO CONTRATADO UTILIZANDO CAPO VALOR
+	 * TESTE PARA VERIFICAR A ATUALIZACAO DO PLANO CONTRATADO UTILIZANDO CAMPO VALOR
 	 * TOTAL E CALCULANDO VALOR DO PLANO
 	 */
 	@Sql({ "/dataset/truncate.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql", "/dataset/PlanoContratado.sql" })
@@ -244,7 +250,8 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	public void importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoPeloCampoValorPlano()
 			throws Exception {
 		String basePath = new File("").getAbsolutePath();
-		FileInputStream fileInputStream = new FileInputStream(basePath+ "/src/test/resources/PlanilhasDeTeste/importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoPeloCampoValorPlano.xlsx");
+		FileInputStream fileInputStream = new FileInputStream(basePath
+				+ "/src/test/resources/PlanilhasDeTeste/importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoPeloCampoValorPlano.xlsx");
 		byte[] arquivoBytes = IOUtils.toByteArray(fileInputStream);
 		this.service.importPlanilhaContratos(new FileTransfer(
 				"importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoPeloCampoValorPlano.xlsx",
@@ -281,7 +288,8 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	public void importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoPeloCampoDiasSemana()
 			throws Exception {
 		String basePath = new File("").getAbsolutePath();
-		FileInputStream fileInputStream = new FileInputStream(basePath+ "/src/test/resources/PlanilhasDeTeste/importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoPeloCampoDiasSemana.xlsx");
+		FileInputStream fileInputStream = new FileInputStream(basePath
+				+ "/src/test/resources/PlanilhasDeTeste/importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoPeloCampoDiasSemana.xlsx");
 		byte[] arquivoBytes = IOUtils.toByteArray(fileInputStream);
 		this.service.importPlanilhaContratos(new FileTransfer(
 				"importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoPeloCampoDiasSemana.xlsx",
@@ -322,7 +330,8 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	public void importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoRemovendoDiaDaSemana()
 			throws Exception {
 		String basePath = new File("").getAbsolutePath();
-		FileInputStream fileInputStream = new FileInputStream(basePath+ "/src/test/resources/PlanilhasDeTeste/importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoRemovendoDiaDaSemana.xlsx");
+		FileInputStream fileInputStream = new FileInputStream(basePath
+				+ "/src/test/resources/PlanilhasDeTeste/importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoRemovendoDiaDaSemana.xlsx");
 		byte[] arquivoBytes = IOUtils.toByteArray(fileInputStream);
 		this.service.importPlanilhaContratos(new FileTransfer(
 				"importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoRemovendoDiaDaSemana.xlsx",
@@ -354,7 +363,8 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	@Test
 	public void importPlanilhaContratosTestMustPassVerificandoPerformaceDeImporatacao() throws Exception {
 		String basePath = new File("").getAbsolutePath();
-		FileInputStream fileInputStream = new FileInputStream(basePath+ "/src/test/resources/PlanilhasDeTeste/importPlanilhaContratosTestMustPassVerificandoPerformaceDeImporatacao.xlsx");
+		FileInputStream fileInputStream = new FileInputStream(basePath
+				+ "/src/test/resources/PlanilhasDeTeste/importPlanilhaContratosTestMustPassVerificandoPerformaceDeImporatacao.xlsx");
 		byte[] arquivoBytes = IOUtils.toByteArray(fileInputStream);
 		this.service.importPlanilhaContratos(new FileTransfer(
 				"importPlanilhaContratosTestMustPassVerificandoPerformaceDeImporatacao.xlsx", "xls", arquivoBytes));
@@ -393,7 +403,8 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	@Test
 	public void ContratoMustPassVerificandoAdicionandoPlanoContratadoEmContratoExistene() throws Exception {
 		String basePath = new File("").getAbsolutePath();
-		FileInputStream fileInputStream = new FileInputStream(basePath+ "/src/test/resources/PlanilhasDeTeste/ContratoMustPassVerificandoAdicionandoPlanoContratadoEmContratoExistene.xlsx");
+		FileInputStream fileInputStream = new FileInputStream(basePath
+				+ "/src/test/resources/PlanilhasDeTeste/ContratoMustPassVerificandoAdicionandoPlanoContratadoEmContratoExistene.xlsx");
 		byte[] arquivoBytes = IOUtils.toByteArray(fileInputStream);
 		this.service.importPlanilhaContratos(new FileTransfer(
 				"ContratoMustPassVerificandoAdicionandoPlanoContratadoEmContratoExistene.xlsx", "xls", arquivoBytes));
@@ -417,7 +428,8 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	public void importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletaDiasSemanaFaltando()
 			throws Exception {
 		String basePath = new File("").getAbsolutePath();
-		FileInputStream fileInputStream = new FileInputStream(basePath+ "/src/test/resources/PlanilhasDeTeste/importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletaDiasSemanaFaltando.xlsx");
+		FileInputStream fileInputStream = new FileInputStream(basePath
+				+ "/src/test/resources/PlanilhasDeTeste/importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletaDiasSemanaFaltando.xlsx");
 		byte[] arquivoBytes = IOUtils.toByteArray(fileInputStream);
 		this.service.importPlanilhaContratos(new FileTransfer(
 				"importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletaDiasSemanaFaltando.xlsx",
@@ -435,7 +447,8 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	public void importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletasFaltandoSaidaPadrao()
 			throws Exception {
 		String basePath = new File("").getAbsolutePath();
-		FileInputStream fileInputStream = new FileInputStream(basePath+ "/src/test/resources/PlanilhasDeTeste/importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletasFaltandoSaidaPadrao.xlsx");
+		FileInputStream fileInputStream = new FileInputStream(basePath
+				+ "/src/test/resources/PlanilhasDeTeste/importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletasFaltandoSaidaPadrao.xlsx");
 		byte[] arquivoBytes = IOUtils.toByteArray(fileInputStream);
 		this.service.importPlanilhaContratos(new FileTransfer(
 				"importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletasFaltandoSaidaPadrao.xlsx",
@@ -453,7 +466,8 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	public void importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletasFaltandoValorDoPlano()
 			throws Exception {
 		String basePath = new File("").getAbsolutePath();
-		FileInputStream fileInputStream = new FileInputStream(basePath+ "/src/test/resources/PlanilhasDeTeste/importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletasFaltandoSaidaPadrao.xlsx");
+		FileInputStream fileInputStream = new FileInputStream(basePath
+				+ "/src/test/resources/PlanilhasDeTeste/importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletasFaltandoSaidaPadrao.xlsx");
 		byte[] arquivoBytes = IOUtils.toByteArray(fileInputStream);
 		this.service.importPlanilhaContratos(new FileTransfer(
 				"importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletasFaltandoValorDoPlano.xlsx",
@@ -471,7 +485,8 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	public void importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletasFaltandoNomePaciente()
 			throws Exception {
 		String basePath = new File("").getAbsolutePath();
-		FileInputStream fileInputStream = new FileInputStream(basePath+ "/src/test/resources/PlanilhasDeTeste/importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletasFaltandoNomePacient.xlsx");
+		FileInputStream fileInputStream = new FileInputStream(basePath
+				+ "/src/test/resources/PlanilhasDeTeste/importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletasFaltandoNomePacient.xlsx");
 		byte[] arquivoBytes = IOUtils.toByteArray(fileInputStream);
 		final String constraintError = "ConstraintViolationException";
 		String constraintViolaton = null;
@@ -489,7 +504,7 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	/* TESTE CALCULA O VALOR DO DESCONTO SEM PLANO */
 	@Sql({ "/dataset/truncate.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql", "/dataset/Usuario.sql",
 			"/dataset/PlanoContratado.sql" })
-	@Test(expected = NotFoundException.class)
+	@Test(expected = ContratoException.class)
 	public void calcularValorDescontoMustFailContratoSemPlano() throws Exception {
 		final Double desconto = 10.0;
 		this.service.calcularDesconto("3", desconto);

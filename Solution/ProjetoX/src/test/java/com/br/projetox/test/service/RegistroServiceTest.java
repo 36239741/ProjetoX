@@ -1,7 +1,6 @@
 package com.br.projetox.test.service;
 
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalTime;
 
 import org.junit.Assert;
@@ -16,7 +15,6 @@ import com.br.projetox.entity.Registro;
 import com.br.projetox.entity.Situacao;
 import com.br.projetox.exception.RegistroException;
 import com.br.projetox.repository.ConfigParametrosRepository;
-import com.br.projetox.repository.RegistroRepository;
 import com.br.projetox.service.RegistroService;
 
 import javassist.NotFoundException;
@@ -69,7 +67,7 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
 	@Test
 	public void findByDataMustPassBuscandoRegistroAtravesDeData() throws NotFoundException {
-		Page<Registro> page = this.registroService.findByData("2019-12-05","2019-12-06","1", 0, 1);
+		Page<Registro> page = this.registroService.findByDate("2019-12-05","2019-12-06","1", 0, 1);
 		Assert.assertNotNull(page.getContent());
 		Assert.assertEquals(1, page.getTotalElements());
 
@@ -263,7 +261,7 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
 	@Test(expected = RegistroException.class)
 	public void findByDataMustFaillBuscandoRegistroSemOCampoDeDataInicial() throws NotFoundException {
-		Page<Registro> page = this.registroService.findByData("","2019-12-06","1", 0, 1);
+		Page<Registro> page = this.registroService.findByDate("","2019-12-06","1", 0, 1);
 		Assert.assertNotNull(page.getContent());
 		Assert.assertEquals(1, page.getTotalElements());
 
@@ -275,7 +273,7 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
 	@Test(expected = RegistroException.class)
 	public void findByDataMustFaillBuscandoRegistroSemOCampoDeDataFinal() throws NotFoundException {
-		Page<Registro> page = this.registroService.findByData("2019-12-04","","1", 0, 1);
+		Page<Registro> page = this.registroService.findByDate("2019-12-04","","1", 0, 1);
 		Assert.assertNotNull(page.getContent());
 		Assert.assertEquals(1, page.getTotalElements());
 
@@ -286,7 +284,7 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
 	@Test(expected = RegistroException.class)
 	public void findByDataMustFaillBuscandoRegistroSemOCampoContratoId() throws NotFoundException {
-		Page<Registro> page = this.registroService.findByData("2019-12-04","2019-12-06","", 0, 1);
+		Page<Registro> page = this.registroService.findByDate("2019-12-04","2019-12-06","", 0, 1);
 		Assert.assertNotNull(page.getContent());
 		Assert.assertEquals(1, page.getTotalElements());
 
