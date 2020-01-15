@@ -29,6 +29,7 @@ import com.br.projetox.entity.Servico;
 import com.br.projetox.entity.Situacao;
 import com.br.projetox.entity.TipoContrato;
 import com.br.projetox.exception.RegistroException;
+import com.br.projetox.infrastructure.scheduling.SupportScheduling;
 import com.br.projetox.repository.RegistroRepository;
 
 import javassist.NotFoundException;
@@ -56,6 +57,9 @@ public class RegistroService {
 	@Autowired
 	private TaskScheduler taskScheduler;
 
+	@Autowired
+	private SupportScheduling supportScheduling;
+
 	/*
 	 * @Metodo que salva o horario de entrada do paciente atraves da digital, nao
 	 * permite que salva outra entrada enquanto estivar um horario em aberto
@@ -80,34 +84,29 @@ public class RegistroService {
 		registro.setValorTotal(planoContratado.getValorPlano());
 		registro.setDataHoraEntrada(LocalDateTime.now(ZoneId.of("America/Maceio")));
 		registro.setSituacao(Situacao.ATENDIMENTO_NORMAL);
-		if (findRegistro == null) {
-			return this.registroRepository.save(registro);
+
+		if (findRegistro == null || findRegistro.getDataHoraSaida() != null) {
+			this.registroRepository.save(registro);
+			this.supportScheduling.scheduleSaidaAutomatica(registro);
+			return registro;
+
+		} else {
+			throw new RegistroException("O contrato com o nome " + contrato.getNomePaciente() + " tem um registro em "
+					+ findRegistro.getDataHoraEntrada().format(DateTimeFormatter.ofPattern("dd-MM-uuuu HH:mm"))
+					+ " que ainda não foi fechado");
 		}
-		if (findRegistro.getDataHoraSaida() != null) {
-			return this.registroRepository.save(registro);
-		}
-		else {
-				throw new RegistroException(
-						"O contrato com o nome "
-								+ contrato.getNomePaciente() + " tem um registro em " + findRegistro
-										.getDataHoraEntrada().format(DateTimeFormatter.ofPattern("dd-MM-uuuu HH:mm"))
-								+ " que ainda não foi fechado");
-			}
-		}
-	
+	}
 
 	public Page<Registro> findByData(String dataInicial, String dataFinal, String contratoId, int page, int size) {
-		if(dataInicial.isEmpty() == false && dataFinal.isEmpty() == false && contratoId.isEmpty() == false) {
+		if (dataInicial.isEmpty() == false && dataFinal.isEmpty() == false && contratoId.isEmpty() == false) {
 			Pageable pagebale = PageRequest.of(page, size);
-			return this.registroRepository.findByDate(LocalDateTime.parse(dataInicial+"T00:00:00"),
-					LocalDateTime.parse(dataFinal+"T00:00:00"),
-					Long.parseLong(contratoId), pagebale);
-		}
-		else {
+			return this.registroRepository.findByDate(LocalDateTime.parse(dataInicial + "T00:00:00"),
+					LocalDateTime.parse(dataFinal + "T00:00:00"), Long.parseLong(contratoId), pagebale);
+		} else {
 			throw new RegistroException("Campos obrigatório não preenchidos");
 		}
 	}
-		
+
 	/*
 	 * Metodo que salva o horario de saida de um paciente atraves da digital
 	 * 
@@ -202,46 +201,43 @@ public class RegistroService {
 	 * @throws RegistroException - lanca a essecao quando nao encontrar nenhum
 	 * registro com esse id
 	 */
-	public Registro exchangeOfContractStatus (String situacaoRegistro, Long registroId, String servico,
+	public Registro exchangeOfContractStatus(String situacaoRegistro, Long registroId, String servico,
 			Double valorSessao) {
 		Registro registro = this.registroRepository.findById(registroId).orElseThrow(
 				() -> new RegistroException("Nenhum registro com esse id: " + registroId + "foi encontrado"));
 		Situacao situacao = Situacao.valueOf(situacaoRegistro);
-		
-		if(registro.getSituacao() == Situacao.ATENDIMENTO_NORMAL && registro.getDataHoraSaida() == null) {
+
+		if (registro.getSituacao() == Situacao.ATENDIMENTO_NORMAL && registro.getDataHoraSaida() == null) {
 			if (registro.getPlanoContratado().getTipoContrato().equals(TipoContrato.PLANO)
 					|| registro.getPlanoContratado().getTipoContrato().equals(TipoContrato.PARTICULAR)) {
 
 				if (Situacao.AUSENCIA_DO_PROFISSIONAL == situacao) {
-					registro.getPlanoContratado().setValorTotal(
-							registro.getPlanoContratado().getValorTotal() - registro.getPlanoContratado().getValorPlano());
+					registro.getPlanoContratado().setValorTotal(registro.getPlanoContratado().getValorTotal()
+							- registro.getPlanoContratado().getValorPlano());
 				}
 
 				else if (Situacao.TROCA_DE_SERVICO == situacao && valorSessao != null && valorSessao != 0.0) {
 					Servico findServico = this.servicoService.findServico(servico);
-						Double diferenca = registro.getPlanoContratado().getValorPlano() - valorSessao;
-						registro.getPlanoContratado().setServico(findServico);
-						if (diferenca > 0) {
+					Double diferenca = registro.getPlanoContratado().getValorPlano() - valorSessao;
+					registro.getPlanoContratado().setServico(findServico);
+					if (diferenca > 0) {
 
-							registro.getPlanoContratado()
-									.setValorTotal(registro.getPlanoContratado().getValorTotal() - diferenca);
-						} else {
-							registro.getPlanoContratado()
-									.setValorTotal(registro.getPlanoContratado().getValorTotal() + Math.abs(diferenca));
-						}
-				}
-				else {
+						registro.getPlanoContratado()
+								.setValorTotal(registro.getPlanoContratado().getValorTotal() - diferenca);
+					} else {
+						registro.getPlanoContratado()
+								.setValorTotal(registro.getPlanoContratado().getValorTotal() + Math.abs(diferenca));
+					}
+				} else {
 					throw new RegistroException("O valor da sessão esta com valor nulo");
 				}
 			}
 			registro.getContrato().calcularValorTotal();
 			registro.setSituacao(situacao);
+		} else {
+			throw new RegistroException("A situação do regitro é " + registro.getSituacao().getDescricao()
+					+ "e ja contém horário de saída" + registro.getDataHoraSaida());
 		}
-		else {
-			throw new RegistroException("A situação do regitro é " + registro.getSituacao().getDescricao() + "e ja contém horário de saída" + 
-		registro.getDataHoraSaida());
-		}
-
 
 		return this.registroRepository.save(registro);
 
@@ -254,6 +250,16 @@ public class RegistroService {
 			this.taskScheduler.schedule(new RunnableTask("Horario de entrada do plano: " + plano.getHorarioEntrada()),
 					cronTrigger);
 		});
+	}
+
+	public void registrarSaidaAutomatica(Registro registro) {
+		registro.setValorTotal(registro.getPlanoContratado().getValorPlano());
+
+		Duration tempoTotal = Duration.between(registro.getDataHoraEntrada().toLocalTime(),
+				LocalTime.now(ZoneId.of("America/Maceio")));
+		registro.setTempoTotal(LocalTime.MIN.plusMinutes(tempoTotal.toMinutes()));
+		registro.setDataHoraSaida(LocalDateTime.now(ZoneId.of("America/Maceio")));
+		this.registroRepository.save(registro);
 	}
 
 }

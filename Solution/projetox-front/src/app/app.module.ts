@@ -12,6 +12,7 @@ import { BasicInterceptorService } from './core/interceptor/basic-interceptor.se
 import { registerLocaleData } from '@angular/common';
 import { MaterialModule } from './core/material/material.module';
 import { CovalentLoadingModule } from '@covalent/core/loading';
+import {MatDialogModule} from '@angular/material/dialog';
 
 registerLocaleData(localept, 'pt');
 
@@ -27,7 +28,8 @@ registerLocaleData(localept, 'pt');
     HttpClientModule,
     MaterialModule,
     CovalentLoadingModule,
-    ClockBiometriaModule
+    ClockBiometriaModule,
+    MatDialogModule
   ],
   providers: [{
     provide: HTTP_INTERCEPTORS ,

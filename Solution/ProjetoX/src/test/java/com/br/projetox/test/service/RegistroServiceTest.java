@@ -33,7 +33,7 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 	/* SALVA UM HORARIO DE ENTRADA */
 	@WithUserDetails("henrique_nitatori@hotmail.com")
 	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
-			"/dataset/PlanoContratado.sql","/dataset/Registro.sql" })
+			"/dataset/PlanoContratado.sql" })
 	@Test
 	public void saveHorarioEntradaAtivoTestMustPassSalvaUmHorarioDeEntrada() throws NotFoundException {
 		Registro registro =this.registroService.saveHorarioEntrada("2", "1");

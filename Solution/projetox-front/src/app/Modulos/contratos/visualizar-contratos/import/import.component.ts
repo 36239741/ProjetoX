@@ -5,6 +5,8 @@ import { TdDialogService } from '@covalent/core/dialogs';
 import { FeedBack } from '../../../../shared/model/feedBack';
 import { BehaviorMessageFeedBackService } from '../../../../shared/Services/behavior-message-feed-back.service';
 import { BehaviorSubjectContratoRefreshService } from '../../../../shared/Services/behavior-subject-contrato-refresh.service';
+import { ToastService } from 'src/app/shared/Services/toast.service';
+
 
 @Component({
   selector: "app-import",
@@ -15,6 +17,7 @@ export class ImportComponent implements OnInit{
 
   constructor(private _dialogService: TdDialogService,
               private contratoService: ContratoService,
+              private toast: ToastService,
               private loading: TdLoadingService,
               private behaviorSubject: BehaviorMessageFeedBackService,
               private behaviorRefreshTableContrato: BehaviorSubjectContratoRefreshService) {
@@ -58,7 +61,11 @@ export class ImportComponent implements OnInit{
       this.behaviorSubject.setBehaviorView(res);
       this.behaviorRefreshTableContrato.setBehaviorView(true);
     },
-    () => this.loading.resolve('spinnerProgress'));
+    (error: any) => {
+      this.toast.toastError(error.error.message);
+      this.loading.resolve('spinnerProgress')
+    });
+
   }
 
 
