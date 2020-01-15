@@ -95,12 +95,8 @@ public class RegistroService {
 					+ findRegistro.getDataHoraEntrada().format(DateTimeFormatter.ofPattern("dd-MM-uuuu HH:mm"))
 					+ " que ainda não foi fechado");
 		}
-<<<<<<< HEAD
 	}
 
-	public Page<Registro> findByData(String dataInicial, String dataFinal, String contratoId, int page, int size) {
-		if (dataInicial.isEmpty() == false && dataFinal.isEmpty() == false && contratoId.isEmpty() == false) {
-=======
 	
 	/*
 	 * Metodo que busca os registros pela data
@@ -119,7 +115,6 @@ public class RegistroService {
 	 */
  	public Page<Registro> findByDate(String dataInicial, String dataFinal, String contratoId, int page, int size) {
 		if(dataInicial.isEmpty() == false && dataFinal.isEmpty() == false && contratoId.isEmpty() == false) {
->>>>>>> 1143963e36fda1d5a93dd3c5db7cc1d477f9ae01
 			Pageable pagebale = PageRequest.of(page, size);
 			return this.registroRepository.findByDate(LocalDateTime.parse(dataInicial + "T00:00:00"),
 					LocalDateTime.parse(dataFinal + "T00:00:00"), Long.parseLong(contratoId), pagebale);
