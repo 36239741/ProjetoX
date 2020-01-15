@@ -14,18 +14,19 @@
                 type="date"
                 matTooltip="Filtra os registros pela data "
                 [formControl]="formGroup.controls['afterDate']"
-                (blur)="filterByData()"
             />
         </mat-form-field>
         <button
+        class="btn"
         mat-raised-button
         color="accent"
         matTooltip="Faz a busca dos registros"
+        (click)="filterByData()"
     >
-        Buscar
+        Filtrar
     </button>
     </section>
-    <section>
+    <section class="export-registro">
         <button
             mat-raised-button
             color="accent"

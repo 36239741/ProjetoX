@@ -95,8 +95,22 @@ public class RegistroService {
 			}
 		}
 	
-
-	public Page<Registro> findByData(String dataInicial, String dataFinal, String contratoId, int page, int size) {
+	/*
+	 * Metodo que busca os registros pela data
+	 * 
+	 * @Param dataInicial String - data de inicio para busca
+	 * 
+	 * @Param dataFinal String - data final da busca
+	 * 
+	 * @Param contratoId String - id do contrato
+	 * 
+	 * @Param page int - numero da pagina de retorno
+	 * 
+	 * @Param size int - tamanho da pagina de retorno
+	 * 
+	 * @return page<Registro>
+	 */
+ 	public Page<Registro> findByDate(String dataInicial, String dataFinal, String contratoId, int page, int size) {
 		if(dataInicial.isEmpty() == false && dataFinal.isEmpty() == false && contratoId.isEmpty() == false) {
 			Pageable pagebale = PageRequest.of(page, size);
 			return this.registroRepository.findByDate(LocalDateTime.parse(dataInicial+"T00:00:00"),

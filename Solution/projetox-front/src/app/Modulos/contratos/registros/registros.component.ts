@@ -81,7 +81,16 @@ export class RegistrosComponent implements OnInit {
       });
   }
   filterByData() {
-     console.log(this.formGroup.get('beforeDate').value  + this.formGroup.get('afterDate').value);
+      let dataInicial: String = this.formGroup.get('beforeDate').value;
+      let dataFinal: String = this.formGroup.get('afterDate').value;
+      let contratoId : String = this.activatedRoute.snapshot.params.id;
+      this.registroService.findByDate(dataInicial, dataFinal, contratoId , this.page , this.pageSize).subscribe(registro => {
+        this.totalElements = registro['totalElements'];
+        this.data = registro['content'];
+      },
+      error => {
+          this.toastService.toastError(error.error.message);
+      });
   }
 
   trocaServico(trocaServico: any){

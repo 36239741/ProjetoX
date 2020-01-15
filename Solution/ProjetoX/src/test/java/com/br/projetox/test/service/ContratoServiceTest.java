@@ -25,6 +25,7 @@ import com.br.projetox.entity.DiasSemana;
 import com.br.projetox.entity.PlanoContratado;
 import com.br.projetox.entity.Servico;
 import com.br.projetox.entity.TipoContrato;
+import com.br.projetox.exception.ContratoException;
 import com.br.projetox.exception.ImportPlanilhaException;
 import com.br.projetox.repository.ContratoRepository;
 import com.br.projetox.repository.PlanoContratoRepository;
@@ -110,8 +111,8 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 		byte[] arquivoBytes = IOUtils.toByteArray( fileInputStream );
 		HashMap<String, Integer> map = null;
 		map = this.service.importPlanilhaContratos(new FileTransfer( "importPlanilhaContratosTestMustPassVerificandoContratosAtualizados.xlsx", "xls", arquivoBytes ));
-		final int updateContrato = 1;
-		final int saveContrato = 1;
+		final int updateContrato = 2;
+		final int saveContrato = 0;
 
 		
 		
@@ -241,7 +242,7 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	
 	}
 	
-				/* TESTE PARA VERIFICAR A ATUALIZACAO DO PLANO CONTRATADO UTILIZANDO CAPO VALOR TOTAL E CALCULANDO VALOR DO PLANO */
+				/* TESTE PARA VERIFICAR A ATUALIZACAO DO PLANO CONTRATADO UTILIZANDO CAMPO VALOR TOTAL E CALCULANDO VALOR DO PLANO */
 	@Sql({	"/dataset/truncate.sql",
 	"/dataset/Servico.sql",
 	"/dataset/Contrato.sql",
@@ -473,7 +474,7 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 			"/dataset/Contrato.sql",
 			"/dataset/Usuario.sql",
 			"/dataset/PlanoContratado.sql"})
-	@Test(expected = NotFoundException.class)
+	@Test(expected = ContratoException.class)
 	public void calcularValorDescontoMustFailContratoSemPlano() throws Exception  {
 	final Double desconto = 10.0;
 	this.service.calcularDesconto("3", desconto);
