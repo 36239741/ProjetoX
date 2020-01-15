@@ -80,10 +80,8 @@ public class RegistroService {
 		registro.setValorTotal(planoContratado.getValorPlano());
 		registro.setDataHoraEntrada(LocalDateTime.now(ZoneId.of("America/Maceio")));
 		registro.setSituacao(Situacao.ATENDIMENTO_NORMAL);
-		if (findRegistro == null) {
-			return this.registroRepository.save(registro);
-		}
-		if (findRegistro.getDataHoraSaida() != null) {
+
+		if (findRegistro == null || findRegistro.getDataHoraSaida() != null ) {
 			return this.registroRepository.save(registro);
 		}
 		else {
