@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -17,7 +16,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.support.CronTrigger;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -32,7 +33,6 @@ import com.br.projetox.entity.Situacao;
 import com.br.projetox.entity.TipoContrato;
 import com.br.projetox.exception.RegistroException;
 import com.br.projetox.infrastructure.scheduling.SupportScheduling;
-import com.br.projetox.repository.PlanoContratoRepository;
 import com.br.projetox.repository.RegistroRepository;
 
 import javassist.NotFoundException;
@@ -350,6 +350,7 @@ public class RegistroService {
 		
 		
 	}
+	
 	
 	
 
