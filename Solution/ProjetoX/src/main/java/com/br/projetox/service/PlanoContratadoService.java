@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,11 +40,13 @@ public class PlanoContratadoService {
 	
 
 
-	
+	@PreAuthorize("hasPermission('admin')")
 	public PlanoContratado findById(Long id) throws NotFoundException {
 		return this.planoContraRepository.findById(id).orElseThrow(() -> 
 		new NotFoundException("Nenhum plano encontrado com esse id: " + id) );
 	}
+	
+	@PreAuthorize("hasPermission('admin')")
 	public void deleteLogical(String planoContratadoId) {
 		this.planoContraRepository.deleteLogical(Long.parseLong(planoContratadoId));
 		PlanoContratado planoContratado = this.planoContraRepository.findById(Long.parseLong(planoContratadoId)).get();
@@ -59,6 +62,7 @@ public class PlanoContratadoService {
 	 * 
 	 * @return List<PlanoContratado>
 	 */
+	@PreAuthorize("hasPermission('admin')")
 	public List<PlanoContratado> findAllPlanoContratadoByContratoId(String numeroContrato) {
 		List<PlanoContratado> listPlanos = this.planoContraRepository.findByContratoId(numeroContrato);
 		for (PlanoContratado planos : listPlanos) {

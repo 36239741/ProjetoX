@@ -1,75 +1,58 @@
-<div fxLayout="row" fxLayoutAlign="center center">
-  <h1>Importar Contrato</h1>
-</div>
-<div fxLayout="column" class="height" fxLayoutAlign="center center">
+<h3 mat-dialog-title class="tc-accent-400">Importar Contratos</h3>
 
-  <div fxLayout="row" fxLayoutAlign="center center" >
-    <app-import-feed-back  *ngIf="isSuccess == true" ></app-import-feed-back>
-  </div>
-  <div *ngIf="isSuccess == false" fxLayout="row" fxLayoutAlign="center center" class="height">
-    <div fxLayout="row" fxLayoutAlign="center center" class="height">
-      <mat-form-field
-        tdFileDrop
-        [disabled]="disabled"
-        (fileDrop)="files = $event"
-        (click)="fileInput.inputElement.click()"
-        (keyup.enter)="fileInput.inputElement.click()"
-        (keyup.delete)="fileInput.clear()"
-        (keyup.backspace)="fileInput.clear()"
-      >
-        <input
-          matInput
-          placeholder="Selecionar Planilha"
-          [value]="files?.length ? files?.length + ' files' : files?.name"
-          [disabled]="disabled"
-          readonly
-        />
-      </mat-form-field>
-      <button
-        mat-icon-button
-        *ngIf="files"
-        (click)="fileInput.clear()"
-        (keyup.enter)="fileInput.clear()"
-      >
-        <mat-icon>cancel</mat-icon>
-      </button>
-      <td-file-input
-        class="push-left-sm push-right-sm"
-        #fileInput
-        [(ngModel)]="files"
-        multiple
-        [disabled]="disabled"
-        (select)="selectEvent($event)"
-      >
-        <mat-icon>folder</mat-icon>
-        <span class="text-upper">Browse...</span>
-      </td-file-input>
+<td-dialog-content>
+  <div fxLayout=column>
+    <div fxLayout="row" fxLayoutAlign="center center" >
+      <app-import-feed-back  *ngIf="isSuccess == true" ></app-import-feed-back>
     </div>
-  </div>
-  <div fxLayout='row' fxLayoutAlign='center center'>
-      <span *ngIf="fileType < 0" class="error">{{ error }}</span>
-  </div>
+    <div *ngIf="isSuccess == false" fxLayout="row" fxLayoutAlign="center start" >
+      <div fxLayout="row" fxFlex>
+        <mat-form-field
+          tdFileDrop
+          [disabled]="disabled"
+          (fileDrop)="files = $event"
+          (click)="fileInput.inputElement.click()"
+          (keyup.enter)="fileInput.inputElement.click()"
+          (keyup.delete)="fileInput.clear()"
+          (keyup.backspace)="fileInput.clear()"
+          fxFlex=90
+        >
+          <input
+            matInput
+            placeholder="Selecionar Planilha"
+            [value]="files?.length ? files?.length + ' files' : files?.name"
+            [disabled]="disabled"
+            readonly
+          />
+        </mat-form-field>
+  
+        <button mat-icon-button *ngIf="files" (click)="fileInput.clear()" (keyup.enter)="fileInput.clear()" matTooltip="Limpar seleção">
+          <mat-icon>cancel</mat-icon>
+        </button>
+  
+        <td-file-input color="accent" class="push-left-sm push-right-sm" #fileInput [(ngModel)]="files" multiple [disabled]="disabled" (select)="selectEvent($event)" matTooltip="Buscar arquivo para selecionar">
+          <span>Procurar</span>
+        </td-file-input>
+      </div>
+    </div>
+    <div fxLayout='column' fxLayoutAlign="center start">
+        <span *ngIf="fileType < 0" class="error">{{ error }}</span>
+    </div>
 
-</div>
-<div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="20px">
+  </div>
+</td-dialog-content>
+
+<td-dialog-actions>
+  <div fxLayout="row" fxLayoutGap="20px" fxLayoutAlign='end end'>
     <div>
-      <button
-      mat-raised-button
-      color="accent"
-      (click)="buttonFechar($event)"
-      >
+      <button mat-raised-button (click)="buttonFechar($event)" matTooltip="Cancelar importação">
         Fechar
       </button>
     </div>
     <div>
-          <button
-            mat-raised-button
-            color="accent"
-            [disabled]="!habilityButton"
-            (click)="import()"
-            *ngIf="isSuccess == false"
-          >
-            Importar
-          </button>
-        </div>
-      </div>
+      <button mat-raised-button color="accent" [disabled]="!habilityButton" (click)="import()" *ngIf="isSuccess == false" matTooltip="Confirmar importação de contratos a partir da planilha selecionada" >
+        Importar
+      </button>
+    </div>
+  </div>
+</td-dialog-actions>

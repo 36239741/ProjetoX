@@ -17,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -75,6 +77,7 @@ public class ContratoService {
 	 * 
 	 * @return Page<contrato>
 	 */
+	@PreAuthorize("hasPermission(#Usuario, 'admin')")
 	public Page<Contrato> findAll(int pageNum, int pageSize, Direction direction, String atributo) {
 		Page<Contrato> page = null;
 		PageRequest pageable = PageRequest.of(pageNum, pageSize,
@@ -97,6 +100,7 @@ public class ContratoService {
 	 * 
 	 * @return Page<Contrato>
 	 */
+	@PreAuthorize("hasPermission(#Usuario, 'admin')")
 	@Transactional(readOnly = true)
 	public Page<Contrato> findByFilters(String numero, String nomePaciente, PageRequest pageable) {
 		return this.repository.findByFilters(numero, nomePaciente, pageable);
@@ -117,6 +121,7 @@ public class ContratoService {
 	 * 
 	 * @return Page<Contrato>
 	 */
+	@PreAuthorize("hasPermission(#Usuario, 'admin')")
 	public Page<Contrato> findByFiltersParamActive(String numero, String nomePaciente, PageRequest pageable,
 			Boolean ativo) {
 		return this.repository.findByFiltersParamActive(numero, nomePaciente, pageable, ativo);
@@ -133,6 +138,7 @@ public class ContratoService {
 	 * @throws NotFoundException - retorna a excessao quando nao for encontrado
 	 * nenhum contrato
 	 */
+	@PreAuthorize("hasPermission(#Usuario, 'admin')")
 	public Contrato findByContractNumber(String numeroContrato) throws NotFoundException {
 		Optional<Contrato> contrato = this.repository.findByNumero(numeroContrato);
 		contrato.get().getPlanoContratado().clear();
@@ -150,6 +156,7 @@ public class ContratoService {
 	 * 
 	 * @return HashMap<String, Integer>
 	 */
+	@PreAuthorize("hasPermission(#Usuario, 'admin')")
 	public HashMap<String, Integer> importPlanilhaContratos(FileTransfer file) throws Exception {
 		List<Contrato> listContrato = new ArrayList<>();
 		Workbook workbook = WorkbookFactory.create(file.getInputStream());
@@ -308,7 +315,8 @@ public class ContratoService {
 		map.put("save", save);
 		return map;
 	}
-
+	
+	@PreAuthorize("hasPermission(#Usuario, 'admin')")
 	public Contrato calcularDesconto(String numeroContrato, Double desconto) throws Exception {
 		List<PlanoContratado> plano = this.planoContratadoService.findAllPlanoContratadoByContratoId(numeroContrato);
 		Double valorDesconto = 0.0;
@@ -347,6 +355,8 @@ public class ContratoService {
 	 * 
 	 * @return void
 	 */
+	
+	@PreAuthorize("hasPermission(#Usuario, 'admin')")
 	private void checkContractedPlan(List<Contrato> contratos, Optional<Contrato> findContrato, int i) {
 		for (PlanoContratado planoContratado : contratos.get(i).getPlanoContratado()) {
 			Long servicoId = this.servicoService.findServico(planoContratado.getServico().getServico()).getId();
@@ -382,6 +392,7 @@ public class ContratoService {
 	 * 
 	 * @throws FingerPrintException
 	 */
+	@PreAuthorize("hasPermission(#Usuario, 'admin')")
 	public void saveFingerprint(String contractNumber) throws NotFoundException {
 		Template templateMerge = this.fingerPrint.captureThreeFingerPrint();
 		byte[] binary;
@@ -396,6 +407,7 @@ public class ContratoService {
 	 * 
 	 * @return Boolean - retorna true se sucesso e false se falhar
 	 */
+	@PreAuthorize("hasPermission(#Usuario, 'admin')")
 	public Contrato findByBiometria() throws UnsupportedEncodingException {
 		ImageAndTemplate imgAndTemplate = null;
 		List<Contrato> listContrato = null;
@@ -412,7 +424,7 @@ public class ContratoService {
 		}
 		return returnContrato;
 	}
-
+	
 	public void cancelCaptureFingerPrint() {
 		this.fingerPrint.cancelCapture();
 	}

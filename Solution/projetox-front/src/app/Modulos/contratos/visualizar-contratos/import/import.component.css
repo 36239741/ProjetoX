@@ -1,12 +1,14 @@
-.height{
-  height: 70%;
-}
 
 .error{
   color: red;
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 10px;
 }
 .successMessage{
   height: 100%;
   position: relative;
+  font-size: 12px;
+  font-weight: bold;
 }
 

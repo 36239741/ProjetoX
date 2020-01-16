@@ -175,8 +175,8 @@ export class VisualizarContratosComponent implements OnInit, OnDestroy {
   @void*/
   openModalImport($event) {
     this._dialogService.open(ImportComponent, {
-      width: '40%',
-      height: ' 80%',
+      width: '700px',
+      height: ' 250px',
       disableClose: false
     });
   }

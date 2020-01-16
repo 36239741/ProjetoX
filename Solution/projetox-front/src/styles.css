@@ -1,24 +1,31 @@
 .mat-tooltip{
   font-size: 14px !important;
 }
-     .toast-error {
-      background-color: #c62828 !important; }
+.toast-error {
+  background-color: #c62828 !important; 
+}
+.toast-warnning {
+  background-color: #f9a825 !important; 
+}
+.toast-success {
+  background-color: #2e7d32 !important; 
+}
 
-    .toast-warnning {
-      background-color: #f9a825 !important; }
+button{
+  width: 250px;
+  height: 50px;
+}
 
-    .toast-success {
-      background-color: #2e7d32 !important; }
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif;  font-size: 16px;}
+a {
+  cursor: pointer;
+  text-decoration: none;
+}
+a:hover, a:visited, a:focus, a:active{ text-decoration: none; color: inherit; }
 
-      button{
-        width: 250px;
-        height: 50px;
-      }
 
-      html, body { height: 100%; }
-      body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif;  font-size: 20px;}
-      a {
-        cursor: pointer;
-        text-decoration: none;
-    }
-    a:hover, a:visited, a:focus, a:active{ text-decoration: none; color: inherit; }
+.dialog-title{
+  font-size: 20px;
+  font-weight: bold;
+}

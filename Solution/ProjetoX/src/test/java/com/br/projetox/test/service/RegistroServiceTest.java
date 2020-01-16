@@ -1,7 +1,6 @@
 package com.br.projetox.test.service;
 
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalTime;
 
 import org.junit.Assert;
@@ -16,7 +15,6 @@ import com.br.projetox.entity.Registro;
 import com.br.projetox.entity.Situacao;
 import com.br.projetox.exception.RegistroException;
 import com.br.projetox.repository.ConfigParametrosRepository;
-import com.br.projetox.repository.RegistroRepository;
 import com.br.projetox.service.RegistroService;
 
 import javassist.NotFoundException;
@@ -33,7 +31,7 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 	/* SALVA UM HORARIO DE ENTRADA */
 	@WithUserDetails("henrique_nitatori@hotmail.com")
 	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
-			"/dataset/PlanoContratado.sql","/dataset/Registro.sql" })
+			"/dataset/PlanoContratado.sql" })
 	@Test
 	public void saveHorarioEntradaAtivoTestMustPassSalvaUmHorarioDeEntrada() throws NotFoundException {
 		Registro registro =this.registroService.saveHorarioEntrada("2", "1");

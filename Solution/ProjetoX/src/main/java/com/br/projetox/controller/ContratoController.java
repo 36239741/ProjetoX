@@ -99,6 +99,7 @@ public class ContratoController {
 		HashMap<String, Integer> map = null;
 		ResponseEntity<?> responseEntityOK = null;
 		if(file.isEmpty() == false) {
+			System.out.println(file.getContentType());
 			if(file.getContentType().equalsIgnoreCase("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") || 
 					file.getContentType().equalsIgnoreCase("application/vnd.ms-excel")) {
 				FileTransfer fileTransfer = new FileTransfer(file.getName(), file.getContentType(), file.getInputStream());
@@ -106,11 +107,11 @@ public class ContratoController {
 				responseEntityOK = ResponseEntity.ok(map);
 			}
 			else {
-				throw new FilerException("Tipo de arquivo nao suportado");
+				throw new FilerException("Tipo de arquivo não suportado.");
 			}
 		}
 		else {
-			throw new FilerException("Arquivo de Upload Vazio");
+			throw new FilerException("Arquivo de Upload vazio.");
 		}
 		
 		return responseEntityOK;
