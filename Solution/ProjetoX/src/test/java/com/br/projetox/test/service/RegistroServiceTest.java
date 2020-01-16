@@ -1,6 +1,10 @@
 package com.br.projetox.test.service;
 
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 import org.junit.Assert;
@@ -15,6 +19,7 @@ import com.br.projetox.entity.Registro;
 import com.br.projetox.entity.Situacao;
 import com.br.projetox.exception.RegistroException;
 import com.br.projetox.repository.ConfigParametrosRepository;
+import com.br.projetox.repository.RegistroRepository;
 import com.br.projetox.service.RegistroService;
 
 import javassist.NotFoundException;
@@ -27,6 +32,8 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 	@Autowired
 	private ConfigParametrosRepository configRepository;
 	
+	@Autowired
+	private RegistroRepository registroRepository;
 	
 	/* SALVA UM HORARIO DE ENTRADA */
 	@WithUserDetails("henrique_nitatori@hotmail.com")
@@ -289,4 +296,59 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 		Assert.assertEquals(1, page.getTotalElements());
 
 	}
+	
+	
+	//************************ TESTES PARA SERVIÇO DE REGISTRAR SAÍDA AUTOMÁTICA *****************************//
+	
+	/* Teste que verifica um registro fechado automaticamente */
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
+	@Test
+	public void registrarSaidaAutomaticaMustPass() {
+		final Registro registro = this.registroRepository.findById(2L).orElse(null);
+		this.registroService.registrarSaidaAutomatica(registro);
+		Assert.assertNotNull(registro);
+		Assert.assertTrue(registro.getValorTotal().equals(1000.00));
+		LocalDateTime dataHoraSaida = LocalDateTime.of(LocalDate.now(), LocalTime.of(17, 10, 0));
+		Assert.assertTrue(registro.getDataHoraSaida().equals(dataHoraSaida));
+
+	}
+	
+	/* Teste que verifica um registro fechado automaticamente
+	 * Falhar pois não foi passado registro */
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
+	@Test(expected = IllegalArgumentException.class)
+	public void registrarSaidaAutomaticaMustFailSemPassarRegistro() {
+		this.registroService.registrarSaidaAutomatica(null);
+
+	}
+	
+	/* Teste que verifica um registro fechado automaticamente 
+	 * Falhar pois a situação não é ATENDIMENTO NORMAL*/
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
+	@Test(expected = IllegalArgumentException.class)
+	public void registrarSaidaAutomaticaMustFailSituacaoErrada() {
+		final Registro registro = this.registroRepository.findById(8L).orElse(null);
+		this.registroService.registrarSaidaAutomatica(registro);
+
+	}
+	
+	/* Teste que verifica um registro fechado automaticamente 
+	 * Falhar pois registro já está fechado*/
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
+	@Test(expected = IllegalArgumentException.class)
+	public void registrarSaidaAutomaticaMustFailRegistroFechado() {
+		final Registro registro = this.registroRepository.findById(9L).orElse(null);
+		this.registroService.registrarSaidaAutomatica(registro);
+
+	}
+	
+	
 }

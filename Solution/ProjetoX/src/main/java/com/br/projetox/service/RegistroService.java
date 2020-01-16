@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import com.br.projetox.config.RunnableTask;
 import com.br.projetox.entity.ConfiguracaoParametro;
@@ -268,14 +270,30 @@ public class RegistroService {
 		});
 	}
 
+	/**
+	 * Quando chegar no horário de saída do atendimento que estiver na situação "Atendimento Normal" e sem horário de saída registrado, 
+	 * o sistema automaticamente registra a saída do paciente com horário previsto de saída (sessão cheia).
+	 * O valor deve ser calculado de acordo com as regras:
+	 *  - É cobrado o valor do serviço prestado de acordo com o valor da sessão.
+	 *  
+	 * @param registro
+	 */
 	public void registrarSaidaAutomatica(Registro registro) {
+		Assert.notNull(registro, "Registro não informado.");
+		Assert.isNull(registro.getDataHoraSaida(), "Este registro já encontra-se fechado.");
+		Assert.isTrue(registro.getSituacao().equals(Situacao.ATENDIMENTO_NORMAL), "A situação do atendimento deve ser Atendimento Normal.");
 		registro.setValorTotal(registro.getPlanoContratado().getValorPlano());
 
+		LocalDate dataAtual = LocalDate.now();
+		LocalTime horaSaida = registro.getPlanoContratado().getHorarioSaida();
+		LocalDateTime dataHoraSaida = dataAtual.atTime(horaSaida).atZone(ZoneId.systemDefault()).toLocalDateTime();
 		Duration tempoTotal = Duration.between(registro.getDataHoraEntrada().toLocalTime(),
-				LocalTime.now(ZoneId.of("America/Maceio")));
+				dataHoraSaida);
 		registro.setTempoTotal(LocalTime.MIN.plusMinutes(tempoTotal.toMinutes()));
-		registro.setDataHoraSaida(LocalDateTime.now(ZoneId.of("America/Maceio")));
+		registro.setDataHoraSaida(dataHoraSaida);
 		this.registroRepository.save(registro);
 	}
+	
+	
 
 }
