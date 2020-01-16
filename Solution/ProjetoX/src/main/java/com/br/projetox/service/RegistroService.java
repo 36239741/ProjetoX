@@ -32,6 +32,7 @@ import com.br.projetox.entity.Situacao;
 import com.br.projetox.entity.TipoContrato;
 import com.br.projetox.exception.RegistroException;
 import com.br.projetox.infrastructure.scheduling.SupportScheduling;
+import com.br.projetox.repository.PlanoContratoRepository;
 import com.br.projetox.repository.RegistroRepository;
 
 import javassist.NotFoundException;
@@ -61,6 +62,7 @@ public class RegistroService {
 
 	@Autowired
 	private SupportScheduling supportScheduling;
+	
 
 	/*
 	 * @Metodo que salva o horario de entrada do paciente atraves da digital, nao
@@ -80,14 +82,14 @@ public class RegistroService {
 		Contrato contrato = this.contratoService.findByContractNumber(numeroContrato);
 		PlanoContratado planoContratado = this.planoContratadoService.findById(Long.parseLong(idPlanocontratado));
 		Registro findRegistro = this.registroRepository.findByMaxId(contrato.getNumero());
-		Registro registro = new Registro();
-		registro.setContrato(contrato);
-		registro.setPlanoContratado(planoContratado);
-		registro.setValorTotal(planoContratado.getValorPlano());
-		registro.setDataHoraEntrada(LocalDateTime.now(ZoneId.of("America/Maceio")));
-		registro.setSituacao(Situacao.ATENDIMENTO_NORMAL);
 
 		if (findRegistro == null || findRegistro.getDataHoraSaida() != null) {
+			Registro registro = new Registro();
+			registro.setContrato(contrato);
+			registro.setPlanoContratado(planoContratado);
+			registro.setValorTotal(planoContratado.getValorPlano());
+			registro.setDataHoraEntrada(LocalDateTime.now(ZoneId.of("America/Maceio")));
+			registro.setSituacao(Situacao.ATENDIMENTO_NORMAL);
 			this.registroRepository.save(registro);
 			this.supportScheduling.scheduleSaidaAutomatica(registro);
 			return registro;
@@ -292,6 +294,61 @@ public class RegistroService {
 		registro.setTempoTotal(LocalTime.MIN.plusMinutes(tempoTotal.toMinutes()));
 		registro.setDataHoraSaida(dataHoraSaida);
 		this.registroRepository.save(registro);
+	}
+	
+	/**
+	 * Quando passar 10 minutos do horário de início do atendimento sem registro de entrada através da biometria, 
+	 * o sistema registra automaticamente o diário, com a situação "Ausência do paciente".
+	 * O horário de saída fica registrado com o horário fim da sessão (sessão cheia).
+	 * O valor deve ser calculado de acordo com as regras:
+	 *    - Regras para descontos e acréscimos (Contrato - Plano):
+	 *        - Ausência do paciente: não concede desconto. O valor cobrado pelo atendimento é total.
+	 *    - Regras para descontos e acréscimos (Contrato - Particular):
+	 *        - Ausência do paciente: concede desconto. Não é cobrado o valor da consulta.
+	 * @throws NotFoundException 
+	 */
+	public Registro registrarAusenciaPacienteAutomaticamente(long planoId) throws NotFoundException {
+		Assert.notNull(planoId, "Registro automático de ausência do paciente CANCELADO: Plano não informado.");
+		
+		PlanoContratado plano = this.planoContratadoService.findById(planoId);
+		Assert.notNull(plano, "Registro automático de ausência do paciente CANCELADO: Plano não encontrado.");
+		
+		Assert.isTrue(plano.getAtivo().equals(true), "Registro automático de ausência do paciente CANCELADO: Plano não ativo.");
+
+		// busca se há um registro aberto para o atendimento
+		Registro findRegistro = this.registroRepository.findByPlanoContratadoAndMaxId(plano.getId());
+	
+		// se não houver registro ou se o mesmo encontrar-se fechado, abre um novo registrando ausência do paciente
+		if (findRegistro == null || findRegistro.getDataHoraSaida() != null) {
+			Registro registro = new Registro();
+			registro.setContrato(plano.getContrato());
+			registro.setPlanoContratado(plano);
+			registro.setSituacao(Situacao.AUSENCIA_DO_PACIENTE);
+			
+			LocalDate dataAtual = LocalDate.now();
+			LocalTime horaEntrada = plano.getHorarioEntrada();
+			LocalTime horaSaida = plano.getHorarioSaida();
+			LocalDateTime dataHoraEntrada = dataAtual.atTime(horaEntrada).atZone(ZoneId.systemDefault()).toLocalDateTime();
+			LocalDateTime dataHoraSaida = dataAtual.atTime(horaSaida).atZone(ZoneId.systemDefault()).toLocalDateTime();
+			registro.setDataHoraEntrada(dataHoraEntrada);
+			registro.setDataHoraSaida(dataHoraSaida);
+			
+			if(plano.getTipoContrato().equals(TipoContrato.PLANO)) {
+				registro.setValorTotal(plano.getValorPlano());
+			} else {
+				registro.setValorTotal(0.0);
+			}
+			
+			return this.registroRepository.save(registro);
+
+		} else {
+			throw new RegistroException("Registro automático de ausência do paciente CANCELADO: O Serviço contratado " + plano.getServico().getServico() + " tem um registro em "
+					+ findRegistro.getDataHoraEntrada().format(DateTimeFormatter.ofPattern("dd-MM-uuuu HH:mm"))
+					+ " que ainda não foi fechado");
+		}
+	
+		
+		
 	}
 	
 	

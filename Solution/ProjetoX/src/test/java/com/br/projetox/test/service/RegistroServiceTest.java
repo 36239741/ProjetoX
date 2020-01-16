@@ -309,7 +309,9 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 		final Registro registro = this.registroRepository.findById(2L).orElse(null);
 		this.registroService.registrarSaidaAutomatica(registro);
 		Assert.assertNotNull(registro);
+		Assert.assertNotNull(registro.getValorTotal());
 		Assert.assertTrue(registro.getValorTotal().equals(1000.00));
+		Assert.assertNotNull(registro.getDataHoraSaida());
 		LocalDateTime dataHoraSaida = LocalDateTime.of(LocalDate.now(), LocalTime.of(17, 10, 0));
 		Assert.assertTrue(registro.getDataHoraSaida().equals(dataHoraSaida));
 
@@ -350,5 +352,84 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 
 	}
 	
+	//************************ TESTES PARA SERVIÇO DE REGISTRAR AUSÊNCIA DO PACIENTE AUTOMATICAMENTE *****************************//
 	
+	/* Teste que verifica um registro criado automaticamente devido à ausência do paciente
+	 * Verificando dados gerais do registro */
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
+	@Test
+	public void registrarAusenciaPacienteAutomaticamenteMustPass() throws NotFoundException {
+		final Registro registro = this.registroService.registrarAusenciaPacienteAutomaticamente(5);
+		
+		Assert.assertNotNull(registro);
+		
+		Assert.assertNotNull(registro.getSituacao());
+		Assert.assertTrue(registro.getSituacao().equals(Situacao.AUSENCIA_DO_PACIENTE));
+		
+		Assert.assertNotNull(registro.getDataHoraEntrada());
+		LocalDateTime dataHoraEntrada = LocalDateTime.of(LocalDate.now(), LocalTime.of(8, 45, 0));
+		Assert.assertTrue(registro.getDataHoraEntrada().equals(dataHoraEntrada));
+		
+		Assert.assertNotNull(registro.getDataHoraSaida());
+		LocalDateTime dataHoraSaida = LocalDateTime.of(LocalDate.now(), LocalTime.of(19, 50, 0));
+		Assert.assertTrue(registro.getDataHoraSaida().equals(dataHoraSaida));
+
+	}
+	
+	/* Teste que verifica um registro criado automaticamente devido à ausência do paciente
+	 * Verificando valor do registro, se tratando de um contrato do tipo PLANO */
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
+	@Test
+	public void registrarAusenciaPacienteAutomaticamenteMustPassTipoContratoPlano() throws NotFoundException {
+		final Registro registro = this.registroService.registrarAusenciaPacienteAutomaticamente(6);
+		
+		Assert.assertNotNull(registro);
+		
+		Assert.assertNotNull(registro.getValorTotal());
+		Assert.assertTrue(registro.getValorTotal().equals(1000.00));
+
+	}
+	
+	/* Teste que verifica um registro criado automaticamente devido à ausência do paciente
+	 * Verificando valor do registro, se tratando de um contrato do tipo PARTICULAR */
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
+	@Test
+	public void registrarAusenciaPacienteAutomaticamenteMustPassTipoContratoParticular() throws NotFoundException {
+		final Registro registro = this.registroService.registrarAusenciaPacienteAutomaticamente(5);
+		
+		Assert.assertNotNull(registro);
+		
+		Assert.assertNotNull(registro.getValorTotal());
+		Assert.assertTrue(registro.getValorTotal().equals(0.0));
+
+	}
+	
+	
+	/* Teste que verifica um registro criado automaticamente devido à ausência do paciente
+	 * Falha pois há um registro aberto para o plano informado */
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
+	@Test(expected = RegistroException.class)
+	public void registrarAusenciaPacienteAutomaticamenteMustFailHasRegistroAberto() throws NotFoundException {
+		final Registro registro = this.registroService.registrarAusenciaPacienteAutomaticamente(7);
+
+	}
+	
+	/* Teste que verifica um registro criado automaticamente devido à ausência do paciente
+	 * Falha pois o plano não está ativo */
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
+	@Test(expected = IllegalArgumentException.class)
+	public void registrarAusenciaPacienteAutomaticamenteMustFailPlanoInativo() throws NotFoundException {
+		final Registro registro = this.registroService.registrarAusenciaPacienteAutomaticamente(8);
+
+	}
 }
