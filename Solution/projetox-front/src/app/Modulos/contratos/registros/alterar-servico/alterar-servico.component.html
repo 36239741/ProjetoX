@@ -6,7 +6,7 @@
         
     <mat-form-field>
         <mat-label>Novo serviço</mat-label>
-      <mat-select [(value)]="selected" required [formControl]="formGroup.controls['servico']">
+      <mat-select [(value)]="selected" required [formControl]="formGroup.controls['servico']" (selectionChange)="inputValorServico($event)">
         <mat-option *ngFor="let servico of servicos[0]" [value]="servico.servico" >
             {{servico.servico}}
           </mat-option>     
@@ -29,7 +29,7 @@
                         align: 'left'
                     }"
                 />
-                <mat-error *ngIf="formGroup.controls['valorSessao'].hasError('required')">O campo valor do desconto requer que seja preenchido</mat-error>
+                <mat-error *ngIf="formGroup.controls['valorSessao'].hasError('required')">O campo valor da sessão requer que seja preenchido</mat-error>
             </mat-form-field>
 <div class="container-buttons">
     <section class="buttons">

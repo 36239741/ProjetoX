@@ -28,4 +28,10 @@ export class RegistroService {
     return this.http.get<Registro> (API_URL + '/registros/find-by-date?dataInicial='+ dataInicial + '&dataFinal=' + dataFinal + '&contratoId='
     + contratoId + '&page=' + page + '&size=' + size);
   }
+  exportPlanilhaRegistros(numeroContrato: String): Observable<any>{
+    const httpOptions = {
+      'responseType'  : 'arraybuffer' as 'json'
+    };
+    return this.http.get<any>(API_URL + '/registros/export-registro?numeroContrato='+numeroContrato, httpOptions);
+  }
 }

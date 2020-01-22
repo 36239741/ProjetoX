@@ -17,7 +17,7 @@
     margin-left: 20px;
 }
 .form mat-form-field:nth-child(2) {
-    margin-left: 100px;
+    margin-left: 50px;
 }
  td-paging-bar {
      display: flex;

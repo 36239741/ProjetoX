@@ -4,7 +4,7 @@ import { RegistroService } from './../../../../shared/Services/registro.service'
 import { Servico } from './../../../../shared/model/Contrato';
 import { Component, OnInit, Inject, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
 import { TdDialogService } from '@covalent/core';
-import { MAT_DIALOG_DATA } from '@angular/material';
+import { MAT_DIALOG_DATA, MatSelectChange } from '@angular/material';
 import { fromEvent } from 'rxjs';
 import { debounceTime, filter, distinctUntilChanged, tap } from 'rxjs/operators';
 import { FormGroup, FormBuilder } from '@angular/forms';
@@ -17,7 +17,10 @@ import { Registro } from 'src/app/shared/model/registro';
   styleUrls: ['./alterar-servico.component.css']
 })
 export class AlterarServicoComponent implements OnInit, AfterViewInit {
-
+    data: any; 
+    totalElements: number = 0;
+    pageSize: number = 10;
+    page: number = 0;
     selected: String = '';
     formGroup: FormGroup;
     valorSessao: number = 0;
@@ -50,6 +53,8 @@ export class AlterarServicoComponent implements OnInit, AfterViewInit {
     )
     .subscribe();
 }
+
+
 findAllServicos() {
     this.servicoService.findAll().subscribe(servico => {
         this.servicos.push(servico);
@@ -62,6 +67,14 @@ form() {
     });
 }
 
+inputValorServico(selectionChange: MatSelectChange ) {
+    let arrayServicos: Servico[] = this.servicos.concat(this.servicos[0]);
+    for(let i = 0; i <  arrayServicos.length; i ++) {
+        if(arrayServicos[i].servico == selectionChange.value) {
+            this.formGroup.get('valorSessao').setValue(arrayServicos[i].valor);
+        }
+    }
+}
 
 trocarServico() {
     if( this.formGroup.valid) {

@@ -21,9 +21,10 @@ import com.br.projetox.service.ImplementDetailService;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
+	
 	@Autowired
 	private ImplementDetailService detail;
-
+	
 	
 	@Bean
 	public PasswordEncoder encoder() {
@@ -37,14 +38,14 @@ public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
 		return authProvider;
 	}
 
-	
+
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.authenticationProvider(authenticationProvaider());
 	}
 	
 
-	
+
 
 	
 	@Override	
@@ -62,7 +63,8 @@ public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
      public void configure(WebSecurity web) throws Exception {
        web
          .ignoring()
-            .antMatchers("/","/resources/**", "/*.js", "/*.png", "/assets/**"); // #3
+            .antMatchers("/","/resources/**", "/*.js", "/*.png", "/assets/**"); 
+       
      }
 		
 

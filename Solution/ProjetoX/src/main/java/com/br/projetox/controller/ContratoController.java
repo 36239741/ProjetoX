@@ -99,7 +99,6 @@ public class ContratoController {
 		HashMap<String, Integer> map = null;
 		ResponseEntity<?> responseEntityOK = null;
 		if(file.isEmpty() == false) {
-			System.out.println(file.getContentType());
 			if(file.getContentType().equalsIgnoreCase("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") || 
 					file.getContentType().equalsIgnoreCase("application/vnd.ms-excel")) {
 				FileTransfer fileTransfer = new FileTransfer(file.getName(), file.getContentType(), file.getInputStream());

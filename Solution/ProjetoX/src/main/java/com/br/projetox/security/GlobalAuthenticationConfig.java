@@ -58,4 +58,6 @@ public class GlobalAuthenticationConfig extends GlobalAuthenticationConfigurerAd
 				.userDetailsService( this.userDetailsService )
 				.passwordEncoder( this.passwordEncoder() );
 	}
+	
+
 }

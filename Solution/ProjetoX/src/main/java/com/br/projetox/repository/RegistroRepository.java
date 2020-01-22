@@ -24,7 +24,10 @@ public interface RegistroRepository extends JpaRepository<Registro, Long>{
 	Registro findByMaxId(@Param("numeroContrato") String contratoId);
 	
 	@Query("FROM Registro registro WHERE registro.contrato.numero = :numeroContrato")
-	public List<Registro> findAllRegistro(@Param("numeroContrato") String numeroContrato);
+	public Page<Registro> findAllRegistro(@Param("numeroContrato") String numeroContrato, Pageable pageable);
+	
+	@Query("FROM Registro registro WHERE registro.contrato.numero = :numeroContrato")
+	public List<Registro> findAllRegistroList(@Param("numeroContrato") String numeroContrato);
 	
 	@Query("FROM Registro registro WHERE registro.contrato.id = :contratoId AND registro.dataHoraEntrada "
 			+ "BETWEEN :dataInicial AND :dataFinal")
@@ -33,4 +36,7 @@ public interface RegistroRepository extends JpaRepository<Registro, Long>{
 			@Param("contratoId") Long contratoId,
 			Pageable pagebale);
 	
+	@Query("FROM Registro registro WHERE registro.planoContratado.id = :planoId AND registro.id = "
+			+ "(SELECT max(registro.id) FROM Registro registro)")
+	Registro findByPlanoContratadoAndMaxId(@Param("planoId") Long planoId);
 }

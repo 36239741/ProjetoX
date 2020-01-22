@@ -25,12 +25,22 @@
     >
         Filtrar
     </button>
+    <button
+    class="btn"
+    mat-raised-button
+    color="accent"
+    matTooltip="Limpa os filtros das datas"
+    (click)="resetDate()"
+>
+    Limpar
+</button>
     </section>
     <section class="export-registro">
         <button
             mat-raised-button
             color="accent"
             matTooltip="Exporta em uma planilha os reigstro de entrada e saída"
+            (click)="exportRegistros()"
         >
             Exportar registro
         </button>

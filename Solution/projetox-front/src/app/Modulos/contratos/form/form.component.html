@@ -87,10 +87,19 @@
                     >Campo não preenchido</mat-error
                 >
             </mat-form-field>
-            <div fxLayout="column" fxLayoutAlign="center center">
-                <mat-label><b>Horario de saída</b></mat-label>
-                <span>{{ form.get('horarioSaida').value }}</span>
-            </div>
+                <mat-form-field fxFlex="1 1 25%">
+                    <input
+                        formControlName="horarioSaida"
+                        matInput
+                        required
+                        (blur)="calcularValorTotal()"
+                        placeholder="Horario de saída"
+                        type="time"
+                    />
+                    <mat-error *ngIf="hasError('sessao', 'required')"
+                        >Campo não preenchido</mat-error
+                    >
+                </mat-form-field>
         </div>
         <div fxLayout="row" fxLayoutAlign="space-between">
             <div fxLayout="column">

@@ -1,13 +1,15 @@
+import { ContratoService } from './../../../shared/Services/contrato.service';
 import { ToastService } from './../../../shared/Services/toast.service';
 import { ActivatedRoute } from '@angular/router';
 import { RegistroService } from './../../../shared/Services/registro.service';
-import { FormGroup, FormControl, FormBuilder } from '@angular/forms';
+import { FormGroup, FormBuilder } from '@angular/forms';
 import { Component, OnInit, ViewContainerRef } from '@angular/core';
 import { ITdDataTableColumn, IPageChangeEvent, TdDialogService } from '@covalent/core';
 import { AlterarServicoComponent } from './alterar-servico/alterar-servico.component';
 import {Situacao} from '../../../shared/Enum/Situacao';
 import { MatDialogConfig } from '@angular/material';
 import { Registro } from 'src/app/shared/model/registro';
+import { saveAs } from 'file-saver';
 
 
 
@@ -39,6 +41,7 @@ const SITUACAO_FORMAT: (v: any) => any = (v: any) => {return Situacao[v]};
 export class RegistrosComponent implements OnInit {
 
   constructor(private registroService: RegistroService,
+              private contratoService: ContratoService,
               private activatedRoute : ActivatedRoute,
               private toastService : ToastService,
               private formBuilder: FormBuilder,
@@ -50,6 +53,7 @@ export class RegistrosComponent implements OnInit {
   totalElements: number = 0;
   page: number = 0;
   data: any; 
+  nomePaciente: String = '';
   columns: ITdDataTableColumn[] = [
     { name: 'dataHoraEntrada', label: 'Entrada', format: DATA_FORMAT},
     { name: 'dataHoraSaida', label: 'Saída', format: DATA_FORMAT},
@@ -61,13 +65,32 @@ export class RegistrosComponent implements OnInit {
   ngOnInit() {
     this.startTable();
     this.form();
+    this.findContratoById();
   }
   startTable() {
     this.registroService.findAllRegistro( this.activatedRoute.snapshot.params.id, this.page , this.pageSize).subscribe(data => {
         this.data = data['content'];
-        this.totalElements = data ['totalElements'];
+        this.totalElements = data['totalElements'];
     });
   }
+
+exportRegistros() {
+    this.registroService.exportPlanilhaRegistros(this.activatedRoute.snapshot.params.id).subscribe(planilhaRegistro => {
+        let file = new Blob([planilhaRegistro], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });            
+        var fileURL = URL.createObjectURL(file);
+        saveAs(fileURL, this.nomePaciente + '-Registros.xlsx');
+    },error => {
+        console.log(error.error.message);
+    });
+}
+
+findContratoById() {
+    this.contratoService.findByContrato(this.activatedRoute.snapshot.params.id).subscribe(contrato => {
+        this.nomePaciente = contrato.nomePaciente.replace(/\s/g, '');
+    },error => {
+        this.toastService.toastError(error.error.message);
+    });
+}
 
   changePageSize(event: IPageChangeEvent) {
     this.pageSize = event.pageSize;
@@ -79,6 +102,12 @@ export class RegistrosComponent implements OnInit {
         beforeDate: [''],
         afterDate: ['']
       });
+  }
+  resetDate() {
+      this.startTable();
+      this.formGroup.get('beforeDate').setValue('');
+      this.formGroup.get('afterDate').setValue('');
+
   }
   filterByData() {
       let dataInicial: String = this.formGroup.get('beforeDate').value;
@@ -127,7 +156,8 @@ export class RegistrosComponent implements OnInit {
     }).afterClosed().subscribe((accept: boolean) => {
       if (accept) {
         this.registroService.trocaServico('AUSENCIA_DO_PROFISSIONAL',tableRow.id,tableRow.planoContratado.servico.servico,0).subscribe(response => {
-            this.toastService.toastSuccess('Troca do profissional executada com sucesso.');
+            this.toastService.toastSuccess('Ausência do profissional declarada com sucesso.');
+            this.startTable();
         },
         error => {
             this.toastService.toastError(error.error.message);
