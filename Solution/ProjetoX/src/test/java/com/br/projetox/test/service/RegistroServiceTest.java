@@ -220,11 +220,10 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 	@WithUserDetails("henrique_nitatori@hotmail.com")
 	@Test
 	public void verificadorDeDescontoMustPassTestandoODescontoComValorMaiorQueOPlanoAtual(){
-		final Double valorTotalRegistro = 1000.00;
-		final Double valorFinalTotalPlano = 3000.00;
+		final Double valorTotal = 1000.00;
 		Registro registro = this.registroService.verificadorDescontoTrocaServico(this.registroRepository.findById(1L).get(), 2000.00);
-		Assert.assertEquals(valorTotalRegistro, registro.getValorTotal());
-		Assert.assertEquals(valorFinalTotalPlano, registro.getPlanoContratado().getValorTotal());
+		Assert.assertEquals(valorTotal, registro.getValorTotal());
+
 	}
 	
 	/* Testa o desconto do plano */
@@ -234,10 +233,9 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 	@Test
 	public void verificadorDeDescontoMustPassTestandoODescontoComValorMenorQueOPlanoAtual(){
 		final Double valorTotalRegistro = 500.00;
-		final Double valorFinalTotalPlano = 1500.00;
 		Registro registro = this.registroService.verificadorDescontoTrocaServico(this.registroRepository.findById(1L).get(), 500.00);
 		Assert.assertEquals(valorTotalRegistro, registro.getValorTotal());
-		Assert.assertEquals(valorFinalTotalPlano, registro.getPlanoContratado().getValorTotal());
+
 	}
 	
 	/* Testa o desconto do plano */
@@ -247,24 +245,10 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 	@Test
 	public void verificadorDeDescontoMustPassTestandoODescontoComValorIgualQueOPlanoAtual(){
 		final Double valorTotalRegistro = 1000.00;
-		final Double valorFinalTotalPlano = 2000.00;
 		Registro registro = this.registroService.verificadorDescontoTrocaServico(this.registroRepository.findById(1L).get(), 1000.00);
 		Assert.assertEquals(valorTotalRegistro, registro.getValorTotal());
-		Assert.assertEquals(valorFinalTotalPlano, registro.getPlanoContratado().getValorTotal());
 	}
 	
-	/* Testa a da situacao do contrato para  ausencia do profissional */
-	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
-		"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
-	@WithUserDetails("henrique_nitatori@hotmail.com")
-	@Test
-	public void exchangeOfContractStatusMustPassTestandoATrocaDaSituacaoParaAusenciaDoProfissionalComSituacaoAtendimentoNormal(){
-		final Double valorDoPlanoAtualizado = 1000.00;
-		final Situacao situacao = Situacao.AUSENCIA_DO_PROFISSIONAL;
-		Registro registro = this.registroService.registrarAusenciaDoProfisional(1L);
-		Assert.assertEquals(valorDoPlanoAtualizado, registro.getPlanoContratado().getValorTotal());
-		Assert.assertEquals(situacao, registro.getSituacao());
-	}
 	/* Testa a da situacao do contrato para  ausencia do profissional */
 	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
 		"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })

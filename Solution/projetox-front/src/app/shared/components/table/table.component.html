@@ -12,7 +12,7 @@
   <ng-template tdDataTableTemplate="acoes" let-value="value" let-row="row" let-column="column" >
     <div class="row">
       <a matTooltip="Declarar ausência de um profissional." (click)="ausenciaProfissional(row)"
-       *ngIf="row.situacao == 'ATENDIMENTO_NORMAL' && row.dataHoraSaida == null || row.situacao == 'AUSENCIA_DO_PACIENTE'">
+       *ngIf="row.situacao == 'AUSENCIA_DO_PACIENTE'">
         <mat-icon>person</mat-icon>
       </a>
       <a matTooltip="Fazer troca de serviço." (click)="trocaServico(row)" *ngIf="row.situacao == 'ATENDIMENTO_NORMAL' && row.dataHoraSaida == null">

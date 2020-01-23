@@ -82,7 +82,7 @@ exportRegistros() {
         let file = new Blob([planilhaRegistro], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });            
         var fileURL = URL.createObjectURL(file);
         saveAs(fileURL, 'registros' + '_' + this.numeroContrato + '_' + 
-        date.getDay().toString() + '-'
+        date.getDate() + '-'
          + date.getMonth().toString() + 1
           + '-' + 
           date.getFullYear().toString() + '-' +

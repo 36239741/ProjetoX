@@ -264,15 +264,9 @@ public class RegistroService {
 		Double valorDoPlanoAtual = registro.getPlanoContratado().getValorPlano();
 
 		Double diferencaEntreValoresDoPlano = valorDoPlanoAtual - valorSessao;
-
 		registro.setValorTotal(Math.abs(diferencaEntreValoresDoPlano));
-		if (diferencaEntreValoresDoPlano > 0) {
-			registro.getPlanoContratado()
-					.setValorTotal(registro.getPlanoContratado().getValorTotal() - diferencaEntreValoresDoPlano);
-		} else if (diferencaEntreValoresDoPlano < 0) {
-			registro.getPlanoContratado().setValorTotal(
-					registro.getPlanoContratado().getValorTotal() + Math.abs(diferencaEntreValoresDoPlano));
-		} else {
+		
+		if(diferencaEntreValoresDoPlano == 0){
 			registro.setValorTotal(registro.getPlanoContratado().getValorPlano());
 		}
 
@@ -292,12 +286,6 @@ public class RegistroService {
 	 * O operador dosistema poderá alterar a situação de um registro diário que
 	 * estiver na situação "Ausência do paciente" para "Ausência do profissional".
 	 * 
-	 * O operador do sistema poderá alterar a situação de um registro diário que
-	 * estiver na situação"Atendimento normal"( enquanto não houver registro de
-	 * saída) para "Troca de serviço", caso o profissional que iria atender o
-	 * paciente se ausentou, e o paciente preferiu pela troca pontual do
-	 * serviço.Nesse caso, o operador deve indicar qual o serviço escolhido para a
-	 * substituição pontual.
 	 * 
 	 * @param registroId
 	 */
@@ -306,12 +294,12 @@ public class RegistroService {
 		Registro registro = this.registroRepository.findById(registroId).orElseThrow(
 				() -> new RegistroException("Nenhum registro com esse id: " + registroId + "foi encontrado."));
 
-		if (registro.getSituacao() == Situacao.ATENDIMENTO_NORMAL && registro.getDataHoraSaida() == null
-				|| registro.getSituacao() == Situacao.AUSENCIA_DO_PACIENTE) {
+		if (registro.getSituacao() == Situacao.AUSENCIA_DO_PACIENTE) {
 
 			registro.getPlanoContratado().setValorTotal(
 					registro.getPlanoContratado().getValorTotal() - registro.getPlanoContratado().getValorPlano());
 			registro.setSituacao(Situacao.AUSENCIA_DO_PROFISSIONAL);
+			registro.setValorTotal(0D);
 
 		} else {
 			throw new RegistroException("Operação inválida, este registro já possui registro de saída ou a situação do "

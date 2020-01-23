@@ -26,7 +26,6 @@ export class AlterarServicoComponent implements OnInit, AfterViewInit {
     valorSessao: number = 0;
     servicos: Servico [] = [];
     returnRegistro: Registro = null;
-    trocaServicoSucesso: Boolean = false;
   constructor(private _dialogService: TdDialogService,
     @ViewChild('valorSessao',null) private inputValorDesconto: ElementRef,
     @Inject(MAT_DIALOG_DATA) public registro: Registro,
@@ -76,7 +75,8 @@ trocarServico() {
         this.registroService.trocaServico(this.registro.id, valorSessao)
         .subscribe(response => {
         this.returnRegistro = response;
-        this.trocaServicoSucesso = true;
+        this.toastService.toastSuccess("Serviço alterado com sucesso.");
+        this._dialogService.closeAll();
         },
         error => {
             this.toastService.toastError(error.error.message);
@@ -87,7 +87,6 @@ trocarServico() {
 
   closeModal(event: any){
     if(event) {
-        this.trocaServicoSucesso = false
         this._dialogService.closeAll();
     }
   }

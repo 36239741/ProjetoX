@@ -1,4 +1,4 @@
-<div class="alterar-servico-container" *ngIf="trocaServicoSucesso == false">
+<div class="alterar-servico-container">
     <section class="title">
         <h3>Troca de serviço</h3>
     </section>
@@ -38,33 +38,6 @@
     </section>
 </div>
 </form>
-</div>
-
-<div class="alterar-servico-container"  *ngIf="trocaServicoSucesso == true">
-    <section class="title">
-        <h3>Troca de serviço</h3>
-    </section>  
-    <section class="dados-contratos">
-        <article>
-            <p><b>Nº contrato</b></p>
-            <p>{{ returnRegistro.contrato.numero }}</p>
-        </article>
-
-        <article>
-            <p><b>Nome paciente</b></p>
-            <p>{{ returnRegistro.contrato.nomePaciente }}</p>
-        </article>
-    </section>
-    <Section>
-        <p><b>Valor total do plano atualizado</b></p>
-        <p>{{ returnRegistro.planoContratado.valorTotal | currency: 'BRL' }}</p>
-    </Section>
-
-    <div class="container-buttons">
-        <section class="buttons">
-            <button mat-flat-button color="accent" (click)="closeModal($event)" >Ok</button>
-        </section>
-    </div>
 </div>
 
 
