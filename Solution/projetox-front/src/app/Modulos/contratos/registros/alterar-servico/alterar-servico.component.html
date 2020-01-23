@@ -6,8 +6,8 @@
         
     <mat-form-field>
         <mat-label>Novo serviço</mat-label>
-      <mat-select [(value)]="selected" required [formControl]="formGroup.controls['servico']" (selectionChange)="inputValorServico($event)">
-        <mat-option *ngFor="let servico of servicos[0]" [value]="servico.servico" >
+      <mat-select [(value)]="selected" required [formControl]="formGroup.controls['servico']" (selectionChange)="alterarValorInput($event)">
+        <mat-option *ngFor="let servico of servicos[0]" [value]="servico.valor" >
             {{servico.servico}}
           </mat-option>     
          </mat-select>
@@ -55,11 +55,6 @@
             <p>{{ returnRegistro.contrato.nomePaciente }}</p>
         </article>
     </section>
-    <section class="novo-servico">
-        <p><b>Novo serviço</b></p>
-        <p>{{ returnRegistro.planoContratado.servico.servico }}</p>
-    </section>
-
     <Section>
         <p><b>Valor total do plano atualizado</b></p>
         <p>{{ returnRegistro.planoContratado.valorTotal | currency: 'BRL' }}</p>

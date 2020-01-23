@@ -19,6 +19,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -56,15 +57,14 @@ public class ResgistroController {
 		return this.registroService.findAllRegistro(numeroContrato, page, size);
 	}
 	
-	@PostMapping(path = "/trocar-servico")
-	public Registro findAllRegistro(@RequestParam(name = "situacaoRegistro") String situacaoRegistro,@RequestParam(name = "registroId") String registroId,
-			@RequestParam(name = "servico") String servico,@RequestParam(name = "valorSessao") String valorSessao){
-		if(servico != null && valorSessao != null) {
-			return this.registroService.exchangeOfContractStatus(situacaoRegistro, Long.parseLong(registroId), servico, Double.parseDouble(valorSessao));
-		}
-		else {
-			throw new RegistroException("Existem valores nulos");
-		}
+	@GetMapping(path = "/ausencia-profissional")
+	public Registro findAllRegistro(@RequestParam(name = "registroId") String registroId){
+		return this.registroService.registrarAusenciaDoProfisional(Long.parseLong(registroId));
+	}
+	@GetMapping(path = "/trocar-servico")
+	public Registro findAllRegistro(@RequestParam(name = "registroId") String registroId, @RequestParam(name = "valorSessao") String valorSessao){
+		Assert.notNull(valorSessao, "Informe o valor do serviço.");
+		return this.registroService.registrarTrocaDeServico(Long.parseLong(registroId), Double.valueOf(valorSessao));
 	}
 	@GetMapping(path = "/find-by-date")
 	public Page<Registro> findByDate(@RequestParam(name = "dataInicial") String dataInicial, @RequestParam(name = "dataFinal") String dataFinal,

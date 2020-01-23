@@ -33,7 +33,7 @@ export class AlterarServicoComponent implements OnInit, AfterViewInit {
     private formBuilder: FormBuilder,
     private registroService: RegistroService,
     private servicoService: ServicesService,
-    private toastService: ToastService) {}
+    private toastService: ToastService,) {}
 
 
   ngOnInit() { 
@@ -66,19 +66,14 @@ form() {
         servico: [this.selected, [Validators.required]]
     });
 }
-
-inputValorServico(selectionChange: MatSelectChange ) {
-    let arrayServicos: Servico[] = this.servicos.concat(this.servicos[0]);
-    for(let i = 0; i <  arrayServicos.length; i ++) {
-        if(arrayServicos[i].servico == selectionChange.value) {
-            this.formGroup.get('valorSessao').setValue(arrayServicos[i].valor);
-        }
-    }
+alterarValorInput(event: MatSelectChange) {
+    this.formGroup.get('valorSessao').setValue(event.value);
 }
 
 trocarServico() {
     if( this.formGroup.valid) {
-        this.registroService.trocaServico('TROCA_DE_SERVICO', this.registro.id, this.selected, this.formGroup.get('valorSessao').value)
+        let valorSessao: String = this.formGroup.get('valorSessao').value;
+        this.registroService.trocaServico(this.registro.id, valorSessao)
         .subscribe(response => {
         this.returnRegistro = response;
         this.trocaServicoSucesso = true;

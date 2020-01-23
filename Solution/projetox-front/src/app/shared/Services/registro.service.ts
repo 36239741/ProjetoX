@@ -17,9 +17,11 @@ export class RegistroService {
   saveHoraSaida(numeroContrato: String): Observable<Registro>{
     return this.http.post<Registro>(API_URL + '/registros/save-saida', numeroContrato);
   }
-  trocaServico(situacaoRegistro: String, registroId: Number, servico: String, valorSessao: Number):Observable<Registro>{
-    return this.http.post<Registro>(API_URL + '/registros/trocar-servico?situacaoRegistro='+ situacaoRegistro + '&registroId=' +registroId
-     + '&servico='+servico + '&valorSessao=' + valorSessao, null);
+  trocaServico(registroId: Number, valorSessao: String):Observable<Registro>{
+    return this.http.get<Registro>(API_URL + '/registros/trocar-servico?registroId=' +registroId + '&valorSessao=' + valorSessao);
+  }
+  ausenciaProfissional(registroId: Number):Observable<Registro>{
+    return this.http.get<Registro>(API_URL + '/registros/ausencia-profissional?registroId=' +registroId);
   }
   findAllRegistro(numeroContrato: String, page: Number, size: Number): Observable<Registro>{
     return this.http.get<Registro>(API_URL + '/registros/find-all?numeroContrato='+ numeroContrato + '&page=' + page + '&size=' + size);

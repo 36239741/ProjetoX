@@ -21,7 +21,7 @@ export class GerarDescontoComponent implements OnInit, AfterViewInit {
     @ViewChild('valorSessao',null) private inputValorSessao: ElementRef,
     private formBuilder: FormBuilder,
     private contratoService: ContratoService,
-    private message: ToastService) { }
+    private message: ToastService,) { }
     
   descontoGerado: Boolean = false;
   formGroup: FormGroup;

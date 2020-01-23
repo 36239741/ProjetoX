@@ -40,20 +40,21 @@ const SITUACAO_FORMAT: (v: any) => any = (v: any) => {return Situacao[v]};
 })
 export class RegistrosComponent implements OnInit {
 
+
   constructor(private registroService: RegistroService,
               private contratoService: ContratoService,
               private activatedRoute : ActivatedRoute,
               private toastService : ToastService,
               private formBuilder: FormBuilder,
               private _dialogService: TdDialogService,
-                private _viewContainerRef: ViewContainerRef
+            private _viewContainerRef: ViewContainerRef,
     ) { }
     formGroup: FormGroup;
   pageSize: number = 10;
   totalElements: number = 0;
   page: number = 0;
   data: any; 
-  nomePaciente: String = '';
+  numeroContrato: String = '';
   columns: ITdDataTableColumn[] = [
     { name: 'dataHoraEntrada', label: 'Entrada', format: DATA_FORMAT},
     { name: 'dataHoraSaida', label: 'Saída', format: DATA_FORMAT},
@@ -74,19 +75,26 @@ export class RegistrosComponent implements OnInit {
     });
   }
 
+
 exportRegistros() {
     this.registroService.exportPlanilhaRegistros(this.activatedRoute.snapshot.params.id).subscribe(planilhaRegistro => {
+        let date: Date = new Date();
         let file = new Blob([planilhaRegistro], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });            
         var fileURL = URL.createObjectURL(file);
-        saveAs(fileURL, this.nomePaciente + '-Registros.xlsx');
-    },error => {
+        saveAs(fileURL, 'registros' + '_' + this.numeroContrato + '_' + 
+        date.getDay().toString() + '-'
+         + date.getMonth().toString() + 1
+          + '-' + 
+          date.getFullYear().toString() + '-' +
+        date.getHours().toString() + date.getMinutes().toString() + '.xlsx');
+    }, error => {
         console.log(error.error.message);
     });
 }
 
 findContratoById() {
     this.contratoService.findByContrato(this.activatedRoute.snapshot.params.id).subscribe(contrato => {
-        this.nomePaciente = contrato.nomePaciente.replace(/\s/g, '');
+        this.numeroContrato = contrato.numero;
     },error => {
         this.toastService.toastError(error.error.message);
     });
@@ -122,11 +130,11 @@ findContratoById() {
       });
   }
 
-  trocaServico(trocaServico: any){
+  trocaServico(trocaServico: any) {
     this.openTrocaServico(trocaServico);
   }
 
-  openTrocaServico(tableRow: any){
+  openTrocaServico(tableRow: any) {
 
     let dialogConfig: MatDialogConfig<any> = {
         width: '60%',
@@ -135,7 +143,9 @@ findContratoById() {
     };
 
     if(tableRow) {
-        this._dialogService.open(AlterarServicoComponent,dialogConfig);
+      this._dialogService.open(AlterarServicoComponent, dialogConfig).afterClosed().subscribe(() => {
+          this.startTable();
+      });
     }
   }
 
@@ -155,17 +165,18 @@ findContratoById() {
       width: '50%', //OPTIONAL, defaults to 400px
     }).afterClosed().subscribe((accept: boolean) => {
       if (accept) {
-        this.registroService.trocaServico('AUSENCIA_DO_PROFISSIONAL',tableRow.id,tableRow.planoContratado.servico.servico,0).subscribe(response => {
-            this.toastService.toastSuccess('Ausência do profissional declarada com sucesso.');
-            this.startTable();
-        },
-        error => {
-            this.toastService.toastError(error.error.message);
-        });
+            this.registroService.ausenciaProfissional(tableRow.id).subscribe(registro => {
+             this.toastService.toastSuccess('Declarada ausência do profissional com sucesso.')
+             this.startTable();
+            },error => {
+                this.toastService.toastError(error.error.message);
+            })
       } else {
         // DO SOMETHING ELSE
       }
     });
   }
+
+
 
 }

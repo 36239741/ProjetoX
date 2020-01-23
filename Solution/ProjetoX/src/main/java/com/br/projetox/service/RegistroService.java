@@ -162,7 +162,8 @@ public class RegistroService {
 		if (findRegistro != null && findRegistro.getDataHoraEntrada() != null
 				&& findRegistro.getDataHoraSaida() == null) {
 			Duration verificaValorAdicional = Duration.between(
-					findRegistro.getPlanoContratado().getHorarioSaida().plusMinutes(configParametro.getTempoToleranciaAtraso().getMinute()),
+					findRegistro.getPlanoContratado().getHorarioSaida()
+							.plusMinutes(configParametro.getTempoToleranciaAtraso().getMinute()),
 					LocalTime.now(ZoneId.of("America/Maceio")));
 			if (verificaValorAdicional.toMinutes() > 0) {
 				findRegistro.setValorTotal(findRegistro.getPlanoContratado().getValorPlano()
@@ -231,57 +232,94 @@ public class RegistroService {
 	}
 
 	/*
-	 * Metodo que troca a situacao do registro para troca do profisional
-	 * 
-	 * @param situacaoRegistro String - situacao do registro
-	 * 
-	 * @param registroId Long - id do registro
-	 * 
-	 * @return Registro
-	 * 
-	 * @throws RegistroException - lanca a essecao quando nao encontrar nenhum
-	 * registro com esse id
+	 * O operador do sistema poderá alterar a situação de um registro diário que
+	 * estiver na situação "Atendimento normal" (enquanto não houver registro de
+	 * saída) para "Troca de serviço", caso o profissional que iria atender o
+	 * paciente se ausentou, e o paciente preferiu pela troca pontual do serviço.
+	 * Nesse caso, o operador deve indicar qual o serviço escolhido para a
+	 * substituição pontual.
+	 * @param situacaoRegistro
+	 * @param valorSessao
 	 */
-	public Registro exchangeOfContractStatus(String situacaoRegistro, Long registroId, String servico,
-			Double valorSessao) {
+	public Registro registrarTrocaDeServico(Long registroId, Double valorSessao) {
 		Registro registro = this.registroRepository.findById(registroId).orElseThrow(
 				() -> new RegistroException("Nenhum registro com esse id: " + registroId + "foi encontrado."));
-		Situacao situacao = Situacao.valueOf(situacaoRegistro);
+		
+		Assert.isTrue(registro.getSituacao() == Situacao.ATENDIMENTO_NORMAL, "A situação do registro se encontra diferente de atendimento normal.");
+		Assert.isNull(registro.getDataHoraSaida(), "Este registro já encontra-se fechado.");
 
-		if (registro.getSituacao() == Situacao.ATENDIMENTO_NORMAL && registro.getDataHoraSaida() == null) {
-			if (registro.getPlanoContratado().getTipoContrato().equals(TipoContrato.PLANO)
-					|| registro.getPlanoContratado().getTipoContrato().equals(TipoContrato.PARTICULAR)) {
+		Registro registroComDescontoOuAcrescimo = this.verificadorDescontoTrocaServico(registro, valorSessao);
+		registroComDescontoOuAcrescimo.setSituacao(Situacao.TROCA_DE_SERVICO);
+		return this.registroRepository.save(registroComDescontoOuAcrescimo);
 
-				if (Situacao.AUSENCIA_DO_PROFISSIONAL == situacao) {
-					registro.getPlanoContratado().setValorTotal(registro.getPlanoContratado().getValorTotal()
-							- registro.getPlanoContratado().getValorPlano());
-					registro.setValorTotal(0D);
-				}
+	}
 
-				else if (Situacao.TROCA_DE_SERVICO == situacao && valorSessao != null && valorSessao != 0.0) {
-					Servico findServico = this.servicoService.findServico(servico);
-					Double diferenca = registro.getPlanoContratado().getValorPlano() - valorSessao;
-					registro.getPlanoContratado().setServico(findServico);
-					if (diferenca > 0) {
-						registro.getPlanoContratado()
-								.setValorTotal(registro.getPlanoContratado().getValorTotal() - diferenca);	
-					} else {
-						registro.getPlanoContratado()
-								.setValorTotal(registro.getPlanoContratado().getValorTotal() + diferenca);
-					}
-				} else {
-					throw new RegistroException("O valor da sessão esta com valor nulo.");
-				}
-			}
-			registro.setValorTotal(valorSessao);
-			registro.getContrato().calcularValorTotal();
-			registro.setSituacao(situacao);
+	
+	/*Calcula a diferenca entre o servico contratado atual e o da valor da sessao passado por parametro
+	 * e verifica se acrescente ou decrementa no valor do contrato
+	 * @param registro
+	 * @param valorSessao
+	 * */
+	public Registro verificadorDescontoTrocaServico(Registro registro, Double valorSessao) {
+		Double valorDoPlanoAtual = registro.getPlanoContratado().getValorPlano();
+
+		Double diferencaEntreValoresDoPlano = valorDoPlanoAtual - valorSessao;
+
+		registro.setValorTotal(Math.abs(diferencaEntreValoresDoPlano));
+		if (diferencaEntreValoresDoPlano > 0) {
+			registro.getPlanoContratado()
+					.setValorTotal(registro.getPlanoContratado().getValorTotal() - diferencaEntreValoresDoPlano);
+		} else if (diferencaEntreValoresDoPlano < 0) {
+			registro.getPlanoContratado().setValorTotal(
+					registro.getPlanoContratado().getValorTotal() + Math.abs(diferencaEntreValoresDoPlano));
 		} else {
-			throw new RegistroException("A situação do atendimento deve ser Atendimento Normal.");
+			registro.setValorTotal(registro.getPlanoContratado().getValorPlano());
 		}
 
-		return this.registroRepository.save(registro);
+		return registro;
+	}
+	
+	
+	public Situacao verificarSituacao(String situacaoRegistro) {
+		return Situacao.valueOf(situacaoRegistro);
+	}
 
+	public TipoContrato verificarTipoContrato(Registro registro) {
+		return registro.getPlanoContratado().getTipoContrato();
+	}
+
+	/*
+	 * O operador dosistema poderá alterar a situação de um registro diário que
+	 * estiver na situação "Ausência do paciente" para "Ausência do profissional".
+	 * 
+	 * O operador do sistema poderá alterar a situação de um registro diário que
+	 * estiver na situação"Atendimento normal"( enquanto não houver registro de
+	 * saída) para "Troca de serviço", caso o profissional que iria atender o
+	 * paciente se ausentou, e o paciente preferiu pela troca pontual do
+	 * serviço.Nesse caso, o operador deve indicar qual o serviço escolhido para a
+	 * substituição pontual.
+	 * 
+	 * @param registroId
+	 */
+
+	public Registro registrarAusenciaDoProfisional(Long registroId) {
+		Registro registro = this.registroRepository.findById(registroId).orElseThrow(
+				() -> new RegistroException("Nenhum registro com esse id: " + registroId + "foi encontrado."));
+
+		if (registro.getSituacao() == Situacao.ATENDIMENTO_NORMAL && registro.getDataHoraSaida() == null
+				|| registro.getSituacao() == Situacao.AUSENCIA_DO_PACIENTE) {
+
+			registro.getPlanoContratado().setValorTotal(
+					registro.getPlanoContratado().getValorTotal() - registro.getPlanoContratado().getValorPlano());
+			registro.setSituacao(Situacao.AUSENCIA_DO_PROFISSIONAL);
+
+		} else {
+			throw new RegistroException("Operação inválida, este registro já possui registro de saída ou a situação do "
+					+ "registro se encontra diferente de atendimento normal e ausência do paciente.");
+		}
+
+		this.registroRepository.save(registro);
+		return registro;
 	}
 
 	/**
@@ -399,8 +437,9 @@ public class RegistroService {
 		for (Registro registro : registros) {
 			XSSFRow row = sheet.createRow(i);
 			row.setRowStyle(this.createCellStyleDefault(workBook));
-			row.createCell(0).setCellValue(registro.getDataHoraEntrada().format(DateTimeFormatter.ofPattern("dd-MM-uuuu HH:mm")).toString());
-			
+			row.createCell(0).setCellValue(
+					registro.getDataHoraEntrada().format(DateTimeFormatter.ofPattern("dd-MM-uuuu HH:mm")).toString());
+
 			if (registro.getDataHoraSaida() != null) {
 				row.createCell(1).setCellValue(
 						registro.getDataHoraSaida().format(DateTimeFormatter.ofPattern("dd-MM-uuuu HH:mm")).toString());
@@ -409,23 +448,26 @@ public class RegistroService {
 				row.createCell(1).setCellValue("");
 			}
 			row.createCell(2).setCellValue(Situacao.valueOf(registro.getSituacao().toString()).getDescricao());
-			if(registro.getTempoTotal() != null) {
+			if (registro.getTempoTotal() != null) {
 				row.createCell(3).setCellValue(registro.getTempoTotal().toString());
 
-			}else {
+			} else {
 				row.createCell(3).setCellValue("");
 			}
-			if(registro.getValorTotal() != null) {
+			if (registro.getValorTotal() != null) {
 				row.createCell(4).setCellValue(numberFormat.format(registro.getValorTotal()));
 
-			}
-			else {
+			} else {
 				row.createCell(4).setCellValue("");
 			}
 			i++;
 		}
+		for(int contador = 0; contador < 4; i++ ) {
+			sheet.autoSizeColumn(contador);
+		}
+		
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
-
+		
 		workBook.write(stream);
 		workBook.close();
 		stream.close();

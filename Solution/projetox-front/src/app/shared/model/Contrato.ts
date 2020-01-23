@@ -46,7 +46,7 @@
   }
 
   export interface PageContrato {
-      contrato: Contrato[];
+      contrato: Contrato;
       pageable: Pageable;
       totalElements: number;
       last: boolean;
