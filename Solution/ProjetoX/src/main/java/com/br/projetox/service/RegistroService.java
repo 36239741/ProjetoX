@@ -462,7 +462,7 @@ public class RegistroService {
 			}
 			i++;
 		}
-		for(int contador = 0; contador < 4; i++ ) {
+		for(int contador = 0; contador <= 4; contador++) {
 			sheet.autoSizeColumn(contador);
 		}
 		

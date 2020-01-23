@@ -95,6 +95,7 @@ export class DetatalharContratosComponent implements OnInit {
         this.planoContratadoService
             .findAllPlanoContratado(this.activeRoute.snapshot.params.id)
             .subscribe(planoContratado => {
+                this.data = [];
                 this.data.push(planoContratado);
             });
 

@@ -2,6 +2,7 @@ package com.br.projetox.test.service;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -291,6 +292,22 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 		assertEquals(valorDoServico, registro.getValorTotal());
 	}
 	
+	/* TENTAR CRIAR UMA PLANILHA SEM REGISTROS NO CONTRATO */
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/RegistroTestExportPlanilha.sql","/dataset/Config.sql" })
+	@Test()
+	public void createUmaPlanilhaRegistrosRegistrosTestMustPassCriaUmaPlanilhaComOsRegistros() throws NotFoundException, IOException {
+		
+		ByteArrayOutputStream bytePLanilha = this.registroService.createPlanilhaRegistros("1");
+		File file = new File("teste.xlsx");
+		FileOutputStream createPlanilha = new FileOutputStream(file);
+		createPlanilha.write(bytePLanilha.toByteArray());
+		createPlanilha.flush();
+		createPlanilha.close();
+
+	}
+	
 	
 	/* MUST FAIL */
 	
@@ -392,10 +409,12 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 	public void createUmaPlanilhaRegistrosRegistrosTestMustFailTentaCriarUmaPlanilhaSemRegistro() throws NotFoundException, IOException {
 		
 		ByteArrayOutputStream bytePLanilha = this.registroService.createPlanilhaRegistros("2");
-		FileOutputStream createPlanilha = new FileOutputStream("teste.xlsx");
-		createPlanilha.write(bytePLanilha.toByteArray());
-		createPlanilha.flush();
-		createPlanilha.close();
+		File file = new File("teste.xlsx");
+		FileOutputStream createPlanilha = new FileOutputStream(file);
+		BufferedOutputStream bos = new BufferedOutputStream(createPlanilha);
+		bos.write(bytePLanilha.toByteArray());
+		bos.flush();
+		bos.close();
 
 	}
 	/* TESTA A BUSCA DE REGISTROS ATRAVES DE DATAS SEM O CAMPO CONTRATO ID */
