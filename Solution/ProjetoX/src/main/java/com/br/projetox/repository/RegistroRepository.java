@@ -29,11 +29,11 @@ public interface RegistroRepository extends JpaRepository<Registro, Long>{
 	@Query("FROM Registro registro WHERE registro.contrato.numero = :numeroContrato")
 	public List<Registro> findAllRegistroList(@Param("numeroContrato") String numeroContrato);
 	
-	@Query("FROM Registro registro WHERE registro.contrato.id = :contratoId AND registro.dataHoraEntrada "
+	@Query("FROM Registro registro WHERE registro.contrato.numero = :numeroContrato AND registro.dataHoraEntrada "
 			+ "BETWEEN :dataInicial AND :dataFinal")
 	public Page<Registro> findByDate(@Param("dataInicial") LocalDateTime dataInicial,
 			@Param("dataFinal") LocalDateTime dataFinal,
-			@Param("contratoId") Long contratoId,
+			@Param("numeroContrato") String numeroContrato,
 			Pageable pagebale);
 	
 	@Query("FROM Registro registro WHERE registro.planoContratado.id = :planoId AND registro.id = "

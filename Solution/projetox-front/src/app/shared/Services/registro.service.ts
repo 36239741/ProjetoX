@@ -26,9 +26,9 @@ export class RegistroService {
   findAllRegistro(numeroContrato: String, page: Number, size: Number): Observable<Registro>{
     return this.http.get<Registro>(API_URL + '/registros/find-all?numeroContrato='+ numeroContrato + '&page=' + page + '&size=' + size);
   }
-  findByDate(dataInicial:String, dataFinal:String, contratoId: String , page: Number, size: Number): Observable<Registro> {
-    return this.http.get<Registro> (API_URL + '/registros/find-by-date?dataInicial='+ dataInicial + '&dataFinal=' + dataFinal + '&contratoId='
-    + contratoId + '&page=' + page + '&size=' + size);
+  findByDate(dataInicial:String, dataFinal:String, numeroContrato: String , page: Number, size: Number): Observable<Registro> {
+    return this.http.get<Registro> (API_URL + '/registros/find-by-date?dataInicial='+ dataInicial + '&dataFinal=' + dataFinal + '&numeroContrato='
+    + numeroContrato + '&page=' + page + '&size=' + size);
   }
   exportPlanilhaRegistros(numeroContrato: String): Observable<any>{
     const httpOptions = {

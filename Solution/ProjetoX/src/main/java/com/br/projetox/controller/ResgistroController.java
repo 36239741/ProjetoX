@@ -68,8 +68,8 @@ public class ResgistroController {
 	}
 	@GetMapping(path = "/find-by-date")
 	public Page<Registro> findByDate(@RequestParam(name = "dataInicial") String dataInicial, @RequestParam(name = "dataFinal") String dataFinal,
-			@RequestParam(name = "contratoId") String contratoId, @RequestParam(name = "page") int page, @RequestParam(name = "size") int size){
-		return this.registroService.findByDate(dataInicial, dataFinal, contratoId, page, size);
+			@RequestParam(name = "numeroContrato") String numeroContrato, @RequestParam(name = "page") int page, @RequestParam(name = "size") int size){
+		return this.registroService.findByDate(dataInicial, dataFinal, numeroContrato, page, size);
 	}
 	@GetMapping(path = "/export-registro")
 	public  ResponseEntity<ByteArrayResource> planilhaRegistrosExport(@RequestParam(name = "numeroContrato") String numeroContrato) throws IOException {

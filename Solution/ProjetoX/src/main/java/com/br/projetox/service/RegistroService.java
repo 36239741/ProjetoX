@@ -136,11 +136,11 @@ public class RegistroService {
 	 * 
 	 * @return page<Registro>
 	 */
-	public Page<Registro> findByDate(String dataInicial, String dataFinal, String contratoId, int page, int size) {
-		if (dataInicial.isEmpty() == false && dataFinal.isEmpty() == false && contratoId.isEmpty() == false) {
+	public Page<Registro> findByDate(String dataInicial, String dataFinal, String numeroContrato, int page, int size) {
+		if (dataInicial.isEmpty() == false && dataFinal.isEmpty() == false && numeroContrato.isEmpty() == false) {
 			Pageable pagebale = PageRequest.of(page, size);
 			return this.registroRepository.findByDate(LocalDateTime.parse(dataInicial + "T00:00:00"),
-					LocalDateTime.parse(dataFinal + "T00:00:00"), Long.parseLong(contratoId), pagebale);
+					LocalDateTime.parse(dataFinal + "T00:00:00"),numeroContrato, pagebale);
 		} else {
 			throw new RegistroException("Campos obrigatório não preenchidos");
 		}
