@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import com.br.projetox.entity.Contrato;
 import com.br.projetox.entity.Registro;
+import com.br.projetox.entity.Situacao;
 
 @Repository
 public interface RegistroRepository extends JpaRepository<Registro, Long>{
@@ -39,4 +40,10 @@ public interface RegistroRepository extends JpaRepository<Registro, Long>{
 	@Query("FROM Registro registro WHERE registro.planoContratado.id = :planoId AND registro.id = "
 			+ "(SELECT max(registro.id) FROM Registro registro)")
 	Registro findByPlanoContratadoAndMaxId(@Param("planoId") Long planoId);
+
+	@Query("FROM Registro registro "
+			+ "WHERE registro.dataHoraSaida IS NULL "
+			+ "AND registro.dataHoraEntrada IS NOT NULL "
+			+ "AND registro.situacao = " + Situacao.SITUACAO_ATENDIMENTO_NORMAL)
+	List<Registro> findAbertosAndAtendimentoNormal();
 }

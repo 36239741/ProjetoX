@@ -99,15 +99,15 @@ public class ContratoController {
 		HashMap<String, Integer> map = null;
 		ResponseEntity<?> responseEntityOK = null;
 		if(file.isEmpty() == false) {
-			if(file.getContentType().equalsIgnoreCase("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") || 
-					file.getContentType().equalsIgnoreCase("application/vnd.ms-excel")) {
+			/*if(file.getContentType().equalsIgnoreCase("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") || 
+					file.getContentType().equalsIgnoreCase("application/vnd.ms-excel")) {*/
 				FileTransfer fileTransfer = new FileTransfer(file.getName(), file.getContentType(), file.getInputStream());
 				map = this.service.importPlanilhaContratos(fileTransfer);
 				responseEntityOK = ResponseEntity.ok(map);
-			}
+				/*}
 			else {
 				throw new FilerException("Tipo de arquivo não suportado.");
-			}
+			}*/
 		}
 		else {
 			throw new FilerException("Arquivo de Upload vazio.");

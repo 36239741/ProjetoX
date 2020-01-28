@@ -14,4 +14,6 @@ public enum Situacao {
 	public String getDescricao() {
 		return this.mensagem;
 	}
+	
+	public static final int SITUACAO_ATENDIMENTO_NORMAL = 3;
 }

@@ -111,7 +111,6 @@ public class RegistroService {
 			registro.setDataHoraEntrada(LocalDateTime.now(ZoneId.of("America/Maceio")));
 			registro.setSituacao(Situacao.ATENDIMENTO_NORMAL);
 			this.registroRepository.save(registro);
-			this.supportScheduling.scheduleSaidaAutomatica(registro);
 			return registro;
 
 		} else {
@@ -311,8 +310,8 @@ public class RegistroService {
 	}
 
 	/**
-	 * Quando chegar no horário de saída do atendimento que estiver na situação
-	 * "Atendimento Normal" e sem horário de saída registrado, o sistema
+	 * Todas as noites, para os registros abertos (sem horário de saída registrado) 
+	 * e que estiverem na situação "Atendimento Normal", o sistema
 	 * automaticamente registra a saída do paciente com horário previsto de saída
 	 * (sessão cheia). O valor deve ser calculado de acordo com as regras: - É
 	 * cobrado o valor do serviço prestado de acordo com o valor da sessão.
@@ -511,6 +510,14 @@ public class RegistroService {
 		cell.setCellStyle(style);
 
 		return cell;
+	}
+	
+	/**
+	 * Serviço que lista todos os registros abertos e na situação Atendimento normal
+	 * @return
+	 */
+	public List<Registro> listRegistrosAbertos() {
+		return this.registroRepository.findAbertosAndAtendimentoNormal();
 	}
 
 }

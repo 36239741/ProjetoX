@@ -67,10 +67,17 @@ public class SupportScheduling {
 	 */
 	@PostConstruct
 	public void postConstruct() {
-		System.out.println("imprime");
+		
 	}
 
-	public void scheduleSaidaAutomatica(final Registro registro) {
+	/**
+	 * Esse serviço executa automaticamente no horário agendado para a saída de um atendimento
+	 * A fim de registrar automaticamente o encerramento do atendimento
+	 * Agendado ao registrar a entrada de um paciente
+	 * SUBSTITUÍDO PELO AGENDAMENTO NOTURNO
+	 * @param registro
+	 */
+	/*public void scheduleSaidaAutomatica(final Registro registro) {
 		LocalDate dataAtual = LocalDate.now();
 		LocalTime horaExcecucao = registro.getPlanoContratado().getHorarioSaida();
 		Date date = Date.from(dataAtual.atTime(horaExcecucao).atZone(ZoneId.systemDefault()).toInstant());
@@ -84,8 +91,29 @@ public class SupportScheduling {
 		}, date);
 
 		this.futureSupportJobsSaidaAutomatica.put(registro.getId(), future);
+	}*/
+	
+	/**
+	 * Esse serviço executa automaticamente todas as noites verificando os atendimentos que não foram fechados
+	 * A fim de registrar automaticamente o encerramento do atendimento
+	 * Substituindo a execução do serviço scheduleSaidaAutomatica(final Registro registro)
+	 */
+	@Scheduled(cron = "0 0 17 * * ?")
+	public void scheduleSaidaAutomatica() {
+		//recupera todos os registros abertos
+	    List<Registro> registrosAbertos = this.registroService.listRegistrosAbertos();
+	    //para cada registro aberto realiza o fechamento automático
+	    for (Registro registro : registrosAbertos) {
+	    	registroService.registrarSaidaAutomatica(registro);
+		}
+		
 	}
 	
+	/**
+	 * Esse serviço executa automaticamente após 10 minutos do horário de entrada de um atendimento
+	 * A fim de registrar a ausência do paciente caso o mesmo não tenha comparecido ao atendimento
+	 * @param plano
+	 */
 	public void scheduleRegistroAutomaticoAusenciaPaciente(final PlanoContratado plano) {
 		LocalDate dataAtual = LocalDate.now();
 		//adiciona 10 minutos ao horário de entrada

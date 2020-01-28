@@ -6,11 +6,11 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.junit.Assert;
@@ -412,6 +412,21 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 		Assert.assertEquals(1, page.getTotalElements());
 
 	}
+
+	//************************ TESTES PARA SERVIÇO QUE RECUPERA OS REGISTROS ABERTOS *****************************//
+	
+	
+	/* Teste que verifica um registro fechado automaticamente */
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
+	@Test
+	public void listRegistrosAbertosMustPass() {
+		final List<Registro> registrosAbertos = this.registroService.listRegistrosAbertos();
+		Assert.assertNotNull(registrosAbertos);
+		Assert.assertEquals(5, registrosAbertos.size());
+
+	}
 	
 	
 	//************************ TESTES PARA SERVIÇO DE REGISTRAR SAÍDA AUTOMÁTICA *****************************//
@@ -548,4 +563,6 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 		final Registro registro = this.registroService.registrarAusenciaPacienteAutomaticamente(8);
 
 	}
+	
+	
 }
