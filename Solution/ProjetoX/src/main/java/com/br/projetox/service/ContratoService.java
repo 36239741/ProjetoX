@@ -63,6 +63,12 @@ public class ContratoService {
 	private static final Integer DIAS_SEMANA = 7;
 	private static final Integer MULTIPLICADOR_PROXIMO_SERVICO = 6;
 
+	
+	
+	
+	public List<Contrato> findAllContratos(){
+		return this.repository.findAll();
+	}
 	/*
 	 * Método para a busca de todos os contratos com ordenacao
 	 * 

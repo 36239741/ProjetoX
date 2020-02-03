@@ -29,8 +29,12 @@ import {
     MatProgressSpinnerModule,
     MatListModule,
     MatSidenavModule,
-    MatToolbarModule} from '@angular/material';
+    MatDatepickerModule,
+    MatToolbarModule,
+    MatNativeDateModule,
+    } from '@angular/material';
 
+  import { MatMomentDateModule } from '@angular/material-moment-adapter';
 
 
 
@@ -51,6 +55,9 @@ import {
     MatSnackBarModule,
     MatToolbarModule,
     MatSidenavModule,
+    MatDatepickerModule,
+    MatMomentDateModule,
+    MatNativeDateModule,
 
     /*Teradata Covalent*/
 
@@ -88,6 +95,10 @@ import {
        MatToolbarModule,
        MatProgressSpinnerModule,
        MatSidenavModule,
+       MatDatepickerModule,
+       MatNativeDateModule,
+       MatMomentDateModule,
+
 
        /*Teradata Covalent*/
 

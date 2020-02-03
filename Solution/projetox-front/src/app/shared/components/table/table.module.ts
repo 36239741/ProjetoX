@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CovalentDataTableModule } from '@covalent/core/data-table';
 import {TableComponent} from './table.component';
-import { MatTooltipModule } from '@angular/material';
+import { MatTooltipModule, MatTableModule } from '@angular/material';
 
 @NgModule({
   declarations: [TableComponent],
@@ -11,7 +11,8 @@ import { MatTooltipModule } from '@angular/material';
     CommonModule,
     CovalentDataTableModule,
     MatIconModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatTableModule
   ],
   exports: [TableComponent]
 })

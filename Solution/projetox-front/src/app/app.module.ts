@@ -14,6 +14,7 @@ import { MaterialModule } from './core/material/material.module';
 import { CovalentLoadingModule } from '@covalent/core/loading';
 import {MatDialogModule} from '@angular/material/dialog';
 
+
 registerLocaleData(localept, 'pt');
 
 @NgModule({

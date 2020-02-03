@@ -9,7 +9,7 @@
   [sortBy]="sortBy"
   [clickable]="true"
   >
-  <ng-template tdDataTableTemplate="acoes" let-value="value" let-row="row" let-column="column" >
+  <ng-template tdDataTableTemplate="acoes" let-value="value" let-row="row" let-column="column"  >
     <div class="row">
       <a matTooltip="Declarar ausência de um profissional." (click)="ausenciaProfissional(row)"
        *ngIf="row.situacao == 'AUSENCIA_DO_PACIENTE'">
@@ -20,6 +20,7 @@
       </a>
     </div>
   </ng-template>
+
   <ng-template
   tdDataTableTemplate="ativo"
   let-value="value"

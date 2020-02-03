@@ -9,6 +9,7 @@ const routes: Routes = [
   {path: '', component: LoginComponent},
   {path: 'home', loadChildren: () => import('./Modulos/Layout/layout.module').then(m => m.LayoutModule)},
   {path: 'contratos', loadChildren: () => import('../app/Modulos/contratos/contratos.module').then(m => m.ContratosModule)},
+  {path: 'relatorios', loadChildren: () => import('../app/Modulos/relatorios/relatorios.module').then(m => m.RelatoriosModule)}
 ];
 
 @NgModule({

@@ -1,0 +1,10 @@
+.buttonPicker {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 40px;
+}
+.paging {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
