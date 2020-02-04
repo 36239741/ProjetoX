@@ -70,4 +70,15 @@ export class ContratoService {
     return this.httpClient.post<FeedBack>(API_URL + '/contratos', xlsx);
   }
 
+  getRelatorios(page:Number, size:Number, ano: Number, mes: Number): Observable<Contrato> {
+return this.httpClient.get<Contrato>(API_URL + '/contratos/relatorios?page=' + page + '&size=' + size + '&ano=' + ano + '&mes=' + mes);
+}
+
+exportPlanilhaRegistros(ano: Number, mes: Number): Observable<any>{
+  const httpOptions = {
+    'responseType'  : 'arraybuffer' as 'json'
+  };
+  return this.httpClient.get<any>(API_URL + '/contratos/export-relatorio?ano='+ ano + '&mes=' + mes, httpOptions);
+}
+
 }

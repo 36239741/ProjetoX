@@ -21,6 +21,8 @@
       valorTotal: number;
       biometria?: any;
       tipoContratoTransient: string;
+      valorExecutado: Number;
+      diferenca: Number;
       planoContratado: PlanoContratado[];
   }
 

@@ -1,16 +1,23 @@
 package com.br.projetox.controller;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.annotation.processing.FilerException;
 import javax.validation.Valid;
 
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.directwebremoting.io.FileTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.support.PagedListHolder;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -115,4 +122,23 @@ public class ContratoController {
 		
 		return responseEntityOK;
 	}
+	
+	@GetMapping(path = "/relatorios")
+	public PagedListHolder<Contrato> getRelatorio(@RequestParam("ano") int ano, @RequestParam("mes") int mes,@RequestParam("page") int page,@RequestParam("size") int size) {
+		List<Contrato> contratos = this.service.montarEntidade(ano, mes);
+		PagedListHolder<Contrato>  pageList = new PagedListHolder<>(contratos);
+		pageList.setPage(page);
+		pageList.setPageSize(size);
+		return pageList;
+	}
+	
+	@GetMapping(path = "/export-relatorio")
+	public  ResponseEntity<ByteArrayResource> planilhaRegistrosExport(@RequestParam("ano") int ano, @RequestParam("mes") int mes) throws IOException {
+		ByteArrayOutputStream planilhaRegistro =  this.service.createPlanilhaRelatorio(ano, mes);
+		 HttpHeaders header = new HttpHeaders();
+		 header.set("Content-type","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+         return new ResponseEntity<>(new ByteArrayResource(planilhaRegistro.toByteArray()),
+                 header, HttpStatus.CREATED);
+	}
+	
 }

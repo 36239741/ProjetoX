@@ -10,16 +10,17 @@ import {Situacao} from '../../../shared/Enum/Situacao';
 import { MatDialogConfig } from '@angular/material';
 import { Registro } from 'src/app/shared/model/registro';
 import { saveAs } from 'file-saver';
+import * as moment from 'moment';
 
 
 
 const DECIMAL_FORMAT: (v: any) => any = (v: number) => new Intl.NumberFormat('pt-BR',{style: 'currency', currency:'BRL'} ).format(v);
 const DATA_FORMAT: (v: any) => any = (v: any) => 
 {if(v != null){
-    return  v['dayOfMonth'] + '-' 
-    + v['monthValue'] + '-' 
-    + v['year'] +  ' ' +  ('0' + v['hour']).slice(-2)
-    + ':' + ('0' + v['minute']).slice(-2)
+
+    return  ('0' + v['dayOfMonth']).slice(-2) + '-' +('0' + v['monthValue']).slice(-2) + '-' + v['year']
+    +  ' ' +  ('0' + v['hour']).slice(-2)
+    + ':' + ('0' + v['minute']).slice(-2);
 }else{
     return v = '';
 }};
@@ -58,7 +59,7 @@ export class RegistrosComponent implements OnInit {
   columns: ITdDataTableColumn[] = [
     { name: 'dataHoraEntrada', label: 'Entrada', format: DATA_FORMAT},
     { name: 'dataHoraSaida', label: 'Saída', format: DATA_FORMAT},
-    { name: 'tempoTotal', label: 'Tempo',format: TIME_FORMAT},
+    { name: 'tempoTotal', label: 'Tempo (hh:mm)',format: TIME_FORMAT},
     { name: 'situacao',label: 'Situação', format: SITUACAO_FORMAT},
     { name: 'valorTotal', label: 'Valor total', numeric: true, format: DECIMAL_FORMAT },
     { name: 'acoes', label: 'Ações', width: 150, numeric: true}
@@ -159,7 +160,7 @@ findContratoById() {
       message: 'Tem certeza que deseja registrar a ausência do profissional? \n Sua ação não poderá ser desfeita.',
       disableClose:  false, // defaults to false
       viewContainerRef: this._viewContainerRef, //OPTIONAL
-      title: 'Confirmar', //OPTIONAL, hides if not provided
+      title: 'Confirmar registro de ausência do profissional', //OPTIONAL, hides if not provided
       cancelButton: 'Cancelar', //OPTIONAL, defaults to 'CANCEL'
       acceptButton: 'Aceitar', //OPTIONAL, defaults to 'ACCEPT'
       width: '50%', //OPTIONAL, defaults to 400px

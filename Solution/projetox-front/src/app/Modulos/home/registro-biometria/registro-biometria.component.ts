@@ -8,7 +8,7 @@ import { ContratoService } from "./../../../shared/Services/contrato.service";
 import { Component, OnInit, ViewContainerRef } from "@angular/core";
 import { RegistroService } from "../../../shared/Services/registro.service";
 import { SnackBarClockBiometriaService } from "../../../shared/Services/snack-bar-clock-biometria.service";
-import { ITdDataTableColumn } from "@covalent/core/data-table";
+import { ITdDataTableColumn, ITdDataTableRowClickEvent } from "@covalent/core/data-table";
 import { TdDialogService } from "@covalent/core/dialogs";
 
 const DATA_FORMAT: (v: any) => any = (v: HorarioEntradaOrHorarioSaida) => {
@@ -89,9 +89,9 @@ export class RegistroBiometriaComponent implements OnInit {
                     this.registroService
                         .saveHoraSaida(this.contrato.numero)
                         .subscribe(
-                            () => {
+                            registro => {
                                 this.toastService.toastSuccess(
-                                    "Hora de saida salva com sucesso."
+                                    registro.planoContratado.servico + ' ' + registro.contrato.nomePaciente + ' encerrado com sucesso.'
                                 );
                             },
                             error => {
@@ -108,19 +108,21 @@ export class RegistroBiometriaComponent implements OnInit {
             }
         );
     }
-    rowClick(event: any) {
+    rowClick(event: ITdDataTableRowClickEvent) {
         this.openConfirm(event);
     }
-    openConfirm(event: any): void {
+    openConfirm(event: ITdDataTableRowClickEvent): void {
         this._dialogService
             .openConfirm({
-                message: "Confirma o registro nesse serviço?.",
+                message: " Confirmar registro de entrada do paciente.",
                 disableClose: false, // defaults to false
                 viewContainerRef: this._viewContainerRef, //OPTIONAL
-                title: "Confirmar", //OPTIONAL, hides if not provided
-                cancelButton: "Cancelar", //OPTIONAL, defaults to 'CANCEL'
+                title: "Deseja confirmar o registro de entrada do paciente" + this.contrato.nomePaciente + 
+                "no atendimento para o serviço " + event.row.servico.servico , //OPTIONAL, hides if not provided
+                cancelButton: "Fechar", //OPTIONAL, defaults to 'CANCEL'
                 acceptButton: "Confirmar", //OPTIONAL, defaults to 'ACCEPT'
-                width: "50%" //OPTIONAL, defaults to 400px
+                width: "50%", //OPTIONAL, defaults to 400px
+                panelClass: ['confirmarRegistroDialog']
             })
             .afterClosed()
             .subscribe((accept: boolean) => {

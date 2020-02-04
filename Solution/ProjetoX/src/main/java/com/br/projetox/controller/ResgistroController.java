@@ -47,8 +47,8 @@ public class ResgistroController {
 	}
 	
 	@PostMapping(path = "/save-saida")
-	public void saveHorarioSaida(@RequestBody String numeroContrato) throws NotFoundException {
-		this.registroService.saveHorarioSaida(numeroContrato);
+	public Registro saveHorarioSaida(@RequestBody String numeroContrato) throws NotFoundException {
+		return this.registroService.saveHorarioSaida(numeroContrato);
 	}
 	
 	@GetMapping(path = "/find-all")

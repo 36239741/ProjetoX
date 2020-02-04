@@ -1,6 +1,6 @@
+import { ContratoService } from './../../shared/Services/contrato.service';
 import { Component, OnInit } from '@angular/core';
 import { ITdDataTableColumn, IPageChangeEvent } from '@covalent/core';
-import {RelatorioService} from '../../shared/Services/relatorio.service';
 import { saveAs } from 'file-saver';
 
 
@@ -18,9 +18,9 @@ const DECIMAL_FORMAT: (v: any) => any = (v: number) =>
 export class RelatoriosComponent implements OnInit {
     
     columns: ITdDataTableColumn[] = [
-        { name: "numeroContrato", label: "No. Contrato",},
+        { name: "numero", label: "No. Contrato",},
         { name: "nomePaciente", label: "Nome do Paciente", },
-        { name: "valorContratado", label: "Valor Contratado", numeric: true, format: DECIMAL_FORMAT },
+        { name: "valorTotal", label: "Valor Contratado", numeric: true, format: DECIMAL_FORMAT },
         { name: "valorExecutado", label: "Valor Executado", numeric: true, format: DECIMAL_FORMAT },
         { name: "diferenca", label: "Diferença", numeric: true, format: DECIMAL_FORMAT }
     ];
@@ -33,21 +33,16 @@ export class RelatoriosComponent implements OnInit {
     total: Number = 0;
     verificadorLinha: any = 0;
 
-  constructor(private relatorioService : RelatorioService) { }
+  constructor(private contratoService : ContratoService) { }
 
   ngOnInit() {
     this.startTable();
   }
 
   startTable(){
-    this.relatorioService.getRelatorios(this.page, this.size, this.ano, this.mes).subscribe(relatorio => {
-        this.data = relatorio['pageList'];
-        this.total = relatorio['nrOfElements'];
-        this.data.forEach(element => {
-          this.verificadorLinha = Math.sign(element['diferenca']);
-          console.log(this.verificadorLinha);
-          
-        });
+    this.contratoService.getRelatorios(this.page, this.size, this.ano, this.mes).subscribe(contrato => {
+        this.data = contrato['pageList'];
+        this.total = contrato['nrOfElements'];
     });
   }
 
@@ -68,7 +63,7 @@ export class RelatoriosComponent implements OnInit {
  }
 
  exportRelatorios() {
-    this.relatorioService.exportPlanilhaRegistros(this.ano, this.mes).subscribe(planilhaRelatorio => {
+    this.contratoService.exportPlanilhaRegistros(this.ano, this.mes).subscribe(planilhaRelatorio => {
         let date: Date = new Date();
         let file = new Blob([planilhaRelatorio], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });            
         var fileURL = URL.createObjectURL(file);

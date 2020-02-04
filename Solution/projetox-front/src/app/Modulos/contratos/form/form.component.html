@@ -4,13 +4,13 @@
         <div fxLayout="row"  fxLayoutAlign="space-between">
             <div fxLayout="column" fxLayoutAlign="center center">
                 <mat-label>
-                    <b>No:</b>
+                    <b>Nº do Contrato:</b>
                 </mat-label>
                 <span>{{ detalhesContrato[0] }}</span>
             </div>
             <div fxLayout="column" fxLayoutAlign="center center">
                 <mat-label>
-                    <b>Nome paciente:</b>
+                    <b>Nome do Paciente:</b>
                 </mat-label>
                 <span>{{ detalhesContrato[1] }}</span>
             </div>
@@ -66,7 +66,7 @@
                     matInput
                     required
                     (blur)="calcularTempoSessao($event)"
-                    placeholder="Horario de entrada padrão"
+                    placeholder="Horário de Entrada"
                     type="time"
                 />
                 <mat-error *ngIf="hasError('horarioEntrada', 'required')"
@@ -80,7 +80,7 @@
                     required
                     (blur)="calcularTempoSessao($event)"
                     (blur)="calcularValorTotal()"
-                    placeholder="Número de sessao"
+                    placeholder="Número de Sessões"
                     type="number"
                 />
                 <mat-error *ngIf="hasError('sessao', 'required')"
@@ -93,7 +93,7 @@
                         matInput
                         required
                         (blur)="calcularValorTotal()"
-                        placeholder="Horario de saída"
+                        placeholder="Horário de Saída"
                         type="time"
                     />
                     <mat-error *ngIf="hasError('sessao', 'required')"
@@ -149,10 +149,10 @@
             </div>
         </div>
         <div fxLayour="row" fxLayoutAlign="center center" fxLayoutGap="20px">
-            <button mat-raised-button color="primary" (click)="cancelar()">
+            <button mat-raised-button color="accent" (click)="cancelar()">
                 Cancelar
             </button>
-            <button mat-raised-button color="primary" (submit)="onSubmit()">
+            <button mat-raised-button color="accent" (submit)="onSubmit()">
                 Salvar
             </button>
         </div>

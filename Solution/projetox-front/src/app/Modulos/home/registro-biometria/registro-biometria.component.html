@@ -1,12 +1,13 @@
 <div class="biometria-container">
-    <section class="buttons">
+    <section class="buttons" *ngIf="hideTable == false">
         <button
+            matTooltip="Registrar entrada do paciente em um atendimento, através de sua biometria. Após acionar o botão, posicionar o dedo indicador do paciente sobre a superfície do leitor biométrico até ouvir um bipe. Em seguida selecionar o atendimento desejado."
             mat-flat-button
             color="accent"
             (click)="openClockBiometria()"
             (click)="saveEntrada()"
         >
-            Salvar registro entrada
+            Registrar entrada do paciente
         </button>
         <button
             mat-flat-button
@@ -17,7 +18,12 @@
             Salvar registro saída
         </button>
     </section>
+
     <div *ngIf="hideTable" class="hide-table">
+        <h3>
+            Planos disponíveis para registro de entrada do paciente
+            {{ contrato.nomePaciente }}
+        </h3>
         <section class="table">
             <app-table
                 [columns]="columns"

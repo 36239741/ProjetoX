@@ -60,12 +60,23 @@ public class Contrato extends AbstractEntity implements Serializable {
 	@OneToMany(targetEntity = PlanoContratado.class,cascade = {CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.MERGE}, fetch = FetchType.LAZY,mappedBy = "contrato")
 	@AuditMappedBy(mappedBy = "contrato")
 	private List<PlanoContratado> planoContratado = new ArrayList<PlanoContratado>();
+	
+	@JsonIgnoreProperties("contrato")
+	@OneToMany(targetEntity = PlanoContratado.class,cascade = {CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.MERGE}, fetch = FetchType.LAZY,mappedBy = "contrato")
+	@AuditMappedBy(mappedBy = "contrato")
+	private List<Registro> registro = new ArrayList<Registro>();
+	
 	@NotNull
 	private Boolean ativo = true;
 	
 	@Transient
 	private TipoContrato tipoContratoTransient;
-
+	
+	@Transient 
+	private Double valorExecutado;
+	
+	@Transient 
+	private Double diferenca;
 	
 	public void calcularValorTotal() {
 		this.valorTotal = 0.0;

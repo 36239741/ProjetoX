@@ -1,11 +1,6 @@
 package com.br.projetox.service;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
-import java.nio.file.Files;
 import java.text.NumberFormat;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -19,29 +14,19 @@ import java.util.Locale;
 import javax.transaction.Transactional;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.Color;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.apache.tomcat.util.file.ConfigurationSource.Resource;
-import org.directwebremoting.io.FileTransfer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -53,7 +38,6 @@ import com.br.projetox.entity.Contrato;
 import com.br.projetox.entity.DiasSemana;
 import com.br.projetox.entity.PlanoContratado;
 import com.br.projetox.entity.Registro;
-import com.br.projetox.entity.Servico;
 import com.br.projetox.entity.Situacao;
 import com.br.projetox.entity.TipoContrato;
 import com.br.projetox.exception.RegistroException;
@@ -78,11 +62,6 @@ public class RegistroService {
 	@Autowired
 	private PlanoContratadoService planoContratadoService;
 
-	@Autowired
-	private ServicoService servicoService;
-
-	@Autowired
-	private SupportScheduling supportScheduling;
 
 	/*
 	 * @Metodo que salva o horario de entrada do paciente atraves da digital, nao
@@ -144,6 +123,8 @@ public class RegistroService {
 			throw new RegistroException("Campos obrigatório não preenchidos");
 		}
 	}
+	
+
 
 	/*
 	 * Metodo que salva o horario de saida de um paciente atraves da digital

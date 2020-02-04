@@ -2,4 +2,12 @@
 .row mat-icon{
   margin-left: 10px;
 }
-
+.negativo {
+  background-color: red;
+}
+.positivo {
+  background-color: green;
+}
+.neutro {
+  background-color: blue;
+}

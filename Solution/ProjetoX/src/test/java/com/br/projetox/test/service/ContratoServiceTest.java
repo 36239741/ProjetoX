@@ -2,12 +2,15 @@ package com.br.projetox.test.service;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.poi.util.IOUtils;
 import org.directwebremoting.io.FileTransfer;
 import org.junit.Assert;
@@ -102,7 +105,7 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	}
 
 	/* TESTE QUE VERIFICA QUANTOS CONTRATOS FORAM ATUALIZADOS */
-	@Sql({ "/dataset/truncate.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql", "/dataset/PlanoContratado.sql" })
+	@Sql({ "/dataset/truncate.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql"})
 	@Test
 	public void importPlanilhaContratosTestMustPassVerificandoContratosAtualizados() throws Exception {
 		String basePath = new File("").getAbsolutePath();
@@ -175,7 +178,7 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	 * TESTE PARA VERIFICAR A ATUALIZACAO DO PLANO CONTRATADO UTILIZANDO CAMPO
 	 * SESSAO E O CAMPO SERVICO
 	 */
-	@Sql({ "/dataset/truncate.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql", "/dataset/PlanoContratado.sql" })
+	@Sql({ "/dataset/truncate.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql"})
 	@Test
 	public void importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratado() throws Exception {
 		String basePath = new File("").getAbsolutePath();
@@ -208,7 +211,7 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	 * TESTE PARA VERIFICAR A ATUALIZACAO DO PLANO CONTRATADO UTILIZANDO CAMPO
 	 * ENTRADA E SAIDA PADRAO
 	 */
-	@Sql({ "/dataset/truncate.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql", "/dataset/PlanoContratado.sql" })
+	@Sql({ "/dataset/truncate.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql"})
 	@Test
 	public void importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoPeloCampoEntradaESaida()
 			throws Exception {
@@ -245,7 +248,7 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	 * TESTE PARA VERIFICAR A ATUALIZACAO DO PLANO CONTRATADO UTILIZANDO CAMPO VALOR
 	 * TOTAL E CALCULANDO VALOR DO PLANO
 	 */
-	@Sql({ "/dataset/truncate.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql", "/dataset/PlanoContratado.sql" })
+	@Sql({ "/dataset/truncate.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql"})
 	@Test
 	public void importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoPeloCampoValorPlano()
 			throws Exception {
@@ -282,7 +285,7 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	 * TESTE PARA VERIFICAR A ATUALIZACAO DO PLANO CONTRATADO UTILIZANDO CAMPO DIAS
 	 * SEMANA
 	 */
-	@Sql({ "/dataset/truncate.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql", "/dataset/PlanoContratado.sql",
+	@Sql({ "/dataset/truncate.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
 			"/dataset/Usuario.sql" })
 	@Test
 	public void importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoPeloCampoDiasSemana()
@@ -324,7 +327,7 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	 * TESTE PARA VERIFICAR A ATUALIZACAO DO PLANO CONTRATADO REMOVENDO DIAS DA
 	 * SEMANA
 	 */
-	@Sql({ "/dataset/truncate.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql", "/dataset/PlanoContratado.sql",
+	@Sql({ "/dataset/truncate.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
 			"/dataset/Usuario.sql" })
 	@Test
 	public void importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoRemovendoDiaDaSemana()
@@ -359,7 +362,7 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 
 	/* TESTE PARA VERIFICAR PARA VERIFICAR A PERFORMACE DE IMPORTACAO DA PLANILHA */
 	@Sql({ "/dataset/truncate.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql", "/dataset/Usuario.sql",
-			"/dataset/PlanoContratado.sql" })
+			 })
 	@Test
 	public void importPlanilhaContratosTestMustPassVerificandoPerformaceDeImporatacao() throws Exception {
 		String basePath = new File("").getAbsolutePath();
@@ -415,8 +418,80 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 		Assert.assertNotNull(planoContratado);
 
 	}
+	
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/RegistroTestExportPlanilha.sql","/dataset/Config.sql" })
+	@Test
+	public void valorExecutadoMustPassTestandoOValorExecutadoDoContrato() {
+		final Double valorExecutadoTest = 1090.00;
+		final Double valorExecutado = this.service.valorExecutado(2019, 12, "1");
+		
+		Assert.assertEquals(valorExecutadoTest, valorExecutado);
+	}
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/RegistroTestExportPlanilha.sql","/dataset/Config.sql" })
+	@Test
+	public void valorExecutadoMustPassSemRegistro() {
+		final Double valorExecutadoTest = 0.0;
+		final Double valorExecutado = this.service.valorExecutado(2020, 1, "2");
+		
+		Assert.assertEquals(valorExecutadoTest, valorExecutado);
+	}
+	
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/RegistroTestExportPlanilha.sql","/dataset/Config.sql" })
+	@Test
+	public void montarEntidadeRelatorioMustPassMontandoAEntidadeRelatorio() {
+		List<Contrato> contratos = this.service.montarEntidade(2019, 12);
+		
+		Assert.assertEquals(3, contratos.size());
+	}
+	
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/RegistroTestExportPlanilha.sql","/dataset/Config.sql" })
+	@Test
+	public void montarEntidadeRelatorioMustPassVerificandoDadosRetornados() {
+		final Double valorExecutado = 1090.00;
+		final Double valorDiferenca = 90.00;
+		
+		List<Contrato> contratos = this.service.montarEntidade(2019, 12);
+
+		Assert.assertEquals(3, contratos.size());
+		
+		for(Contrato contrato: contratos) {
+			if(contrato.getNumero().equals("1")) {
+				Double diferenca = contrato.getValorExecutado() - contrato.getValorTotal();
+				Assert.assertEquals(valorExecutado, contrato.getValorExecutado());
+				Assert.assertEquals(valorDiferenca, diferenca);
+			}
+			
+		}
+		
+	}
+	
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/RegistroTestExportPlanilha.sql","/dataset/Config.sql" })
+	@Test
+	public void createPlanilhaRelatorioMustPassCriandoUmaPlanilhaDeRelatorio() throws IOException {
+		
+		ByteArrayOutputStream bytePLanilha = this.service.createPlanilhaRelatorio(2019, 12);
+		File file = new File("teste.xlsx");
+		FileOutputStream createPlanilha = new FileOutputStream(file);
+		createPlanilha.write(bytePLanilha.toByteArray());
+		createPlanilha.flush();
+		createPlanilha.close();
+		
+	}
 
 	/* MUST FAIL */
+	
+	
+
 
 	/*
 	 * TESTE PARA VERIFICAR A FALHA QUE OCORRE QUANDO A PLANILHA ESTA INCOMPLETA
@@ -492,7 +567,7 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 		String constraintViolaton = null;
 		try {
 			this.service.importPlanilhaContratos(new FileTransfer(
-					"importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletasFaltandoNomePaciente.xlsx",
+					"importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletasFaltandoNomePacient.xlsx",
 					"xls", arquivoBytes));
 		} catch (TransactionSystemException e) {
 			constraintViolaton = e.getRootCause().getClass().getSimpleName();
