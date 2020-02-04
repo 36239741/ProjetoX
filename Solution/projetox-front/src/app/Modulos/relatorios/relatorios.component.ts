@@ -1,7 +1,8 @@
 import { ContratoService } from './../../shared/Services/contrato.service';
 import { Component, OnInit } from '@angular/core';
-import { ITdDataTableColumn, IPageChangeEvent } from '@covalent/core';
+import { IPageChangeEvent } from '@covalent/core';
 import { saveAs } from 'file-saver';
+import { TableMaterialConfig } from 'src/app/shared/components/table-material/table-material-config';
 
 
 
@@ -17,12 +18,12 @@ const DECIMAL_FORMAT: (v: any) => any = (v: number) =>
 })
 export class RelatoriosComponent implements OnInit {
     
-    columns: ITdDataTableColumn[] = [
-        { name: "numero", label: "No. Contrato",},
-        { name: "nomePaciente", label: "Nome do Paciente", },
-        { name: "valorTotal", label: "Valor Contratado", numeric: true, format: DECIMAL_FORMAT },
-        { name: "valorExecutado", label: "Valor Executado", numeric: true, format: DECIMAL_FORMAT },
-        { name: "diferenca", label: "Diferença", numeric: true, format: DECIMAL_FORMAT }
+    columns: TableMaterialConfig[] = [
+        { name: "numero", label: "No. Contrato"},
+        { name: "nomePaciente", label: "Nome do Paciente"},
+        { name: "valorTotal", label: "Valor Contratado", format: DECIMAL_FORMAT},
+        { name: "valorExecutado", label: "Valor Executado"},
+        { name: "diferenca", label: "Diferença"}
     ];
 
     data: any = [];
@@ -37,6 +38,7 @@ export class RelatoriosComponent implements OnInit {
 
   ngOnInit() {
     this.startTable();
+    
   }
 
   startTable(){
@@ -46,6 +48,12 @@ export class RelatoriosComponent implements OnInit {
     });
   }
 
+  decimalConverter(valor: any) {
+   return new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+    }).format(valor);
+  }
 
   chosenYearHandler(ano: any){
     this.ano = 0;

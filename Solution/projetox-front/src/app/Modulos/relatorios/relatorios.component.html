@@ -8,16 +8,14 @@
     </section>
 </div>
 <div>
-    <app-table
-    matTooltip="Relatórios dos contratos."
-    #dataTable
-    message="Nenhum relatório encontrado"
-    [data]="data"
-    [columns]="columns"
-    [style.height.%]="100"
+    <app-table-material
+    
+    [dataSource]="data"
+    [tableMaterialConfig]="columns"
     >
-    </app-table >
-
+        
+    </app-table-material
+    >
 
     <section >
         <td-paging-bar

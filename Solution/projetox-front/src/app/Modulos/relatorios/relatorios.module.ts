@@ -7,7 +7,7 @@ import { YearMonthPickerComponent } from './year-month-picker/year-month-picker.
 import { RelatoriosComponent } from './relatorios.component';
 import { RelatorioRoutingModule } from './relatorios-routing.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { TableModule } from 'src/app/shared/components/table/table.module';
+import { TableMaterialModule } from '../../shared/components/table-material/table-material.module';
 
 
 
@@ -20,7 +20,7 @@ import { TableModule } from 'src/app/shared/components/table/table.module';
     MaterialModule,
     FormsModule,
     ReactiveFormsModule,
-    TableModule
+    TableMaterialModule
 
   ]
 })
