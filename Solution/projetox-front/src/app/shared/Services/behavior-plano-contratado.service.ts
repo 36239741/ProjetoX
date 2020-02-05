@@ -1,4 +1,4 @@
-import { PlanoContratado } from './../model/plano-contradao';
+import { PlanoContratado } from '../model/plano-contratado';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 

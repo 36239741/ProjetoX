@@ -1,5 +1,5 @@
 import { Contrato } from "./Contrato";
-import { PlanoContratado } from "./plano-contradao";
+import { PlanoContratado } from "./plano-contratado";
 
 export interface Registro{
   id : number;

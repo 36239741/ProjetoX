@@ -16,8 +16,9 @@ export class TableMaterialComponent implements OnInit {
   ngOnInit() {
     this.columnsDisplay();
   }
-
-
+  rowc(click: any){
+    console.log(click);
+  }
   columnsDisplay(){
     this.tableMaterialConfig.forEach(data => {
       this.displayedColumns.push(data.name);

@@ -86,7 +86,7 @@ public class RegistroService {
 			Registro registro = new Registro();
 			registro.setContrato(contrato);
 			registro.setPlanoContratado(planoContratado);
-			registro.setValorTotal(planoContratado.getValorPlano());
+			registro.setValorTotal(planoContratado.getValorSessao());
 			registro.setDataHoraEntrada(LocalDateTime.now(ZoneId.of("America/Maceio")));
 			registro.setSituacao(Situacao.ATENDIMENTO_NORMAL);
 			this.registroRepository.save(registro);
@@ -146,11 +146,11 @@ public class RegistroService {
 							.plusMinutes(configParametro.getTempoToleranciaAtraso().getMinute()),
 					LocalTime.now(ZoneId.of("America/Maceio")));
 			if (verificaValorAdicional.toMinutes() > 0) {
-				findRegistro.setValorTotal(findRegistro.getPlanoContratado().getValorPlano()
+				findRegistro.setValorTotal(findRegistro.getPlanoContratado().getValorSessao()
 						+ (verificaValorAdicional.toMinutes() + configParametro.getTempoToleranciaAtraso().getMinute())
 								* configParametro.getValorMinutoAdicional());
 			} else {
-				findRegistro.setValorTotal(findRegistro.getPlanoContratado().getValorPlano());
+				findRegistro.setValorTotal(findRegistro.getPlanoContratado().getValorSessao());
 			}
 			Duration tempoTotal = Duration.between(findRegistro.getDataHoraEntrada().toLocalTime(),
 					LocalTime.now(ZoneId.of("America/Maceio")));
@@ -183,7 +183,7 @@ public class RegistroService {
 			registro.setPlanoContratado(plano);
 			registro.setTempoTotal(config.getTempoSessao());
 			registro.setSituacao(Situacao.ATENDIMENTO_NORMAL);
-			registro.setValorTotal(plano.getValorPlano());
+			registro.setValorTotal(plano.getValorSessao());
 			this.registroRepository.save(registro);
 		}
 
@@ -241,13 +241,13 @@ public class RegistroService {
 	 * @param valorSessao
 	 * */
 	public Registro verificadorDescontoTrocaServico(Registro registro, Double valorSessao) {
-		Double valorDoPlanoAtual = registro.getPlanoContratado().getValorPlano();
+		Double valorDoPlanoAtual = registro.getPlanoContratado().getValorSessao();
 
 		Double diferencaEntreValoresDoPlano = valorDoPlanoAtual - valorSessao;
 		registro.setValorTotal(Math.abs(diferencaEntreValoresDoPlano));
 		
 		if(diferencaEntreValoresDoPlano == 0){
-			registro.setValorTotal(registro.getPlanoContratado().getValorPlano());
+			registro.setValorTotal(registro.getPlanoContratado().getValorSessao());
 		}
 
 		return registro;
@@ -277,7 +277,7 @@ public class RegistroService {
 		if (registro.getSituacao() == Situacao.AUSENCIA_DO_PACIENTE) {
 
 			registro.getPlanoContratado().setValorTotal(
-					registro.getPlanoContratado().getValorTotal() - registro.getPlanoContratado().getValorPlano());
+					registro.getPlanoContratado().getValorTotal() - registro.getPlanoContratado().getValorSessao());
 			registro.setSituacao(Situacao.AUSENCIA_DO_PROFISSIONAL);
 			registro.setValorTotal(0D);
 
@@ -304,7 +304,7 @@ public class RegistroService {
 		Assert.isNull(registro.getDataHoraSaida(), "Este registro já encontra-se fechado.");
 		Assert.isTrue(registro.getSituacao().equals(Situacao.ATENDIMENTO_NORMAL),
 				"A situação do atendimento deve ser Atendimento Normal.");
-		registro.setValorTotal(registro.getPlanoContratado().getValorPlano());
+		registro.setValorTotal(registro.getPlanoContratado().getValorSessao());
 
 		LocalDate dataAtual = LocalDate.now();
 		LocalTime horaSaida = registro.getPlanoContratado().getHorarioSaida();
@@ -357,7 +357,7 @@ public class RegistroService {
 			registro.setDataHoraSaida(dataHoraSaida);
 
 			if (plano.getTipoContrato().equals(TipoContrato.PLANO)) {
-				registro.setValorTotal(plano.getValorPlano());
+				registro.setValorTotal(plano.getValorSessao());
 			} else {
 				registro.setValorTotal(0.0);
 			}

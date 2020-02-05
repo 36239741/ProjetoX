@@ -15,7 +15,7 @@
             (click)="openClockBiometria()"
             (click)="saveSaida()"
         >
-            Salvar registro saída
+             Registrar saída do paciente
         </button>
     </section>
 
@@ -35,7 +35,7 @@
             </app-table>
         </section>
         <section class="button-cancelar">
-            <button mat-flat-button color="primary" (click)="hideTable = false">
+            <button mat-flat-button color="accent" (click)="hideTable = false; data = []">
                 Cancelar
             </button>
         </section>

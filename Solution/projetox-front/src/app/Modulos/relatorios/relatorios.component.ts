@@ -21,9 +21,9 @@ export class RelatoriosComponent implements OnInit {
     columns: TableMaterialConfig[] = [
         { name: "numero", label: "No. Contrato"},
         { name: "nomePaciente", label: "Nome do Paciente"},
-        { name: "valorTotal", label: "Valor Contratado", format: DECIMAL_FORMAT},
-        { name: "valorExecutado", label: "Valor Executado"},
-        { name: "diferenca", label: "Diferença"}
+        { name: "valorTotal", label: "Valor Contratado", type: 'currency'},
+        { name: "valorExecutado", label: "Valor Executado", type: 'currency'},
+        { name: "diferenca", label: "Diferença" ,type: 'currency'}
     ];
 
     data: any = [];

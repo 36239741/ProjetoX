@@ -78,8 +78,8 @@ export class DetatalharContratosComponent implements OnInit {
             format: DIAS_FORMAT
         },
         {
-            name: "valorTotal",
-            label: "Valor do Plano",
+            name: "valorSessao",
+            label: "Valor da sessão",
             numeric: true,
             format: DECIMAL_FORMAT
         },

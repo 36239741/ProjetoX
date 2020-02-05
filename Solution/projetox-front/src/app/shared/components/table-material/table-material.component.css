@@ -1,3 +1,12 @@
 table {
   width: 100%;
 }
+.positivoColor {
+  background-color: green;
+}
+.negativoColor {
+  background-color: #CC0000;
+}
+.neutroColor{
+  background-color: blue;
+}

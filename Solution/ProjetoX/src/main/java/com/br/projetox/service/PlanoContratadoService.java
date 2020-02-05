@@ -90,7 +90,7 @@ public class PlanoContratadoService {
 			PlanoContratado planoContratado = new PlanoContratado();
 			planoContratado.setHorarioEntrada(LocalTime.parse(mapPlanoContratado.get("horarioEntrada").toString()));
 			planoContratado.setHorarioSaida(LocalTime.parse(mapPlanoContratado.get("horarioSaida").toString()));
-			planoContratado.setValorPlano(Double.parseDouble(mapPlanoContratado.get("valorPlano").toString()));
+			planoContratado.setValorSessao(Double.parseDouble(mapPlanoContratado.get("valorPlano").toString()));
 			List<String> list = (List<String>) mapPlanoContratado.get("diaConsulta");
 			planoContratado.setSessao(list.size() * 4);
 			String[] diaConsulta = new String[7];

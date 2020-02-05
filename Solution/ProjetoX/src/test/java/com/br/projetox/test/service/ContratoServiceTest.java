@@ -276,7 +276,7 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 						tipoContrato);
 
 		Assert.assertNotNull(planoContratado);
-		Assert.assertEquals(valorPlano, planoContratado.getValorPlano());
+		Assert.assertEquals(valorPlano, planoContratado.getValorSessao());
 		Assert.assertEquals(valorTotal, planoContratado.getValorTotal());
 
 	}

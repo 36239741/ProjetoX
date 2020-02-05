@@ -1,5 +1,5 @@
 export class TableMaterialConfig {
-  name: String;
-  label: String;
-  pipe?: String;
+  name: string;
+  label: string;
+  type?: string;
 }

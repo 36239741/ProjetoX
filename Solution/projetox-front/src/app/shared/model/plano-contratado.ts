@@ -5,7 +5,7 @@ import { HorarioEntradaOrHorarioSaida, Contrato } from './Contrato';
 export class PlanoContratado {
   id: number;
   updated?: null;
-  valorPlano: number;
+  valorSessao: number;
   horarioEntrada: HorarioEntradaOrHorarioSaida;
   horarioSaida: HorarioEntradaOrHorarioSaida;
   valorTotal: number;
@@ -15,5 +15,6 @@ export class PlanoContratado {
   servico: Servico;
   contrato: Contrato;
   ativo: boolean;
+  valorAtendimento: number;
 }
 

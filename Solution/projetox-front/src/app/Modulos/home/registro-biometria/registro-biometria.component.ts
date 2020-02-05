@@ -91,7 +91,7 @@ export class RegistroBiometriaComponent implements OnInit {
                         .subscribe(
                             registro => {
                                 this.toastService.toastSuccess(
-                                    registro.planoContratado.servico + ' ' + registro.contrato.nomePaciente + ' encerrado com sucesso.'
+                                    'Atendimento do paciente ' + registro.contrato.nomePaciente + ' encerrado com sucesso.'
                                 );
                             },
                             error => {
@@ -114,11 +114,11 @@ export class RegistroBiometriaComponent implements OnInit {
     openConfirm(event: ITdDataTableRowClickEvent): void {
         this._dialogService
             .openConfirm({
-                message: " Confirmar registro de entrada do paciente.",
+                message: "Deseja confirmar o registro de entrada do paciente " + this.contrato.nomePaciente + 
+                "no atendimento para o serviço " + event.row.servico.servico,
                 disableClose: false, // defaults to false
                 viewContainerRef: this._viewContainerRef, //OPTIONAL
-                title: "Deseja confirmar o registro de entrada do paciente" + this.contrato.nomePaciente + 
-                "no atendimento para o serviço " + event.row.servico.servico , //OPTIONAL, hides if not provided
+                title: "Confirmar registro de entrada do paciente." , //OPTIONAL, hides if not provided
                 cancelButton: "Fechar", //OPTIONAL, defaults to 'CANCEL'
                 acceptButton: "Confirmar", //OPTIONAL, defaults to 'ACCEPT'
                 width: "50%", //OPTIONAL, defaults to 400px

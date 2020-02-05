@@ -6,7 +6,7 @@ import { FormPlanoContratado } from './../../../shared/model/formPlanoContratado
 import { Subscription } from 'rxjs';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { BehaviorPlanoContratadoService } from 'src/app/shared/Services/behavior-plano-contratado.service';
-import { PlanoContratado } from 'src/app/shared/model/plano-contradao';
+import { PlanoContratado } from 'src/app/shared/model/plano-contratado';
 import { ToastService } from '../../../shared/Services/toast.service'; 
 
 @Component({
@@ -78,7 +78,7 @@ export class EditarPlanoContratadoComponent implements OnInit, OnDestroy {
         this.formPlanoContratado.servico = this.planoContratado.servico.servico;
         this.formPlanoContratado.sessao = this.planoContratado.sessao;
         this.formPlanoContratado.tipoContrato = this.planoContratado.tipoContrato;
-        this.formPlanoContratado.valorPlano = this.planoContratado.valorPlano;
+        this.formPlanoContratado.valorPlano = this.planoContratado.valorSessao;
         this.formPlanoContratado.valorTotal = this.planoContratado.valorTotal;
         this.formPlanoContratado.horarioEntrada = this.mapHorarioEntradaOrSaida(this.planoContratado.horarioEntrada);
         this.formPlanoContratado.horarioSaida = this.mapHorarioEntradaOrSaida(this.planoContratado.horarioSaida);

@@ -43,7 +43,7 @@ public class PlanoContratado extends AbstractEntity implements Serializable{
 	 * Valor da sessão
 	 */
 	@NotNull
-	private Double valorPlano;
+	private Double valorSessao;
 	@NotNull
 	private LocalTime horarioEntrada;
 	@NotNull()
@@ -72,11 +72,15 @@ public class PlanoContratado extends AbstractEntity implements Serializable{
 	@NotNull
 	private Boolean ativo = true;
 	
+	private Double valorAtendimento;
 	
 	public void calcularValorSessao() {
-		this.valorPlano = this.valorTotal / this.sessao;
+		this.valorSessao = this.valorTotal / this.sessao;
 	}
 	
+	public void calcularValorAtendimento() {
+		this.valorAtendimento = this.valorSessao * this.sessao;
+	}
 	
 			
 	

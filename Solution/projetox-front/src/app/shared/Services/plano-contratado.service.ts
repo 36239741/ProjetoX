@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
-import { PlanoContratado } from '../model/plano-contradao';
+import { PlanoContratado } from '../model/plano-contratado';
 
 
 const API_URL = 'http://localhost:4200/v1';
