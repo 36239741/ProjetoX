@@ -2,11 +2,11 @@ table {
   width: 100%;
 }
 .positivoColor {
-  background-color: green;
+  background-color: rgba(26, 201, 26, 0.623);
 }
 .negativoColor {
-  background-color: #CC0000;
+  background-color:rgba(243, 9, 9, 0.623);
 }
 .neutroColor{
-  background-color: blue;
+  background-color: rgba(9, 9, 243, 0.623);
 }

@@ -2,12 +2,16 @@
 .row mat-icon{
   margin-left: 10px;
 }
-.negativo {
-  background-color: red;
+.positivoColor {
+  color: rgb(172, 204, 172) !important;
 }
-.positivo {
-  background-color: green;
+.negativoColor {
+  color: #CC0000 !important;
 }
-.neutro {
-  background-color: blue;
+.neutroColor{
+  color: blue !important;
+}
+.columnDiferenca {
+  width: 100%;
+  height: 100%;
 }

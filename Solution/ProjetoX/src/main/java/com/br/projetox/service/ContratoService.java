@@ -23,7 +23,6 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
-import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -105,7 +104,13 @@ public class ContratoService {
 		PageRequest pageable = PageRequest.of(pageNum, pageSize,
 				org.springframework.data.domain.Sort.by(direction, atributo));
 		page = this.repository.findAll(pageable);
-		page.forEach(data -> data.clearToList());
+		LocalDate date = LocalDate.now();
+		for(Contrato contrato: page.getContent()) {
+			Double valorExecutado = this.valorExecutado(date.getYear(), date.getMonthValue(), contrato.getNumero());
+			contrato.setValorExecutado(valorExecutado);
+			contrato.setDiferenca(contrato.getValorExecutado() - contrato.getValorTotal());
+			contrato.clearToList();
+		}
 		return page;
 	}
 
@@ -124,7 +129,16 @@ public class ContratoService {
 	 */
 	@Transactional(readOnly = true)
 	public Page<Contrato> findByFilters(String numero, String nomePaciente, PageRequest pageable) {
-		return this.repository.findByFilters(numero, nomePaciente, pageable);
+		Page<Contrato> page = this.repository.findByFilters(numero, nomePaciente, pageable);
+		LocalDate date = LocalDate.now();
+		
+		for(Contrato contrato: page.getContent()) {
+			Double valorExecutado = this.valorExecutado(date.getYear(), date.getMonthValue(), contrato.getNumero());
+			contrato.setValorExecutado(valorExecutado);
+			contrato.setDiferenca(contrato.getValorExecutado() - contrato.getValorTotal());
+			contrato.clearToList();
+		}
+		return page;
 	}
 
 	/*
@@ -144,8 +158,17 @@ public class ContratoService {
 	 */
 	public Page<Contrato> findByFiltersParamActive(String numero, String nomePaciente, PageRequest pageable,
 			Boolean ativo) {
-		return this.repository.findByFiltersParamActive(numero, nomePaciente, pageable, ativo);
-
+		
+		Page<Contrato> page = this.repository.findByFiltersParamActive(numero, nomePaciente, pageable, ativo);
+		LocalDate date = LocalDate.now();
+		
+		for(Contrato contrato: page.getContent()) {
+			Double valorExecutado = this.valorExecutado(date.getYear(), date.getMonthValue(), contrato.getNumero());
+			contrato.setValorExecutado(valorExecutado);
+			contrato.setDiferenca(contrato.getValorExecutado() - contrato.getValorTotal());
+			contrato.clearToList();
+		}
+		return page;
 	}
 
 	/*
@@ -433,6 +456,8 @@ public class ContratoService {
 				Boolean match = this.fingerPrint.verifyFingerprint(contrato.getBiometria(), imgAndTemplate);
 				if (Boolean.TRUE.equals(match)) {
 					returnContrato = contrato;
+				}else {
+					throw new ContratoException("Nenhum contrato cadastrado com essa biometria.");
 				}
 			}
 		}
