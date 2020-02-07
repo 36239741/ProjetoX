@@ -1,0 +1,13 @@
+<h3 mat-dialog-title class="tc-accent-400">Confirmar registro de ausência do profissional</h3>
+
+<td-dialog-content>
+    <div>
+        <p>Tem certeza que deseja registrar a ausência do profissional?</p>
+        <p>Sua ação não poderá ser desfeita.</p>
+    </div>
+</td-dialog-content>
+
+<td-dialog-actions class="dialog-actions-container">
+    <button mat-raised-button (click)="close()" >Fechar</button>
+    <button mat-raised-button color="accent" (click)="confirmarTrocaDeProfissional()">Registrar ausência</button>
+</td-dialog-actions>

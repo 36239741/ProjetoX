@@ -10,7 +10,7 @@ import {Situacao} from '../../../shared/Enum/Situacao';
 import { MatDialogConfig } from '@angular/material';
 import { Registro } from 'src/app/shared/model/registro';
 import { saveAs } from 'file-saver';
-import * as moment from 'moment';
+import { RegistrarAusenciaProfissionalComponent } from './registrar-ausencia-profissional/registrar-ausencia-profissional.component';
 
 
 
@@ -138,8 +138,8 @@ findContratoById() {
   openTrocaServico(tableRow: any) {
 
     let dialogConfig: MatDialogConfig<any> = {
-        width: '60%',
-        height: '80%',
+        width: '650px',
+        height: '250px',
         data: tableRow
     };
 
@@ -156,28 +156,19 @@ findContratoById() {
   }
 
   confirmTrocaDeProfissional(tableRow: Registro): void {
-    this._dialogService.openConfirm({
-      message: 'Tem certeza que deseja registrar a ausência do profissional? \n Sua ação não poderá ser desfeita.',
-      disableClose:  false, // defaults to false
-      viewContainerRef: this._viewContainerRef, //OPTIONAL
-      title: 'Confirmar registro de ausência do profissional', //OPTIONAL, hides if not provided
-      cancelButton: 'Cancelar', //OPTIONAL, defaults to 'CANCEL'
-      acceptButton: 'Aceitar', //OPTIONAL, defaults to 'ACCEPT'
-      width: '50%', //OPTIONAL, defaults to 400px
-    }).afterClosed().subscribe((accept: boolean) => {
-      if (accept) {
-            this.registroService.ausenciaProfissional(tableRow.id).subscribe(registro => {
-             this.toastService.toastSuccess('Declarada ausência do profissional com sucesso.')
-             this.startTable();
-            },error => {
-                this.toastService.toastError(error.error.message);
-            })
-      } else {
-        // DO SOMETHING ELSE
-      }
-    });
+      this.gerarDesconto(tableRow);
+
   }
 
-
+    gerarDesconto(registro: Registro) {
+        let dialogConfig: MatDialogConfig<any> = {
+            width: "650px",
+            height: "250px",
+            data: registro
+        };
+        this._dialogService.open(RegistrarAusenciaProfissionalComponent, dialogConfig).afterClosed().subscribe(() => {
+            this.startTable();
+        });
+    }
 
 }

@@ -22,6 +22,7 @@ import { PipeTimeModule } from '../../shared/Pipe/time-pipe.module';
 import { AlterarServicoComponent } from './registros/alterar-servico/alterar-servico.component';
 import { GerarDescontoComponent } from './visualizar-contratos/gerar-desconto/gerar-desconto.component';
 import { NgxCurrencyModule } from 'ngx-currency';
+import { RegistrarAusenciaProfissionalComponent } from './registros/registrar-ausencia-profissional/registrar-ausencia-profissional.component';
 
 
 
@@ -34,7 +35,8 @@ import { NgxCurrencyModule } from 'ngx-currency';
     ImportComponent,
     RegistrosComponent,
     AlterarServicoComponent,
-    GerarDescontoComponent],
+    GerarDescontoComponent,
+    RegistrarAusenciaProfissionalComponent],
   imports: [
     NgxCurrencyModule,
     PipeTimeModule,
@@ -57,7 +59,8 @@ import { NgxCurrencyModule } from 'ngx-currency';
   entryComponents: [
     ImportComponent,
     AlterarServicoComponent,
-    GerarDescontoComponent
+    GerarDescontoComponent,
+    RegistrarAusenciaProfissionalComponent
   ],
 })
 export class ContratosModule { }

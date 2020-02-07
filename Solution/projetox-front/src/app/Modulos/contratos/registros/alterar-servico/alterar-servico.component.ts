@@ -32,7 +32,7 @@ export class AlterarServicoComponent implements OnInit, AfterViewInit {
     private formBuilder: FormBuilder,
     private registroService: RegistroService,
     private servicoService: ServicesService,
-    private toastService: ToastService,) {}
+    private toastService: ToastService) {}
 
 
   ngOnInit() { 

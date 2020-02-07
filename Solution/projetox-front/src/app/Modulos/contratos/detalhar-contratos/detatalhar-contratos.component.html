@@ -2,12 +2,12 @@
     <div class="informacoes-contratos-buttons">
 
 
-    <section class="informacoes-contrato">
-        <div>
+    <section class="informacoes-contrato-container">
+        <div class="display-flex informacoes-contratos">
             <mat-label><b>Nº do Contrato:</b></mat-label><p>{{ contrato.numero }}</p>
 
         </div>
-        <div>
+        <div class="display-flex informacoes-contratos">
             <mat-label><b>Nome do Paciente:</b></mat-label><p>{{ contrato.nomePaciente }}</p>
         </div>
     </section>
@@ -30,7 +30,7 @@
             <mat-label><b>Situação Biometria</b></mat-label>
             <p>{{ situacaoBiometria }}</p>
             <br/>
-            <button mat-raised-button color="accent" (click)="openSnackBarClockBiometria()" (click)="saveBiometria()" matTooltip="Cadastrar ou atualizar biometria">{{ buttonBiometria }}</button>
+            <button mat-raised-button color="accent" (click)="openSnackBarClockBiometria()" (click)="saveBiometria()" matTooltip="Posicione o dedo indicador sobre a superfície do leitor biométrico e retire após o bipe. Repita o procedimento por três vezes.">{{ buttonBiometria }}</button>
           </div>
           <div >
             <mat-label><b>Total Plano Particular</b></mat-label>

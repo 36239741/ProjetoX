@@ -1,43 +1,43 @@
-<div class="alterar-servico-container">
-    <section class="title">
-        <h3>Troca de serviço</h3>
-    </section>
-    <form [formGroup]="formGroup" class="form">
-        
-    <mat-form-field>
-        <mat-label>Novo serviço</mat-label>
-      <mat-select [(value)]="selected" required [formControl]="formGroup.controls['servico']" (selectionChange)="alterarValorInput($event)">
-        <mat-option *ngFor="let servico of servicos[0]" [value]="servico.valor" >
-            {{servico.servico}}
-          </mat-option>     
-         </mat-select>
-         <mat-error *ngIf="formGroup.controls['servico'].hasError('required')">Selecione um novo serviço</mat-error>    
-        </mat-form-field>
 
-            <mat-form-field >
-                <input
-                    [formControl]="formGroup.controls['valorSessao']"
-                    matInput
-                    required
-                    placeholder="Valor da Sessão"
-                    type="text"
-                    currencyMask
-                    [options]="{
-                        prefix: 'R$ ',
-                        thousands: '.',
-                        decimal: ',',
-                        align: 'left'
-                    }"
-                />
-                <mat-error *ngIf="formGroup.controls['valorSessao'].hasError('required')">O campo valor da sessão requer que seja preenchido</mat-error>
+<h3 mat-dialog-title class="tc-accent-400">Registrar troca de serviço</h3>
+
+<td-dialog-content>
+
+    <form [formGroup]="formGroup" class="display-flex form">
+
+        <mat-form-field>
+            <mat-label>Novo serviço</mat-label>
+          <mat-select [(value)]="selected" required [formControl]="formGroup.controls['servico']" (selectionChange)="alterarValorInput($event)">
+            <mat-option *ngFor="let servico of servicos[0]" [value]="servico.valor" >
+                {{servico.servico}}
+              </mat-option>     
+             </mat-select>
+             <mat-error *ngIf="formGroup.controls['servico'].hasError('required')">Selecione um novo serviço</mat-error>    
             </mat-form-field>
-<div class="container-buttons">
-    <section class="buttons">
-        <button mat-flat-button color="accent" type="submit" (click)="trocarServico()" >Aceitar</button>
-        <button mat-flat-button color="accent" (click)="closeModal($event)">Cancelar</button>
-    </section>
-</div>
-</form>
-</div>
+    
+                <mat-form-field >
+                    <input
+                        [formControl]="formGroup.controls['valorSessao']"
+                        matInput
+                        required
+                        placeholder="Valor da Sessão"
+                        type="text"
+                        currencyMask
+                        [options]="{
+                            prefix: 'R$ ',
+                            thousands: '.',
+                            decimal: ',',
+                            align: 'left'
+                        }"
+                    />
+                    <mat-error *ngIf="formGroup.controls['valorSessao'].hasError('required')">O campo valor da sessão requer que seja preenchido</mat-error>
+                </mat-form-field>
+    
+    </form>
+</td-dialog-content>
 
+<td-dialog-actions class="display-flex container-actions">
+    <button mat-raised-button (click)="closeModal($event)" >Fechar</button>
+    <button mat-raised-button color="accent" type="submit" (click)="trocarServico()">Realizar Troca</button>
+</td-dialog-actions>
 

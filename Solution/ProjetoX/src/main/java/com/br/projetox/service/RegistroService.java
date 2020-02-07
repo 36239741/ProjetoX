@@ -228,30 +228,14 @@ public class RegistroService {
 		Assert.isTrue(registro.getSituacao() == Situacao.ATENDIMENTO_NORMAL, "A situação do registro se encontra diferente de atendimento normal.");
 		Assert.isNull(registro.getDataHoraSaida(), "Este registro já encontra-se fechado.");
 
-		Registro registroComDescontoOuAcrescimo = this.verificadorDescontoTrocaServico(registro, valorSessao);
-		registroComDescontoOuAcrescimo.setSituacao(Situacao.TROCA_DE_SERVICO);
-		return this.registroRepository.save(registroComDescontoOuAcrescimo);
+		registro.setValorTotal(valorSessao);
+		registro.setSituacao(Situacao.TROCA_DE_SERVICO);
+		return this.registroRepository.save(registro);
 
 	}
 
 	
-	/*Calcula a diferenca entre o servico contratado atual e o da valor da sessao passado por parametro
-	 * e verifica se acrescente ou decrementa no valor do contrato
-	 * @param registro
-	 * @param valorSessao
-	 * */
-	public Registro verificadorDescontoTrocaServico(Registro registro, Double valorSessao) {
-		Double valorDoPlanoAtual = registro.getPlanoContratado().getValorSessao();
 
-		Double diferencaEntreValoresDoPlano = valorDoPlanoAtual - valorSessao;
-		registro.setValorTotal(Math.abs(diferencaEntreValoresDoPlano));
-		
-		if(diferencaEntreValoresDoPlano == 0){
-			registro.setValorTotal(registro.getPlanoContratado().getValorSessao());
-		}
-
-		return registro;
-	}
 	
 	
 	public Situacao verificarSituacao(String situacaoRegistro) {
