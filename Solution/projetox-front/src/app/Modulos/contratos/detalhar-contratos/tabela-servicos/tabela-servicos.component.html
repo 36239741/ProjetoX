@@ -14,6 +14,12 @@
         <a (click)="clickDeletar(row)" (click)="dataTable.refresh()" matTooltip="Deletar um serviço contratado"><mat-icon>delete</mat-icon></a>
       </div>
     </ng-template>
+
+    <ng-template tdDataTableTemplate="saldoMensal" let-value="value" let-row="row" let-column="column">
+        <div [ngClass]="{'positivoColor': value > 0,'negativoColor': value < 0, 'neutroColor': value == 0 }">
+          {{value | currency: 'BRL'}}
+      </div>
+        </ng-template>
 </td-data-table>
 <div class="md-padding" *ngIf="!dataTable.hasData" fxLayout="row" fxLayoutAlign="center center">
   <h3>Nenhum Serviço Econtrado</h3>

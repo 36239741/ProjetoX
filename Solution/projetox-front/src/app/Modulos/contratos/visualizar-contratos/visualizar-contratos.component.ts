@@ -36,9 +36,11 @@ export class VisualizarContratosComponent implements OnInit, OnDestroy {
     { name: 'nomePaciente', label: 'Nome do Paciente', sortable: true},
     { name: 'tipoContratoTransient', label: 'Tipo do Contrato'},
     { name: 'ativo', label: 'Status do contrato', sortable: true},
-    { name: 'valorTotal', label: 'Valor Contratado', numeric: true, format: DECIMAL_FORMAT, sortable: true},
-    { name: 'diferenca', label: 'Saldo Mensal',numeric: true, format: DECIMAL_FORMAT}];
-    
+    { name: 'diferenca', label: 'Saldo Mensal',numeric: true, format: DECIMAL_FORMAT},
+    { name: 'valorTotal', label: 'Saldo Total', numeric: true, format: DECIMAL_FORMAT, sortable: true},
+
+  ];
+      
   statuContrato: any[] = [
     {value: null, viewValue: ''},
     {value: true, viewValue: 'Ativo'},

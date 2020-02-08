@@ -220,8 +220,8 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 	@WithUserDetails("henrique_nitatori@hotmail.com")
 	@Test
 	public void verificadorDeDescontoMustPassTestandoODescontoComValorMaiorQueOPlanoAtual(){
-		final Double valorTotal = 1000.00;
-		Registro registro = this.registroService.verificadorDescontoTrocaServico(this.registroRepository.findById(1L).get(), 2000.00);
+		final Double valorTotal = 2000.00;
+		Registro registro = this.registroService.registrarTrocaDeServico(1L, 2000.00D);
 		Assert.assertEquals(valorTotal, registro.getValorTotal());
 
 	}
@@ -233,7 +233,7 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 	@Test
 	public void verificadorDeDescontoMustPassTestandoODescontoComValorMenorQueOPlanoAtual(){
 		final Double valorTotalRegistro = 500.00;
-		Registro registro = this.registroService.verificadorDescontoTrocaServico(this.registroRepository.findById(1L).get(), 500.00);
+		Registro registro = this.registroService.registrarTrocaDeServico(1L, 500.00D);
 		Assert.assertEquals(valorTotalRegistro, registro.getValorTotal());
 
 	}
@@ -245,7 +245,7 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 	@Test
 	public void verificadorDeDescontoMustPassTestandoODescontoComValorIgualQueOPlanoAtual(){
 		final Double valorTotalRegistro = 1000.00;
-		Registro registro = this.registroService.verificadorDescontoTrocaServico(this.registroRepository.findById(1L).get(), 1000.00);
+		Registro registro = this.registroService.registrarTrocaDeServico(1L, 1000.00D);
 		Assert.assertEquals(valorTotalRegistro, registro.getValorTotal());
 	}
 	

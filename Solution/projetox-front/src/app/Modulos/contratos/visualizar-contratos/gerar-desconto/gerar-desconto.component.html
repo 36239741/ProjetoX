@@ -1,86 +1,47 @@
-<div class="container" *ngIf="descontoGerado == false">
-    <section class="title">
-        <h2>
-            Gerar desconto
-        </h2>
-    </section>
+<h3 mat-dialog-title class="tc-accent-400">Gerar desconto</h3>
 
-    <section class="valor-total-contrato">
-        <mat-label>Valor atual do contrato</mat-label>
-        <p>{{ contrato.valorTotal | currency:'BRL' }}</p>
-    </section>
+<td-dialog-content>
+    <form [formGroup]="formGroup" class="display-flex form">
+        <mat-form-field>
+            <input
+                #valorDesconto
+                id="valorDesconto"
+                formControlName="valorDesconto"
+                matInput
+                placeholder="Valor do desconto"
+                type="text"
+                currencyMask
+                [options]="{
+                    prefix: 'R$ ',
+                    thousands: '.',
+                    decimal: ',',
+                    align: 'left'
+                }"
+            />
+        </mat-form-field>
+    </form>
 
-    <section class="input-desconto">
-        <form [formGroup]="formGroup">
-            <mat-form-field >
-                <input
-                    #valorDesconto
-                    id="valorDesconto"
-                    formControlName="valorDesconto"
-                    matInput
-                    placeholder="Valor do desconto"
-                    type="text"
-                    currencyMask
-                    [options]="{
-                        prefix: 'R$ ',
-                        thousands: '.',
-                        decimal: ',',
-                        align: 'left'
-                    }"
-                />
-            </mat-form-field>
-        </form>
-    </section>
-
-    <section class="valor-total-atualizado">
-        <mat-label>Valor total do contrato com desconto</mat-label>
-        <p>{{ calculoValorContratoAposDesconto() |  currency:'BRL' }}</p>
-    </section>
-
-<div class="container-buttons">
-    <section class="buttons">
-        <button mat-flat-button color="accent" (click)="gerarDesconto()">Gerar</button>
-        <button mat-flat-button color="accent" (click)="closeModal($event)">Cancelar</button>
-    </section>
-</div>
-</div>
-
-
-<div class="container" *ngIf="descontoGerado == true">
-    <section class="title">
-        <h2>
-            Gerar desconto
-        </h2>
-    </section>
-
-    <section class="subtitle">
-        <h3>Desconto gerado</h3>
-    </section>
-
-    <section class="numero-contrato-nome-paciente">
-        <div>
-            <mat-label>
-                Nº contrato
-                <p>{{ contrato.numero }}</p>
-            </mat-label>
+    <section class="display-flex valor-contrato-container">
+        <div class="display-flex valor-contrato">
+            <mat-label>Valor atual do contrato</mat-label>
+            <span>{{ contrato.valorTotal | currency: "BRL" }}</span>
         </div>
-        <div>
-            <mat-label>
-                Nome paciente
-                <p>{{ contrato.nomePaciente }}</p>
-            </mat-label>
-        </div>
-        <div>
-            <mat-label>
-                Valor total contrato
-                <p>{{ returnContrato.valorTotal | currency: 'BRL' }}</p>
-            </mat-label>
+
+        <div class="display-flex valor-contrato">
+            <mat-label>Valor total do contrato após o desconto</mat-label>
+            <span>{{
+                calculoValorContratoAposDesconto() | currency: "BRL"
+            }}</span>
         </div>
     </section>
+</td-dialog-content>
 
-    <div class="container-buttons">
-        <section class="buttons">
-            <button mat-flat-button color="accent" (click)="closeModal($event)">Ok</button>
-        </section>
-    </div>
-</div>
+<td-dialog-actions class="display-flex">
+    <button mat-raised-button (click)="closeModal($event)">
+        Fechar
+    </button>
+    <button mat-flat-button color="accent" (click)="gerarDesconto()">
+        Gerar desconto
+    </button>
+</td-dialog-actions>
+

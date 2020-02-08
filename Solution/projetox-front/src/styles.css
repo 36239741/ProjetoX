@@ -36,3 +36,13 @@ a:hover, a:visited, a:focus, a:active{ text-decoration: none; color: inherit; }
 td-dialog-title {
   font-weight: bold;
 }
+
+.positivoColor {
+  color: rgb(172, 204, 172) !important;
+}
+.negativoColor {
+  color: #CC0000 !important;
+}
+.neutroColor{
+  color: blue !important;
+}

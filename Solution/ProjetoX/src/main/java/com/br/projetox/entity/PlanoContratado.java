@@ -12,6 +12,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.envers.Audited;
@@ -60,6 +61,7 @@ public class PlanoContratado extends AbstractEntity implements Serializable{
 			CascadeType.REMOVE},fetch = FetchType.EAGER)
 	private List<DiaConsulta>  diaConsulta = new ArrayList<DiaConsulta>();
 	
+	
 	@Enumerated(EnumType.ORDINAL)
 	private TipoContrato tipoContrato;
 
@@ -73,6 +75,10 @@ public class PlanoContratado extends AbstractEntity implements Serializable{
 	private Boolean ativo = true;
 	
 	private Double valorAtendimento;
+	
+	@Transient
+	private Double saldoMensal;
+	
 	
 	public void calcularValorSessao() {
 		this.valorSessao = this.valorTotal / this.sessao;

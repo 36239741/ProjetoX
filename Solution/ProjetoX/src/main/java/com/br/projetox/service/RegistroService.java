@@ -124,7 +124,15 @@ public class RegistroService {
 		}
 	}
 	
-
+	public Page<Registro> findByDateAndPLanoId(String dataInicial, String dataFinal, Long planoId, int page, int size) {
+		if (dataInicial.isEmpty() == false && dataFinal.isEmpty() == false) {
+			Pageable pagebale = PageRequest.of(page, size);
+			return this.registroRepository.findByDateAndPLanoId(LocalDateTime.parse(dataInicial + "T00:00:00"),
+					LocalDateTime.parse(dataFinal + "T00:00:00"),planoId, pagebale);
+		} else {
+			throw new RegistroException("Campos obrigatório não preenchidos");
+		}
+	}
 
 	/*
 	 * Metodo que salva o horario de saida de um paciente atraves da digital

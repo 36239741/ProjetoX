@@ -1,91 +1,25 @@
-.container {
-    width: 100%;
-    height: 100%;
+.display-flex {
     display: flex;
+}
+.valor-contrato-container {
+    justify-content: space-around;
+    margin-bottom: 20px;
+}
+.valor-contrato {
     flex-direction: column;
     align-items: center;
 }
-.title {
-    width: 100%;
-    height: 10%;
-    margin-bottom: 30px;
-    display: flex;
+.form {
     justify-content: center;
     align-items: center;
 }
-.subtitle {
-    width: 100%;
-    height: 10%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+h3 {
+    padding: 0px;
+    margin: 0px;
 }
-.valor-total-contrato{
-    height: 40%;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-.input-desconto {
-    height: 40%;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-}
-.valor-total-atualizado {
-    height: 40%;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-
-}
-.container-buttons {
-    width: 100%;
-    height: 10%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+td-dialog-actions {
     justify-content: flex-end;
-}
-.buttons {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.buttons button {
- margin-left: 5px;
-}
-.numero-contrato-nome-paciente {
-    height: 70%;
-    width: 100%;
-    display: flex;
-    flex-flow: wrap;
-    justify-content: center;
-    align-items: center;
-}
-.numero-contrato-nome-paciente div:nth-child(1) {
-    width: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.numero-contrato-nome-paciente div:nth-child(2) {
-    width: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.numero-contrato-nome-paciente div:nth-child(3) {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 50px;
+    align-items: flex-end;
+    margin: 0px;
+    padding: 0px;
 }

@@ -477,7 +477,9 @@ public class ContratoService {
 		Double valorExecutado = 0.0;
 		
 		for(Registro registro : registros) {
-			valorExecutado += registro.getValorTotal();
+			if(registro.getValorTotal() != null) {
+				valorExecutado += registro.getValorTotal();
+			}
 		}
 		
 		return valorExecutado;

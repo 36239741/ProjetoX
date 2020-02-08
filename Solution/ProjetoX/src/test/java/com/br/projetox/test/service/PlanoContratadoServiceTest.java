@@ -330,6 +330,20 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 			List<PlanoContratado> list = this.planoContratoService.findByBiometria();
 			Assert.assertNotNull(list);
 	}
+		
+		@Sql({"/dataset/truncate.sql",
+			"/dataset/Servico.sql",
+			"/dataset/Contrato.sql",
+			"/dataset/Usuario.sql",
+			"/dataset/PlanoContratado.sql",
+			"/dataset/DiaConsulta.sql",
+			"/dataset/RegistroTestExportPlanilha.sql"})
+	@Test
+	public void valorExecutadoMustPassVerificandoOValorExecutadoNoMes() {
+		final Double valorExecutado = 2090.00;
+		Double valorRetornado = this.planoContratoService.saldoMensal(2019, 12, 2L);
+		Assert.assertEquals(valorExecutado, valorRetornado);
+	}
 
 
 	/* MUST FAIL */

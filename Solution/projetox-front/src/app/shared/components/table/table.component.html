@@ -9,6 +9,7 @@
   [sortBy]="sortBy"
   [clickable]="true"
   >
+
   <ng-template tdDataTableTemplate="acoes" let-value="value" let-row="row" let-column="column"  >
     <div class="row">
       <a matTooltip="Declarar ausência de um profissional." (click)="ausenciaProfissional(row)"
@@ -23,10 +24,14 @@
 
   <ng-template tdDataTableTemplate="diferenca" let-value="value" let-row="row" let-column="column">
     <div [ngClass]="{'positivoColor': value > 0,'negativoColor': value < 0, 'neutroColor': value == 0 }">
-
       {{value | currency: 'BRL'}}
 </div>
+</ng-template>
 
+<ng-template tdDataTableTemplate="saldoMensal" let-value="value" let-row="row" let-column="column">
+  <div [ngClass]="{'positivoColor': value > 0,'negativoColor': value < 0, 'neutroColor': value == 0 }">
+    {{value | currency: 'BRL'}}
+</div>
   </ng-template>
 
   <ng-template

@@ -37,6 +37,13 @@ public interface RegistroRepository extends JpaRepository<Registro, Long>{
 			@Param("numeroContrato") String numeroContrato,
 			Pageable pagebale);
 	
+	@Query("FROM Registro registro WHERE registro.planoContratado.id = :planoId AND registro.dataHoraEntrada "
+			+ "BETWEEN :dataInicial AND :dataFinal")
+	public Page<Registro> findByDateAndPLanoId(@Param("dataInicial") LocalDateTime dataInicial,
+			@Param("dataFinal") LocalDateTime dataFinal,
+			@Param("planoId") Long planoId,
+			Pageable pagebale);
+	
 	
 	@Query("FROM Registro registro WHERE registro.planoContratado.id = :planoId AND registro.id = "
 			+ "(SELECT max(registro.id) FROM Registro registro)")

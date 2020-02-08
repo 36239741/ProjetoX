@@ -83,6 +83,18 @@ export class DetatalharContratosComponent implements OnInit {
             numeric: true,
             format: DECIMAL_FORMAT
         },
+        {
+            name: "saldoMensal",
+            label: "Saldo Mensal",
+            numeric: true,
+            format: DECIMAL_FORMAT
+        },
+        {
+            name: "valorTotal",
+            label: "Saldo Total",
+            numeric: true,
+            format: DECIMAL_FORMAT
+        },
         { name: "acoes", label: "Ações" }
     ];
 
@@ -105,6 +117,9 @@ export class DetatalharContratosComponent implements OnInit {
                 this.contrato = contrato;
                 this.calcularValorPlanos();
             });
+    }
+    calcularSaldoMensalDosPlanos() {
+        
     }
 
     /*Metodo que recupera o contrato atraves de um snapshot na rota ativa do detalhar-contratos.module
@@ -178,9 +193,9 @@ export class DetatalharContratosComponent implements OnInit {
                 disableClose: false, // defaults to false
                 viewContainerRef: this._viewContainerRef, //OPTIONAL
                 title: "Confirmar", //OPTIONAL, hides if not provided
-                cancelButton: "Cancelar", //OPTIONAL, defaults to 'CANCEL'
-                acceptButton: "Aceitar", //OPTIONAL, defaults to 'ACCEPT'
-                width: "600px" //OPTIONAL, defaults to 400px
+                cancelButton: "Fechar", //OPTIONAL, defaults to 'CANCEL'
+                acceptButton: "Confirmar", //OPTIONAL, defaults to 'ACCEPT'
+                width: "600px", //OPTIONAL, defaults to 400px
             })
             .afterClosed()
             .subscribe((accept: boolean) => {
@@ -235,8 +250,8 @@ export class DetatalharContratosComponent implements OnInit {
 
     gerarDesconto() {
         let dialogConfig: MatDialogConfig<any> = {
-            width: "40%",
-            height: "80%",
+            width: "700px",
+            height: "250px",
             data: this.contrato
         };
         this._dialogService

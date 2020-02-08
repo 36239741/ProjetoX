@@ -1,6 +1,7 @@
 package com.br.projetox.service;
 
 import java.io.UnsupportedEncodingException;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Collections;
 import java.util.Comparator;
@@ -9,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,7 @@ import com.br.projetox.entity.Contrato;
 import com.br.projetox.entity.DiaConsulta;
 import com.br.projetox.entity.DiasSemana;
 import com.br.projetox.entity.PlanoContratado;
+import com.br.projetox.entity.Registro;
 import com.br.projetox.entity.Servico;
 import com.br.projetox.entity.TipoContrato;
 import com.br.projetox.exception.DuplicatePlanoContratadoException;
@@ -37,6 +39,9 @@ public class PlanoContratadoService {
 
 	@Autowired
 	private PlanoContratoRepository planoContraRepository;
+	
+	@Autowired
+	private RegistroService registroService;
 	
 
 
@@ -62,6 +67,7 @@ public class PlanoContratadoService {
 	 */
 	public List<PlanoContratado> findAllPlanoContratadoByContratoId(String numeroContrato) {
 		List<PlanoContratado> listPlanos = this.planoContraRepository.findByContratoId(numeroContrato);
+		LocalDate data = LocalDate.now();
 		for (PlanoContratado planos : listPlanos) {
 			Collections.sort(planos.getDiaConsulta(), new Comparator<DiaConsulta>() {
 				@Override
@@ -70,6 +76,7 @@ public class PlanoContratadoService {
 
 				}
 			});
+			planos.setSaldoMensal(this.saldoMensal(data.getYear(), data.getMonthValue(),planos.getId()));
 		}
 		return listPlanos;
 	}
@@ -247,6 +254,28 @@ public class PlanoContratadoService {
 		return this.planoContraRepository.findPlanoContratadoAtivoByContratoAndServicoAndTipoContrato(servicoId,
 				contratoId, tipoContrato);
 	}
+	
+	public Double saldoMensal(int ano,int mes,Long planoId) {
+		
+		LocalDate dataInicial = LocalDate.of(ano,mes,1);
+
+		LocalDate ultimoDiaMes = dataInicial.withDayOfMonth(dataInicial.lengthOfMonth());
+		LocalDate dataFinal = LocalDate.of(ano,mes,ultimoDiaMes.getDayOfMonth());
+		
+		Page<Registro> registros = this.registroService.findByDateAndPLanoId(dataInicial.toString(), dataFinal.toString(), planoId, 0, 32);
+		
+		Double valorExecutado = 0.0;
+		
+		for(Registro registro : registros.getContent()) {
+			if(registro.getValorTotal() != null) {
+				valorExecutado += registro.getValorTotal();
+			}
+		}
+		
+		return valorExecutado;
+	}
+	
+
 
 	/*
 	 * Método que busca os planos contratados atraves da biometria cadastrada no
@@ -263,5 +292,7 @@ public class PlanoContratadoService {
 	public List<PlanoContratado> findByDiaConsulta(DiasSemana diasSemana){
 		return this.planoContraRepository.findByDiaConsulta(diasSemana);
 	}
+	
+	
 
 }

@@ -23,7 +23,6 @@ export class GerarDescontoComponent implements OnInit, AfterViewInit {
     private contratoService: ContratoService,
     private message: ToastService,) { }
     
-  descontoGerado: Boolean = false;
   formGroup: FormGroup;
   valorDesconto: number = 0;
   returnContrato: Contrato = null;
@@ -56,7 +55,8 @@ calculoValorContratoAposDesconto() {
 gerarDesconto() {
     this.contratoService.gerarDesconto(this.contrato.numero, this.valorDesconto).subscribe(contrato => {
         this.returnContrato = contrato;
-        this.descontoGerado = true;
+        this.message.toastSuccess('Desconto gerado com sucesso.');
+        this.dialogService.closeAll();
     },
     error => {
         this.message.toastError(error.error.message);
@@ -64,7 +64,6 @@ gerarDesconto() {
 }
   
   closeModal(event: any) {
-    this.descontoGerado = false;
     this.dialogService.closeAll();
   }
 }
