@@ -41,8 +41,8 @@ public class ResgistroController {
 	private RegistroService registroService;
 	
 	@PostMapping(path = "/save-entrada")
-	public void saveHorarioEntrada(@RequestBody Map<String, Object> map) throws NumberFormatException, NotFoundException {
-		 this.registroService.saveHorarioEntrada(map.get("numeroContrato").toString(), map.get("idPlanoContratado").toString());
+	public Registro saveHorarioEntrada(@RequestBody Map<String, Object> map) throws NumberFormatException, NotFoundException {
+		 return this.registroService.saveHorarioEntrada(map.get("numeroContrato").toString(), map.get("idPlanoContratado").toString());
 		 
 	}
 	

@@ -35,18 +35,9 @@ export class RegistroBiometriaComponent implements OnInit {
         { name: "tipoContrato", label: "Tipo do Contrato" },
         { name: "servico.servico", label: "Serviço", width: { min: 200 } },
         { name: "sessao", label: "Sessões" },
-        {
-            name: "horarioEntrada",
-            label: "Entrada Padrão",
-            format: DATA_FORMAT
-        },
+        { name: "horarioEntrada",label: "Entrada Padrão",format: DATA_FORMAT},
         { name: "horarioSaida", label: "Saída Padrão", format: DATA_FORMAT },
-        {
-            name: "diaConsulta",
-            label: "Dias da Semana",
-            width: { min: 300 },
-            format: DIAS_FORMAT
-        }
+        { name: "diaConsulta", label: "Dias da Semana", width: { min: 300 },format: DIAS_FORMAT}
     ];
     servico: any;
     data: any[] = [];
@@ -123,7 +114,7 @@ export class RegistroBiometriaComponent implements OnInit {
     }
     openConfirm(event: ITdDataTableRowClickEvent): void {
         let configDialog: CofigConfirmDialog = {
-            title: 'Confirmar registro de entrada do paciente.',
+            title: 'Confirmar registro de entrada do paciente',
             message:"Deseja confirmar o registro de entrada do paciente " +this.contrato.nomePaciente +" no atendimento para o serviço " + event.row.servico.servico + "?" ,
             acceptButton: 'Confirmar',
             cancelButton: 'Fechar'
@@ -140,19 +131,14 @@ export class RegistroBiometriaComponent implements OnInit {
                     this.registroService
                         .saveHoraEntrada(this.contrato.numero, event.row.id)
                         .subscribe(
-                            () => {
-                                this.toastService.toastSuccess(
-                                    "Hora de entrada salva com sucesso."
-                                );
+                            registro => {
+                                this.toastService.toastSuccess("Registro de entrada do paciente "+ registro.contrato.nomePaciente +" realizado com sucesso.");
                             },
                             error => {
-                                this.toastService.toastError(
-                                    error.error.message
-                                );
+                                this.toastService.toastError(error.error.message);
                             }
                         );
                     this.hideTable = false;
-                } else {
                 }
             });
     }

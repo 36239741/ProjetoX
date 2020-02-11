@@ -191,7 +191,7 @@ export class DetatalharContratosComponent implements OnInit {
   return void*/
     deletarPlano(event) {
         let configDialog: CofigConfirmDialog = {
-            title: 'Confirma a exclusão do serviço.',
+            title: 'Confirma a exclusão do serviço',
             message: 'Deseja realmente excluir esse serviço?',
             acceptButton: 'Confirmar',
             cancelButton: 'Fechar'

@@ -44,7 +44,7 @@ export class VisualizarContratosComponent implements OnInit, OnDestroy {
         { name: "tipoContratoTransient", label: "Tipo do Contrato" },
         { name: "ativo", label: "Status do contrato", sortable: true },
         {
-            name: "diferenca",
+            name: "valorExecutado",
             label: "Saldo Mensal",
             numeric: true,
             format: DECIMAL_FORMAT

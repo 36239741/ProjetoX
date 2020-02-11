@@ -94,9 +94,9 @@
                     valorTotalContratosAtivos.Plano | currency: "BRL"
                 }}</span>
             </section>
-            <section>
+            <section >
                 <p><b>Saldo total dos contratos:</b></p>
-                <span>{{
+                <span [ngClass]="{'positivoColor': saldoTotal > 0,'negativoColor': saldoTotal < 0, 'neutroColor': saldoTotal == 0 }">{{
                     saldoTotal | currency: "BRL"
                 }}</span>
             </section>

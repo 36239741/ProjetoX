@@ -11,8 +11,8 @@ export class RegistroService {
 
   constructor(private http: HttpClient) { }
 
-  saveHoraEntrada(numeroContrato: String, idPlanoContratado: String): Observable<any> {
-    return this.http.post(API_URL + '/registros/save-entrada', {numeroContrato:numeroContrato, idPlanoContratado:idPlanoContratado});
+  saveHoraEntrada(numeroContrato: String, idPlanoContratado: String): Observable<Registro> {
+    return this.http.post<Registro>(API_URL + '/registros/save-entrada', {numeroContrato:numeroContrato, idPlanoContratado:idPlanoContratado});
   }
   saveHoraSaida(numeroContrato: String): Observable<Registro>{
     return this.http.post<Registro>(API_URL + '/registros/save-saida', numeroContrato);

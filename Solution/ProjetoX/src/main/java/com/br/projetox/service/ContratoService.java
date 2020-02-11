@@ -183,10 +183,15 @@ public class ContratoService {
 	 * nenhum contrato
 	 */
 	public Contrato findByContractNumber(String numeroContrato) throws NotFoundException {
-		Optional<Contrato> contrato = this.repository.findByNumero(numeroContrato);
-		contrato.get().getPlanoContratado().clear();
-		return contrato.orElseThrow(() -> new ContratoException(
-				"Nenhum contrato encontrado com esse número de contrato:" + numeroContrato));
+		Contrato contrato = this.repository.findByNumero(numeroContrato).get();
+		Assert.notNull(contrato, "Nenhum contrato encontrado com esse número de contrato:" + numeroContrato);
+		
+		LocalDate date = LocalDate.now();
+		Double valorExecutado = this.valorExecutado(date.getYear(), date.getMonthValue(), contrato.getNumero());
+		contrato.setValorExecutado(valorExecutado);
+		contrato.getPlanoContratado().clear();
+		
+		return contrato;
 
 	}
 

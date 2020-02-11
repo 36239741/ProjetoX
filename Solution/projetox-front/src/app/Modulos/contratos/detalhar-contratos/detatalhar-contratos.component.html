@@ -41,12 +41,12 @@
               <p>{{ totalPLanoMensal  | currency:'BRL'}}</p>
             </div>
             <div >
-                <mat-label><b>Saldo Total do Contrato</b></mat-label>
-                <p>{{ saldoTotal | currency:'BRL' }}</p>
-            </div>  
-            <div >
                 <mat-label><b>Valor Total do Contrato</b></mat-label>
                 <p>{{ contrato.valorTotal | currency:'BRL' }}</p>
+            </div>  
+            <div >
+                <mat-label><b>Saldo Total do Contrato</b></mat-label>
+                <p [ngClass]="{'positivoColor': contrato.valorExecutado > 0,'negativoColor': contrato.valorExecutado < 0, 'neutroColor': contrato.valorExecutado == 0 }">{{ contrato.valorExecutado | currency:'BRL' }}</p>
             </div>        
     </section>
  

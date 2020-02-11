@@ -11,9 +11,8 @@ import { take } from 'rxjs/operators';
   templateUrl: './clock-biometria.component.html',
   styleUrls: ['./clock-biometria.component.css']
 })
-export class ClockBiometriaComponent implements OnInit, OnDestroy {
+export class ClockBiometriaComponent implements OnInit {
 
-  subscription: Subscription;
   constructor(private contratoService: ContratoService,
               private tostService: ToastService,
               private snackBar: MatSnackBar,
@@ -24,14 +23,12 @@ export class ClockBiometriaComponent implements OnInit, OnDestroy {
 
 
   cancelCaptureFingerPrint() {
-      this.contratoService.cancelCapture().subscribe(() =>
+    this.contratoService.cancelCapture().subscribe(() =>
       error => {
           this.snackBar.dismiss();
           this.tostService.toastWarnning(error.error.message);
       });
   }
 
-ngOnDestroy(): void {
-this.subscription.unsubscribe();
-}
+
 }
