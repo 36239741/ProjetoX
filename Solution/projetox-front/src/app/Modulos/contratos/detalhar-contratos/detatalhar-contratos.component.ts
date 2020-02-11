@@ -1,3 +1,4 @@
+import { SnackBarClockBiometriaService } from "./../../../shared/Services/snack-bar-clock-biometria.service";
 import { ContratoService } from "./../../../shared/Services/contrato.service";
 import { PlanoContratadoService } from "./../../../shared/Services/plano-contratado.service";
 import {
@@ -10,10 +11,10 @@ import { ActivatedRoute } from "@angular/router";
 import { BehaviorInformacoesContratoService } from "src/app/shared/Services/behavior-informacoes-contrato.service";
 import { BehaviorPlanoContratadoService } from "src/app/shared/Services/behavior-plano-contratado.service";
 import { ToastService } from "src/app/shared/Services/toast.service";
-import { TdDialogService } from "@covalent/core/dialogs";
-import { MatSnackBar, MatDialogConfig } from "@angular/material";
-import { ClockBiometriaComponent } from "../../../shared/components/clock-biometria/clock-biometria.component";
+import { MatSnackBar, MatDialogConfig, MatDialog } from "@angular/material";
 import { GerarDescontoComponent } from "../visualizar-contratos/gerar-desconto/gerar-desconto.component";
+import { DialogConfirmComponent } from 'src/app/shared/components/dialog-confirm/dialog-confirm.component';
+import { CofigConfirmDialog } from 'src/app/shared/components/dialog-confirm/config-confirm-dialog';
 
 const DECIMAL_FORMAT: (v: any) => any = (v: number) =>
     new Intl.NumberFormat("pt-BR", {
@@ -44,15 +45,17 @@ export class DetatalharContratosComponent implements OnInit {
     numeroContrato: number = 0;
     totalPlanoParticular: number = 0;
     totalPLanoMensal: number = 0;
+    saldoTotal: number = 0;
     constructor(
         private activeRoute: ActivatedRoute,
-        private _dialogService: TdDialogService,
+        private dialogService: MatDialog,
         private _viewContainerRef: ViewContainerRef,
         private toastService: ToastService,
         private behaviorInformacoesContrato: BehaviorInformacoesContratoService,
         private behaviorPlanoContratado: BehaviorPlanoContratadoService,
         private planoContratadoService: PlanoContratadoService,
         private contratoService: ContratoService,
+        private snackBarService: SnackBarClockBiometriaService,
         private snackBar: MatSnackBar
     ) {}
 
@@ -91,7 +94,7 @@ export class DetatalharContratosComponent implements OnInit {
         },
         {
             name: "valorTotal",
-            label: "Saldo Total",
+            label: "Valor Total",
             numeric: true,
             format: DECIMAL_FORMAT
         },
@@ -118,9 +121,6 @@ export class DetatalharContratosComponent implements OnInit {
                 this.calcularValorPlanos();
             });
     }
-    calcularSaldoMensalDosPlanos() {
-        
-    }
 
     /*Metodo que recupera o contrato atraves de um snapshot na rota ativa do detalhar-contratos.module
   @return void*/
@@ -129,13 +129,16 @@ export class DetatalharContratosComponent implements OnInit {
         this.contrato.planoContratado = this.activeRoute.snapshot.data[
             "planoContratado"
         ];
+        this.contrato.planoContratado.forEach(plano => {
+            this.saldoTotal += plano.saldoMensal;
+        });
         this.data.push(this.contrato.planoContratado);
         this.calcularValorPlanos();
     }
     openSnackBarClockBiometria() {
-        this.snackBar.openFromComponent(ClockBiometriaComponent, {
-            duration: this.biometriaClock * 1000
-        });
+        this.snackBarService.openSnackBarClockBiometria(
+            "Posicione o dedo indicador sobre a superfície do leitor biométrico e retire após o bipe. Repita o procedimento por três vezes,o leitor ficará em modo de captura por 30 segundos."
+        );
     }
     saveBiometria() {
         this.contratoService.saveBiometria(this.contrato.numero).subscribe(
@@ -187,15 +190,18 @@ export class DetatalharContratosComponent implements OnInit {
   @param event any - recebe um evento que contem os dados do plano contratado da linha da tabela
   return void*/
     deletarPlano(event) {
-        this._dialogService
-            .openConfirm({
-                message: "Deseja realmente excluir esse serviço?",
-                disableClose: false, // defaults to false
-                viewContainerRef: this._viewContainerRef, //OPTIONAL
-                title: "Confirmar", //OPTIONAL, hides if not provided
-                cancelButton: "Fechar", //OPTIONAL, defaults to 'CANCEL'
-                acceptButton: "Confirmar", //OPTIONAL, defaults to 'ACCEPT'
-                width: "600px", //OPTIONAL, defaults to 400px
+        let configDialog: CofigConfirmDialog = {
+            title: 'Confirma a exclusão do serviço.',
+            message: 'Deseja realmente excluir esse serviço?',
+            acceptButton: 'Confirmar',
+            cancelButton: 'Fechar'
+        };
+
+        this.dialogService
+            .open(DialogConfirmComponent, {
+                width: '700px',
+                height: '250px',
+                data: configDialog
             })
             .afterClosed()
             .subscribe((accept: boolean) => {
@@ -234,7 +240,7 @@ export class DetatalharContratosComponent implements OnInit {
                             }
                         );
                 } else {
-                    this._dialogService.closeAll();
+                    this.dialogService.closeAll();
                 }
             });
     }
@@ -254,7 +260,7 @@ export class DetatalharContratosComponent implements OnInit {
             height: "250px",
             data: this.contrato
         };
-        this._dialogService
+        this.dialogService
             .open(GerarDescontoComponent, dialogConfig)
             .afterClosed()
             .subscribe(() => {

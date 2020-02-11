@@ -33,6 +33,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import com.br.projetox.entity.Contrato;
 import com.br.projetox.entity.DiaConsulta;
@@ -456,11 +457,10 @@ public class ContratoService {
 				Boolean match = this.fingerPrint.verifyFingerprint(contrato.getBiometria(), imgAndTemplate);
 				if (Boolean.TRUE.equals(match)) {
 					returnContrato = contrato;
-				}else {
-					throw new ContratoException("Nenhum contrato cadastrado com essa biometria.");
-				}
+				} 
 			}
 		}
+		Assert.notNull(returnContrato, "Nenhum plano disponível para esta biometria.");
 		return returnContrato;
 	}
 	

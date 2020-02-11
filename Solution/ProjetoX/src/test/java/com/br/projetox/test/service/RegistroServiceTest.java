@@ -357,7 +357,7 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 	@WithUserDetails("henrique_nitatori@hotmail.com")
 	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
 			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
-	@Test(expected = RegistroException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void saveHorarioEntradaAtivoTestMustFaillTentaSalvarUmHorarioDeSaidaSemHorarioEmAberto() throws NotFoundException {
 		this.registroService.saveHorarioSaida("2");
 	}

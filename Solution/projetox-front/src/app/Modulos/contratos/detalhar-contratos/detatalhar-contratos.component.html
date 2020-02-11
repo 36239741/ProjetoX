@@ -41,7 +41,11 @@
               <p>{{ totalPLanoMensal  | currency:'BRL'}}</p>
             </div>
             <div >
-                <mat-label><b>Total do Contrato</b></mat-label>
+                <mat-label><b>Saldo Total do Contrato</b></mat-label>
+                <p>{{ saldoTotal | currency:'BRL' }}</p>
+            </div>  
+            <div >
+                <mat-label><b>Valor Total do Contrato</b></mat-label>
                 <p>{{ contrato.valorTotal | currency:'BRL' }}</p>
             </div>        
     </section>

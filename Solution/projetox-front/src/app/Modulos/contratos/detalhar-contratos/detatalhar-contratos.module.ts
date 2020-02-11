@@ -1,3 +1,4 @@
+import { DialogConfirmModule } from './../../../shared/components/dialog-confirm/dialog-confirm.module';
 import { RouterModule } from '@angular/router';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -10,6 +11,7 @@ import { CovalentDialogsModule } from '@covalent/core/dialogs';
 import {MatFormFieldModule} from '@angular/material/form-field'; 
 import { MatTooltipModule } from '@angular/material';
 import { ClockBiometriaModule } from '../../../shared/components/clock-biometria/clock-biometria.module';
+import { DialogConfirmComponent } from 'src/app/shared/components/dialog-confirm/dialog-confirm.component';
 
 @NgModule({
   declarations: [DetatalharContratosComponent],
@@ -23,9 +25,12 @@ import { ClockBiometriaModule } from '../../../shared/components/clock-biometria
     CovalentDialogsModule,
     MatFormFieldModule,
     MatTooltipModule,
-    ClockBiometriaModule
+    ClockBiometriaModule,
+    DialogConfirmModule
 
   ],
+  entryComponents: [DialogConfirmComponent]
+  
 
 })
 export class DetatalharContratosModule { }

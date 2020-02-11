@@ -9,9 +9,10 @@ export class SnackBarClockBiometriaService {
   biometriaClock: number = 30;
   constructor(private snackBar: MatSnackBar) { }
 
-  openSnackBarClockBiometria() {
+  openSnackBarClockBiometria(message: String) {
     this.snackBar.openFromComponent(ClockBiometriaComponent, {
-        duration: this.biometriaClock * 1000
+        duration: this.biometriaClock * 1000,
+        data: message
     });
   }
 }

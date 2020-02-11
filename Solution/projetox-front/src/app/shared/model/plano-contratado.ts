@@ -16,5 +16,6 @@ export class PlanoContratado {
   contrato: Contrato;
   ativo: boolean;
   valorAtendimento: number;
+  saldoMensal: number;
 }
 

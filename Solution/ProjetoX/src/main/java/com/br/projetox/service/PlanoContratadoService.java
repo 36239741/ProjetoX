@@ -99,7 +99,7 @@ public class PlanoContratadoService {
 			planoContratado.setHorarioSaida(LocalTime.parse(mapPlanoContratado.get("horarioSaida").toString()));
 			planoContratado.setValorSessao(Double.parseDouble(mapPlanoContratado.get("valorPlano").toString()));
 			List<String> list = (List<String>) mapPlanoContratado.get("diaConsulta");
-			planoContratado.setSessao(list.size());
+			planoContratado.setSessao(Integer.parseInt(mapPlanoContratado.get("sessao").toString()));
 			String[] diaConsulta = new String[7];
 			diaConsulta = list.toArray(diaConsulta);
 
@@ -183,6 +183,8 @@ public class PlanoContratadoService {
 	public void updatePlanoContrato(Map<String, Object> mapPlanoContratado) throws NotFoundException {
 		PlanoContratado planoContratado = this.mapPlanoContratado(mapPlanoContratado);
 		planoContratado.setId(Long.parseLong(mapPlanoContratado.get("id").toString()));
+		planoContratado.calcularValorAtendimento();
+		planoContratado.calcularValorSessao();
 		this.planoContraRepository.save(planoContratado);
 		this.contractUpdateValor(mapPlanoContratado);
 	}

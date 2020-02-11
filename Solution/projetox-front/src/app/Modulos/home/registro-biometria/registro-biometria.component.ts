@@ -13,6 +13,8 @@ import {
     ITdDataTableRowClickEvent
 } from "@covalent/core/data-table";
 import { TdDialogService } from "@covalent/core/dialogs";
+import { CofigConfirmDialog } from 'src/app/shared/components/dialog-confirm/config-confirm-dialog';
+import { DialogConfirmComponent } from 'src/app/shared/components/dialog-confirm/dialog-confirm.component';
 
 const DATA_FORMAT: (v: any) => any = (v: HorarioEntradaOrHorarioSaida) => {
     return ("0" + v.hour).slice(-2) + ":" + ("0" + v.minute).slice(-2);
@@ -33,9 +35,18 @@ export class RegistroBiometriaComponent implements OnInit {
         { name: "tipoContrato", label: "Tipo do Contrato" },
         { name: "servico.servico", label: "Serviço", width: { min: 200 } },
         { name: "sessao", label: "Sessões" },
-        { name: "horarioEntrada", label: "Entrada Padrão",format: DATA_FORMAT},
+        {
+            name: "horarioEntrada",
+            label: "Entrada Padrão",
+            format: DATA_FORMAT
+        },
         { name: "horarioSaida", label: "Saída Padrão", format: DATA_FORMAT },
-        { name: "diaConsulta", label: "Dias da Semana", width: { min: 300 }, format: DIAS_FORMAT}
+        {
+            name: "diaConsulta",
+            label: "Dias da Semana",
+            width: { min: 300 },
+            format: DIAS_FORMAT
+        }
     ];
     servico: any;
     data: any[] = [];
@@ -65,7 +76,9 @@ export class RegistroBiometriaComponent implements OnInit {
     }
 
     openClockBiometria() {
-        this.clockBiometriaService.openSnackBarClockBiometria();
+        this.clockBiometriaService.openSnackBarClockBiometria(
+            "Posicione o dedo indicador sobre a superfície do leitor biométrico e retire após o bipe, o leitor ficará em modo de captura por 30 segundos."
+        );
     }
     findContratoByBiometria() {
         this.contratoService.findByBiometria().subscribe(
@@ -109,20 +122,17 @@ export class RegistroBiometriaComponent implements OnInit {
         this.openConfirm(event);
     }
     openConfirm(event: ITdDataTableRowClickEvent): void {
+        let configDialog: CofigConfirmDialog = {
+            title: 'Confirmar registro de entrada do paciente.',
+            message:"Deseja confirmar o registro de entrada do paciente " +this.contrato.nomePaciente +" no atendimento para o serviço " + event.row.servico.servico + "?" ,
+            acceptButton: 'Confirmar',
+            cancelButton: 'Fechar'
+        };
         this._dialogService
-            .openConfirm({
-                message:
-                    "Deseja confirmar o registro de entrada do paciente " +
-                    this.contrato.nomePaciente +
-                    " no atendimento para o serviço ?" +
-                    event.row.servico.servico,
-                disableClose: false, // defaults to false
-                viewContainerRef: this._viewContainerRef, //OPTIONAL
-                title: "Confirmar registro de entrada do paciente", //OPTIONAL, hides if not provided
-                cancelButton: "Fechar", //OPTIONAL, defaults to 'CANCEL'
-                acceptButton: "Confirmar", //OPTIONAL, defaults to 'ACCEPT'
-                width: "50%", //OPTIONAL, defaults to 400px
-                panelClass: ["confirmarRegistroDialog"]
+            .open(DialogConfirmComponent, {
+            width: '700px',
+            height: '250px',
+            data: configDialog
             })
             .afterClosed()
             .subscribe((accept: boolean) => {

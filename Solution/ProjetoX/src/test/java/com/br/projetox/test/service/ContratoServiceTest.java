@@ -597,4 +597,15 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 		Contrato contrato = this.contratoRepository.findById(1L).get();
 		Assert.assertEquals(desconto, contrato.getDesconto());
 	}
+	
+	/* Procurando contrato sem biometria */
+	@Sql({ "/dataset/truncate.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql", "/dataset/Usuario.sql",
+			"/dataset/PlanoContratado.sql" })
+	@Test(expected = Exception.class)
+	public void findByBiometriaMustFailProcurandoContratoSemBiometria() throws Exception {
+		final Double desconto = 0.0;
+		this.service.calcularDesconto("1", desconto);
+		Contrato contrato = this.contratoRepository.findById(1L).get();
+		Assert.assertEquals(desconto, contrato.getDesconto());
+	}
 }

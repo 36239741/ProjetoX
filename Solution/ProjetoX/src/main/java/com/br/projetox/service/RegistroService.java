@@ -41,7 +41,6 @@ import com.br.projetox.entity.Registro;
 import com.br.projetox.entity.Situacao;
 import com.br.projetox.entity.TipoContrato;
 import com.br.projetox.exception.RegistroException;
-import com.br.projetox.infrastructure.scheduling.SupportScheduling;
 import com.br.projetox.repository.RegistroRepository;
 
 import javassist.NotFoundException;
@@ -147,7 +146,10 @@ public class RegistroService {
 		Contrato contrato = this.contratoService.findByContractNumber(numeroContrato);
 		ConfiguracaoParametro configParametro = this.configParametrosService.findConfigParametros(1L);
 		Registro findRegistro = this.registroRepository.findByMaxId(contrato.getNumero());
-		if (findRegistro != null && findRegistro.getDataHoraEntrada() != null
+		
+		Assert.notNull(findRegistro, "Nenhum atendimento aberto para esta biometria.");
+		
+		if (findRegistro.getDataHoraEntrada() != null
 				&& findRegistro.getDataHoraSaida() == null) {
 			Duration verificaValorAdicional = Duration.between(
 					findRegistro.getPlanoContratado().getHorarioSaida()
@@ -164,11 +166,9 @@ public class RegistroService {
 					LocalTime.now(ZoneId.of("America/Maceio")));
 			findRegistro.setTempoTotal(LocalTime.MIN.plusMinutes(tempoTotal.toMinutes()));
 			findRegistro.setDataHoraSaida(LocalDateTime.now(ZoneId.of("America/Maceio")));
-			return this.registroRepository.save(findRegistro);
-		} else {
-			throw new RegistroException(
-					"O contrato com o nome " + contrato.getNomePaciente() + " não contem nenhum registro em aberto");
+			this.registroRepository.save(findRegistro);
 		}
+		return findRegistro;
 
 	}
 

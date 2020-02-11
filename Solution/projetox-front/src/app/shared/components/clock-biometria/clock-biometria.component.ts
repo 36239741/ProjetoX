@@ -2,8 +2,8 @@ import { ToastService } from '../../Services/toast.service';
 import { ContratoService } from '../../Services/contrato.service';
 import { Subscription } from 'rxjs';
 import { interval } from 'rxjs';
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { MatSnackBar } from '@angular/material';
+import { Component, OnInit, OnDestroy, Inject } from '@angular/core';
+import { MatSnackBar, MAT_SNACK_BAR_DATA } from '@angular/material';
 import { take } from 'rxjs/operators';
 
 @Component({
@@ -16,7 +16,8 @@ export class ClockBiometriaComponent implements OnInit, OnDestroy {
   subscription: Subscription;
   constructor(private contratoService: ContratoService,
               private tostService: ToastService,
-              private snackBar: MatSnackBar) { }
+              private snackBar: MatSnackBar,
+              @Inject(MAT_SNACK_BAR_DATA) public message: String) { }
 
   ngOnInit() {
   }

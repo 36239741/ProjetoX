@@ -1,0 +1,13 @@
+td-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  padding: 0;
+  height: 60% !important;
+  margin: 0;
+}
+
+td-dialog-actions button:nth-child(2) {
+  margin-left: 20px;
+}
+
