@@ -138,6 +138,7 @@ public class PlanoContratadoService {
 		PlanoContratado findPlanoContratado = this.findPlanoContratadoAtivo(savePlanoContratado.getServico().getId(),
 				savePlanoContratado.getContrato().getId(), savePlanoContratado.getTipoContrato());
 		if (findPlanoContratado == null) {
+			savePlanoContratado.calcularValorAtendimento();
 			this.planoContraRepository.save(savePlanoContratado);
 			Contrato contrato = this.contratoService
 					.findByContractNumber(mapPlanoContratado.get("numeroContrato").toString());

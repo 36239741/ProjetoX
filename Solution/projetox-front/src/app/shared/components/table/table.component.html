@@ -28,11 +28,7 @@
 </div>
 </ng-template>
 
-<ng-template tdDataTableTemplate="saldoMensal" let-value="value" let-row="row" let-column="column">
-  <div [ngClass]="{'positivoColor': value > 0,'negativoColor': value < 0, 'neutroColor': value == 0 }">
-    {{value | currency: 'BRL'}}
-</div>
-  </ng-template>
+
 
   <ng-template
   tdDataTableTemplate="ativo"

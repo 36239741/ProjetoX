@@ -59,6 +59,7 @@ export class DetatalharContratosComponent implements OnInit {
     ngOnInit() {
         this.lodingTable();
         this.situacaoDaBiometria();
+        this.openSnackBarClockBiometria();
     }
 
     columns: ITdDataTableColumn[] = [

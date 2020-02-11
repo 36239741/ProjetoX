@@ -13,21 +13,14 @@ import { take } from 'rxjs/operators';
 })
 export class ClockBiometriaComponent implements OnInit, OnDestroy {
 
-  tempoDeCapturaBiometria: number = 30;
   subscription: Subscription;
-  timerClock: number;
   constructor(private contratoService: ContratoService,
               private tostService: ToastService,
               private snackBar: MatSnackBar) { }
 
   ngOnInit() {
-      this.timer();
   }
-  timer(){
-      const number = interval(1000);
-      const takeForNumbers = number.pipe(take(this.tempoDeCapturaBiometria));
-      this.subscription = takeForNumbers.subscribe(timer => {this.timerClock = timer});
-  }
+
 
   cancelCaptureFingerPrint() {
       this.contratoService.cancelCapture().subscribe(() =>

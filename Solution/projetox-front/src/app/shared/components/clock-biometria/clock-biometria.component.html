@@ -1,4 +1,9 @@
-<div fxLayout="row" fxLayoutGap="20px" fxLayoutAlign="center center">
-        <span>Tempo de captura da biometria: {{ timerClock }}</span>
-        <button mat-flat-button color="primary" (click)="cancelCaptureFingerPrint()" matTooltip="Cancela a captura da biometria" >Cancelar</button>
+<div class="display-flex">
+    <div>
+      <span>Posicione o dedo indicador sobre a superfície do leitor biométrico e retire após o bipe. Repita o procedimento por três vezes,
+        o leitor ficará em modo de captura por 30 segundos.</span>
+    </div>
+    <div>
+      <button mat-flat-button color="primary" (click)="cancelCaptureFingerPrint()" matTooltip="Cancela a captura da biometria" >Cancelar</button>
+    </div>
 </div>
