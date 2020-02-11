@@ -8,7 +8,10 @@ import { ContratoService } from "./../../../shared/Services/contrato.service";
 import { Component, OnInit, ViewContainerRef } from "@angular/core";
 import { RegistroService } from "../../../shared/Services/registro.service";
 import { SnackBarClockBiometriaService } from "../../../shared/Services/snack-bar-clock-biometria.service";
-import { ITdDataTableColumn, ITdDataTableRowClickEvent } from "@covalent/core/data-table";
+import {
+    ITdDataTableColumn,
+    ITdDataTableRowClickEvent
+} from "@covalent/core/data-table";
 import { TdDialogService } from "@covalent/core/dialogs";
 
 const DATA_FORMAT: (v: any) => any = (v: HorarioEntradaOrHorarioSaida) => {
@@ -30,18 +33,9 @@ export class RegistroBiometriaComponent implements OnInit {
         { name: "tipoContrato", label: "Tipo do Contrato" },
         { name: "servico.servico", label: "Serviço", width: { min: 200 } },
         { name: "sessao", label: "Sessões" },
-        {
-            name: "horarioEntrada",
-            label: "Entrada Padrão",
-            format: DATA_FORMAT
-        },
+        { name: "horarioEntrada", label: "Entrada Padrão",format: DATA_FORMAT},
         { name: "horarioSaida", label: "Saída Padrão", format: DATA_FORMAT },
-        {
-            name: "diaConsulta",
-            label: "Dias da Semana",
-            width: { min: 300 },
-            format: DIAS_FORMAT
-        }
+        { name: "diaConsulta", label: "Dias da Semana", width: { min: 300 }, format: DIAS_FORMAT}
     ];
     servico: any;
     data: any[] = [];
@@ -78,6 +72,7 @@ export class RegistroBiometriaComponent implements OnInit {
             contrato => {
                 this.snackBar.dismiss();
                 this.contrato = contrato;
+                this.data = [];
                 contrato.planoContratado.forEach(plano => {
                     if (plano.ativo == true) {
                         this.data.push(plano);
@@ -91,7 +86,9 @@ export class RegistroBiometriaComponent implements OnInit {
                         .subscribe(
                             registro => {
                                 this.toastService.toastSuccess(
-                                    'Atendimento do paciente ' + registro.contrato.nomePaciente + ' encerrado com sucesso.'
+                                    "Atendimento do paciente " +
+                                        registro.contrato.nomePaciente +
+                                        " encerrado com sucesso."
                                 );
                             },
                             error => {
@@ -114,15 +111,18 @@ export class RegistroBiometriaComponent implements OnInit {
     openConfirm(event: ITdDataTableRowClickEvent): void {
         this._dialogService
             .openConfirm({
-                message: "Deseja confirmar o registro de entrada do paciente " + this.contrato.nomePaciente + 
-                "no atendimento para o serviço " + event.row.servico.servico,
+                message:
+                    "Deseja confirmar o registro de entrada do paciente " +
+                    this.contrato.nomePaciente +
+                    " no atendimento para o serviço ?" +
+                    event.row.servico.servico,
                 disableClose: false, // defaults to false
                 viewContainerRef: this._viewContainerRef, //OPTIONAL
-                title: "Confirmar registro de entrada do paciente." , //OPTIONAL, hides if not provided
+                title: "Confirmar registro de entrada do paciente", //OPTIONAL, hides if not provided
                 cancelButton: "Fechar", //OPTIONAL, defaults to 'CANCEL'
                 acceptButton: "Confirmar", //OPTIONAL, defaults to 'ACCEPT'
                 width: "50%", //OPTIONAL, defaults to 400px
-                panelClass: ['confirmarRegistroDialog']
+                panelClass: ["confirmarRegistroDialog"]
             })
             .afterClosed()
             .subscribe((accept: boolean) => {

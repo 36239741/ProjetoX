@@ -69,6 +69,12 @@ INSERT INTO public.registro(
             tempo_total, valor_total, usuario_id, contrato_id, plano_contratado_id)
     VALUES (12, current_timestamp,null ,'2019-12-08 16:10:30.573', '2019-12-08 17:10:30.573', 0, null, 
             null, null, 1, 7);
+
+INSERT INTO public.registro(
+             id,created, updated, data_hora_entrada, data_hora_saida, situacao, 
+            tempo_total, valor_total, usuario_id, contrato_id, plano_contratado_id)
+    VALUES (13,current_timestamp,null ,'2019-12-08 16:10:30.573', null, 3, null, 
+            null, null, 1, 7);
             
 ALTER SEQUENCE registro_id_seq RESTART WITH 100;
 

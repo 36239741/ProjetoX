@@ -23,3 +23,6 @@ td-dialog-actions {
     margin: 0px;
     padding: 0px;
 }
+td-dialog-actions button:nth-child(2) {
+    margin-left: 20px;
+}

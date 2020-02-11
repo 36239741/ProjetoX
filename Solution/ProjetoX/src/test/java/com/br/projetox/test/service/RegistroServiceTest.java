@@ -90,7 +90,7 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 		Registro registro = this.registroService.saveHorarioSaida("1");
 		ConfiguracaoParametro configParametro = this.configRepository.findById(1L).get();
 		Duration duration = Duration.between(registro.getPlanoContratado().getHorarioSaida(),  registro.getDataHoraSaida().toLocalTime());
-		Double minutosAdicional = registro.getPlanoContratado().getValorSessao() + (duration.toMinutes() * configParametro.getValorMinutoAdicional());
+		Double minutosAdicional = registro.getPlanoContratado().getValorAtendimento() + (duration.toMinutes() * configParametro.getValorMinutoAdicional());
 		
 		Assert.assertNotNull(registro);
 		Assert.assertEquals(minutosAdicional, registro.getValorTotal());
@@ -105,10 +105,13 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 	public void saveHorarioSaidaTestMustPassSemAtraso() throws NotFoundException {
 		
 		Registro registro = this.registroService.saveHorarioSaida("1");
-
+		
+		ConfiguracaoParametro configParametro = this.configRepository.findById(1L).get();
+		Duration duration = Duration.between(registro.getPlanoContratado().getHorarioSaida(),  registro.getDataHoraSaida().toLocalTime());
+		Double minutosAdicional = registro.getPlanoContratado().getValorAtendimento() + (duration.toMinutes() * configParametro.getValorMinutoAdicional());
 		
 		Assert.assertNotNull(registro);
-		Assert.assertEquals(registro.getPlanoContratado().getValorSessao(), registro.getValorTotal());
+		Assert.assertEquals(registro.getValorTotal(), minutosAdicional);
 
 	}
 	/* SALVA UM HORARIO DE SAIDA E TESTA O TOTAL DE HORAS */

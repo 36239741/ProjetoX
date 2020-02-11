@@ -29,8 +29,8 @@ a:hover, a:visited, a:focus, a:active{ text-decoration: none; color: inherit; }
   font-weight: bold;
 }
 
-.confirmarRegistroDialog > button{
-  background-color: #1565c0 !important;
+td-dialog-actions button:nth-child(1) {
+  background-color: white !important;
 }
 
 td-dialog-title {

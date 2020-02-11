@@ -42,10 +42,13 @@ export class YearMonthPickerComponent implements OnInit {
         
     }
     // tslint:disable-next-line: member-ordering
-
+    date = new FormControl(moment());
 
     chosenYearHandler(normalizedYear: moment.Moment) {
         this.ano.emit(normalizedYear.year());
+        const ctrlValue = this.date.value;
+        ctrlValue.year(normalizedYear.year());
+        this.date.setValue(ctrlValue);
     }
 
     chosenMonthHandler(
@@ -53,6 +56,9 @@ export class YearMonthPickerComponent implements OnInit {
         datepicker: MatDatepicker<moment.Moment>
     ) {
         this.mes.emit(normalizedMonth.month());
+        const ctrlValue = this.date.value;
+        ctrlValue.month(normalizedMonth.month());
+        this.date.setValue(ctrlValue);
         datepicker.close();
         
     }

@@ -81,7 +81,7 @@ public class PlanoContratado extends AbstractEntity implements Serializable{
 	
 	
 	public void calcularValorSessao() {
-		this.valorSessao = this.valorTotal / this.sessao;
+		this.valorSessao = this.valorTotal / (this.sessao * 4);
 	}
 	
 	public void calcularValorAtendimento() {

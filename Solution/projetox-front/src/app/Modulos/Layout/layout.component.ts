@@ -25,7 +25,7 @@ export class LayoutComponent implements OnInit {
   listMenu: MenuList[] = [
     {
         menuIcon: 'home',
-        menuName: 'Página incial',
+        menuName: 'Página Inicial',
         link: '/home',
         toolTip: 'Voltar a página inicial.'
       },
@@ -37,7 +37,7 @@ export class LayoutComponent implements OnInit {
   },
 {
   menuIcon: 'assessment',
-  menuName: 'Relatorios',
+  menuName: 'Relatórios',
   link: '/relatorios',
   toolTip: 'Visualizar relatorios'
 }];

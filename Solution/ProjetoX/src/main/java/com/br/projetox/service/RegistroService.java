@@ -86,7 +86,7 @@ public class RegistroService {
 			Registro registro = new Registro();
 			registro.setContrato(contrato);
 			registro.setPlanoContratado(planoContratado);
-			registro.setValorTotal(planoContratado.getValorSessao());
+			registro.setValorTotal(planoContratado.getValorAtendimento());
 			registro.setDataHoraEntrada(LocalDateTime.now(ZoneId.of("America/Maceio")));
 			registro.setSituacao(Situacao.ATENDIMENTO_NORMAL);
 			this.registroRepository.save(registro);
@@ -154,11 +154,11 @@ public class RegistroService {
 							.plusMinutes(configParametro.getTempoToleranciaAtraso().getMinute()),
 					LocalTime.now(ZoneId.of("America/Maceio")));
 			if (verificaValorAdicional.toMinutes() > 0) {
-				findRegistro.setValorTotal(findRegistro.getPlanoContratado().getValorSessao()
+				findRegistro.setValorTotal(findRegistro.getPlanoContratado().getValorAtendimento()
 						+ (verificaValorAdicional.toMinutes() + configParametro.getTempoToleranciaAtraso().getMinute())
 								* configParametro.getValorMinutoAdicional());
 			} else {
-				findRegistro.setValorTotal(findRegistro.getPlanoContratado().getValorSessao());
+				findRegistro.setValorTotal(findRegistro.getPlanoContratado().getValorAtendimento());
 			}
 			Duration tempoTotal = Duration.between(findRegistro.getDataHoraEntrada().toLocalTime(),
 					LocalTime.now(ZoneId.of("America/Maceio")));
@@ -236,7 +236,7 @@ public class RegistroService {
 		Assert.isTrue(registro.getSituacao() == Situacao.ATENDIMENTO_NORMAL, "A situação do registro se encontra diferente de atendimento normal.");
 		Assert.isNull(registro.getDataHoraSaida(), "Este registro já encontra-se fechado.");
 
-		registro.setValorTotal(valorSessao);
+		registro.setValorTotal(valorSessao * registro.getPlanoContratado().getSessao());
 		registro.setSituacao(Situacao.TROCA_DE_SERVICO);
 		return this.registroRepository.save(registro);
 
