@@ -74,6 +74,7 @@ public class PlanoContratado extends AbstractEntity implements Serializable{
 	@NotNull
 	private Boolean ativo = true;
 	
+	@NotNull
 	private Double valorAtendimento;
 	
 	@Transient
@@ -81,7 +82,7 @@ public class PlanoContratado extends AbstractEntity implements Serializable{
 	
 	
 	public void calcularValorSessao() {
-		this.valorSessao = this.valorTotal / (this.sessao * 4);
+		this.valorSessao = this.valorTotal / this.sessao;
 	}
 	
 	public void calcularValorAtendimento() {

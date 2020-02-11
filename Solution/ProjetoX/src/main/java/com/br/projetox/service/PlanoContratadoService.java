@@ -117,7 +117,6 @@ public class PlanoContratadoService {
 			Servico servico = this.servicoService.findServico(mapPlanoContratado.get("servico").toString());
 			planoContratado.setServico(servico);
 			planoContratado.setValorTotal(Double.parseDouble(mapPlanoContratado.get("valorTotal").toString()));
-			planoContratado.calcularValorSessao();
 			return planoContratado;
 		} catch (NullPointerException e) {
 			throw new MapPlanoContratadoException("Map com campos nulos");
