@@ -135,7 +135,7 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
 	@Test
 	public void findAllRegistroMustPassBuscaTodosRegistrosDeUmContrato() throws NotFoundException {
-		final Integer numeroRegistro = 1;
+		final Integer numeroRegistro = 10;
 		Page<Registro> registro = this.registroService.findAllRegistro("1", 0, 10);
 		Assert.assertNotNull(registro.getContent());
 		Assert.assertEquals(numeroRegistro, Integer.valueOf( registro.getContent().size()));
@@ -223,7 +223,7 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 	@WithUserDetails("henrique_nitatori@hotmail.com")
 	@Test
 	public void verificadorDeDescontoMustPassTestandoODescontoComValorMaiorQueOPlanoAtual(){
-		final Double valorTotal = 2000.00;
+		final Double valorTotal = 10000.00;
 		Registro registro = this.registroService.registrarTrocaDeServico(1L, 2000.00D);
 		Assert.assertEquals(valorTotal, registro.getValorTotal());
 
@@ -235,7 +235,7 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 	@WithUserDetails("henrique_nitatori@hotmail.com")
 	@Test
 	public void verificadorDeDescontoMustPassTestandoODescontoComValorMenorQueOPlanoAtual(){
-		final Double valorTotalRegistro = 500.00;
+		final Double valorTotalRegistro = 2500.00;
 		Registro registro = this.registroService.registrarTrocaDeServico(1L, 500.00D);
 		Assert.assertEquals(valorTotalRegistro, registro.getValorTotal());
 
@@ -247,7 +247,7 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 	@WithUserDetails("henrique_nitatori@hotmail.com")
 	@Test
 	public void verificadorDeDescontoMustPassTestandoODescontoComValorIgualQueOPlanoAtual(){
-		final Double valorTotalRegistro = 1000.00;
+		final Double valorTotalRegistro = 5000.00;
 		Registro registro = this.registroService.registrarTrocaDeServico(1L, 1000.00D);
 		Assert.assertEquals(valorTotalRegistro, registro.getValorTotal());
 	}
@@ -258,7 +258,7 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 	@WithUserDetails("henrique_nitatori@hotmail.com")
 	@Test
 	public void exchangeOfContractStatusMustPassTestandoATrocaDaSituacaoParaAusenciaDoProfissionalComSituacaoAusenciaDoPaciente(){
-		final Double valorDoPlanoAtualizado = 1000.00;
+		final Double valorDoPlanoAtualizado = 1990.00;
 		final Situacao situacao = Situacao.AUSENCIA_DO_PROFISSIONAL;
 		Registro registro = this.registroService.registrarAusenciaDoProfisional(12L);
 		Assert.assertEquals(valorDoPlanoAtualizado, registro.getPlanoContratado().getValorTotal());
@@ -271,10 +271,10 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 	@WithUserDetails("henrique_nitatori@hotmail.com")
 	@Test
 	public void registrarTrocaDeServicoStatusMustPassTestandoATrocaDeServico(){
-		final Double valorTotalDoPlano = 3000.00;
+		final Double valorTotalDoPlano = 10000.00;
 		final Double valorDoServico = 1000.00;
 		Registro registro = this.registroService.registrarTrocaDeServico(1L, 2000.00D);
-		Assert.assertEquals(valorTotalDoPlano, registro.getPlanoContratado().getValorTotal());
+		Assert.assertEquals(valorTotalDoPlano, registro.getValorTotal());
 		Assert.assertEquals(Situacao.TROCA_DE_SERVICO, registro.getSituacao());
 		assertEquals(valorDoServico, registro.getValorTotal());
 	}
@@ -395,7 +395,7 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 	@Test(expected = RegistroException.class)
 	public void createUmaPlanilhaRegistrosRegistrosTestMustFailTentaCriarUmaPlanilhaSemRegistro() throws NotFoundException, IOException {
 		
-		ByteArrayOutputStream bytePLanilha = this.registroService.createPlanilhaRegistros("2");
+		ByteArrayOutputStream bytePLanilha = this.registroService.createPlanilhaRegistros("3");
 		File file = new File("teste.xlsx");
 		FileOutputStream createPlanilha = new FileOutputStream(file);
 		BufferedOutputStream bos = new BufferedOutputStream(createPlanilha);
@@ -427,7 +427,7 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 	public void listRegistrosAbertosMustPass() {
 		final List<Registro> registrosAbertos = this.registroService.listRegistrosAbertos();
 		Assert.assertNotNull(registrosAbertos);
-		Assert.assertEquals(5, registrosAbertos.size());
+		Assert.assertEquals(6, registrosAbertos.size());
 
 	}
 	
@@ -495,7 +495,7 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
 	@Test
 	public void registrarAusenciaPacienteAutomaticamenteMustPass() throws NotFoundException {
-		final Registro registro = this.registroService.registrarAusenciaPacienteAutomaticamente(5);
+		final Registro registro = this.registroService.registrarAusenciaPacienteAutomaticamente(8);
 		
 		Assert.assertNotNull(registro);
 		
@@ -519,12 +519,12 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
 	@Test
 	public void registrarAusenciaPacienteAutomaticamenteMustPassTipoContratoPlano() throws NotFoundException {
-		final Registro registro = this.registroService.registrarAusenciaPacienteAutomaticamente(6);
+		final Registro registro = this.registroService.registrarAusenciaPacienteAutomaticamente(7);
 		
 		Assert.assertNotNull(registro);
 		
 		Assert.assertNotNull(registro.getValorTotal());
-		Assert.assertTrue(registro.getValorTotal().equals(1000.00));
+		Assert.assertTrue(registro.getValorTotal().equals(0.0));
 
 	}
 	
@@ -535,7 +535,7 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
 	@Test
 	public void registrarAusenciaPacienteAutomaticamenteMustPassTipoContratoParticular() throws NotFoundException {
-		final Registro registro = this.registroService.registrarAusenciaPacienteAutomaticamente(5);
+		final Registro registro = this.registroService.registrarAusenciaPacienteAutomaticamente(8);
 		
 		Assert.assertNotNull(registro);
 		

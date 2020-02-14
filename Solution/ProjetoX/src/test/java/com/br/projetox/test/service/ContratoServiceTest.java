@@ -80,10 +80,6 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 		Assert.assertEquals(2, contratos.size());
 	}
 
-	@Test
-	public void importPla() throws Exception {
-		this.hibernateEnversService.findRevisionContrato();
-	}
 
 	/*
 	 * TESTE PARA VERIFICAR O RETORNO DO MAP ,VERIFICANDO O NUMERO DE CONTRATOS

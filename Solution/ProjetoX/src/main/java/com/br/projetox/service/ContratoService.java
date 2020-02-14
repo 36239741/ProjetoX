@@ -285,6 +285,7 @@ public class ContratoService {
 
 			contator += MULTIPLICADOR_PROXIMO_SERVICO;
 			atualizarNumeroCelula += 6;
+			planoContratado.calcularValorAtendimento();
 			planoContratado.setContrato(contrato);
 			contrato.getPlanoContratado().add(planoContratado);
 		}

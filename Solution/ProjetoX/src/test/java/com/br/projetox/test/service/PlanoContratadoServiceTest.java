@@ -48,7 +48,7 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 			"/dataset/PlanoContratado.sql" })
 	@Test
 	public void findPlanoContratadoAtivoTestMustPass() throws NotFoundException {
-		final Long servicoId = this.servicoRepository.findById(1L).orElse(null).getId();
+		final Long servicoId = this.servicoRepository.findById(4L).orElse(null).getId();
 		final Long contratoId = this.contratoRepository.findById(1L).orElse(null).getId();
 
 		final PlanoContratado plano = this.planoContratoService.findPlanoContratadoAtivo(servicoId, contratoId,
@@ -57,14 +57,7 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 		Assert.assertNotNull(plano);
 		Assert.assertNotNull(plano.getId());
 	}
-	/* VERIFICA A BUSCA DE UM PLANO CONTRATADO */
-	@WithUserDetails("henrique_nitatori@hotmail.com")
-	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
-			"/dataset/PlanoContratado.sql" })
-	@Test
-	public void findPlan() throws NotFoundException {
-		this.planoContratoService.countSessionByPlan();
-	}
+
 	/*
 	 * DELETA UM PLANO CONTRATADO
 	 */
@@ -135,6 +128,7 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 		lista.add("TER");
 		map.put("diaConsulta", lista);
 		map.put("numeroContrato", "1");
+		map.put("sessao", "2");
 		map.put("tipoContrato", "plano");
 		map.put("servico", "Psicologia");
 		map.put("valorTotal", "1000");
@@ -173,6 +167,7 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 		lista.add("TER");
 		map.put("diaConsulta", lista);
 		map.put("numeroContrato", "1");
+		map.put("sessao", "1");
 		map.put("tipoContrato", "plano");
 		map.put("servico", "Psicologia");
 		map.put("valorTotal", "1000");
@@ -206,6 +201,7 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 		map.put("diaConsulta", lista);
 		map.put("numeroContrato", "1");
 		map.put("tipoContrato", "plano");
+		map.put("sessao", "2");
 		map.put("servico", "Psicologia");
 		map.put("valorTotal", "1000");
 		List<DiaConsulta> dias = new ArrayList<>();
@@ -240,6 +236,7 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 		lista.add("SEG");
 		lista.add("TER");
 		map.put("diaConsulta", lista);
+		map.put("sessao", "2");
 		map.put("numeroContrato", "1");
 		map.put("tipoContrato", "plano");
 		map.put("servico", "Psicologia");
@@ -277,6 +274,7 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 		lista.add("TER");
 		map.put("diaConsulta", lista);
 		map.put("numeroContrato", "1");
+		map.put("sessao", "2");
 		map.put("tipoContrato", "particular");
 		map.put("servico", "Psicologia");
 		map.put("valorTotal", "1000");
@@ -305,7 +303,7 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 		List<PlanoContratado> planoContratado = this.planoContratoService.findAllPlanoContratadoByContratoId(numeroContrato);
 
 		Assert.assertNotNull(planoContratado);
-		Assert.assertEquals(1, planoContratado.size());
+		Assert.assertEquals(3, planoContratado.size());
 	}
 
 	/* TESTE DE BUSCA DE TODOS OS PLANOS CONTRTADOS */
@@ -313,7 +311,7 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 	public void findAllMustPass() {
 		final List<PlanoContratado> planoContratado = this.planoContratoService.findAll();
 		Assert.assertNotNull(planoContratado);
-		Assert.assertEquals(0, planoContratado.size());
+		Assert.assertEquals(3, planoContratado.size());
 		;
 
 	}
@@ -344,9 +342,52 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 		Double valorRetornado = this.planoContratoService.saldoMensal(2019, 12, 2L);
 		Assert.assertEquals(valorExecutado, valorRetornado);
 	}
+		
+		@Sql({"/dataset/truncate.sql",
+			"/dataset/Servico.sql",
+			"/dataset/Contrato.sql",
+			"/dataset/Usuario.sql",
+			"/dataset/PlanoContratado.sql",
+			"/dataset/DiaConsulta.sql",
+			"/dataset/RegistroTestExportPlanilha.sql"})
+	@Test
+	public void valorAtendimentoMustPassVerificandoAtendimento() throws NotFoundException {
+		final Double atendimento = 50.00;
+		PlanoContratado plano = this.planoContratoService.findById(4L);
+		plano.calcularValorAtendimento();
+		Assert.assertEquals(atendimento,plano.getValorAtendimento());
+	}
+		
+		@Sql({"/dataset/truncate.sql",
+			"/dataset/Servico.sql",
+			"/dataset/Contrato.sql",
+			"/dataset/Usuario.sql",
+			"/dataset/PlanoContratado.sql",
+			"/dataset/DiaConsulta.sql",
+			"/dataset/RegistroTestExportPlanilha.sql"})
+	@Test
+	public void saldoMensalMustPassVerificandosaldoMensal() throws NotFoundException {
+		final Double saldoMensalTest = 2090.00;
+		Double saldoMensal = this.planoContratoService.saldoMensal(2019,12,2L);
+		Assert.assertEquals(saldoMensalTest, saldoMensal);
+	}
 
 
 	/* MUST FAIL */
+		
+		@Sql({"/dataset/truncate.sql",
+			"/dataset/Servico.sql",
+			"/dataset/Contrato.sql",
+			"/dataset/Usuario.sql",
+			"/dataset/PlanoContratado.sql",
+			"/dataset/DiaConsulta.sql",
+			"/dataset/RegistroTestExportPlanilha.sql"})
+	@Test
+	public void saldoMensalMustFailVerificandosaldoMensalSemPlano() throws NotFoundException {
+		final Double saldoMensalTest = 0.0;
+		Double saldoMensal = this.planoContratoService.saldoMensal(2019,12,4L);
+		Assert.assertEquals(saldoMensalTest, saldoMensal);
+	}
 
 	/* TESTA O METODO SAVE COM PLANO CONTRATADO DUPLICADO */
 	@WithUserDetails("henrique_nitatori@hotmail.com")
@@ -362,6 +403,7 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 		lista.add("SEG");
 		lista.add("TER");
 		map.put("diaConsulta", lista);
+		map.put("sessao", 2);
 		map.put("numeroContrato", "1");
 		map.put("tipoContrato", "plano");
 		map.put("servico", "Neuropsicopedagogia");
