@@ -14,6 +14,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+/*Entidade que representa as configuracoes do sistema.
+*/
 @Data
 @Entity
 @NoArgsConstructor
@@ -24,8 +26,10 @@ public class ConfiguracaoParametro extends AbstractEntity implements Serializabl
 	 * 
 	 */
 	private static final long serialVersionUID = 2372037262770701882L;
-
+	/* tempo base de uma consulta do paciente.*/	
 	private LocalTime tempoSessao;
+	/* Tempo de tolerancia de atraso no horario de saida.*/
 	private LocalTime tempoToleranciaAtraso;
+	/* Valor do minuto adicionado ao exceder o tempo de tolerancia. */
 	private Double valorMinutoAdicional;
 }

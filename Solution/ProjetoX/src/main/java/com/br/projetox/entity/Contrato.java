@@ -1,6 +1,8 @@
 package com.br.projetox.entity;
 
 import java.io.Serializable;
+
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,8 +15,6 @@ import javax.persistence.Transient;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.envers.AuditMappedBy;
-import org.hibernate.envers.Audited;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -23,8 +23,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+/*Entidade que representa os contratos de prestacoes de servicos do paciente.*/
+
 @Data
-@Audited
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -40,48 +41,62 @@ public class Contrato extends AbstractEntity implements Serializable {
 	 */
 	private static final long serialVersionUID = -4109793839195820893L;
 
-	
+	/* Numero do contrato do paciente. */
 	@NotNull
 	@Column(unique = true)
 	private String numero;
 	
+	/* Nome do paciente (Crianca que frequenta a consulta). */
 	@NotBlank
 	@Column(length = 90)
 	private String nomePaciente;
 	
+	/*
+	 * Valor total contrado pelo responsavel do contrato. Soma de todos totais dos
+	 * planos adquiridos.
+	 */
 	@NotNull
 	private Double valorTotal;
 	
+	/* Biometria do paciente que frequenta as consultas. */
 	private byte[] biometria;
 	
+	/* Valor do desconto especificado pelo admnistrador do sistema. */
 	private Double desconto;
 	
 	@JsonIgnoreProperties("contrato")
 	@OneToMany(targetEntity = PlanoContratado.class,cascade = {CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.MERGE}, fetch = FetchType.LAZY,mappedBy = "contrato")
-	@AuditMappedBy(mappedBy = "contrato")
 	private List<PlanoContratado> planoContratado = new ArrayList<PlanoContratado>();
 	
 	@JsonIgnoreProperties("contrato")
 	@OneToMany(targetEntity = PlanoContratado.class,cascade = {CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.MERGE}, fetch = FetchType.LAZY,mappedBy = "contrato")
-	@AuditMappedBy(mappedBy = "contrato")
 	private List<Registro> registro = new ArrayList<Registro>();
 	
+	/* Status do contrato. */
 	@NotNull
 	private Boolean ativo = true;
 	
+	/* Tipo que o contrato pode ser sendo eles plano ou particular. */
 	@Transient
 	private TipoContrato tipoContratoTransient;
 	
+	/* Um valor mensal calculado pela soma dos valores totais dos registros. */
 	@Transient 
 	private Double valorExecutado;
 	
+	/*
+	 * Diferenca entre valor executado e valor contratado, para ter uma estimativa
+	 * de lucro ou perda.
+	 */
 	@Transient 
 	private Double diferenca;
 	
 	public void calcularValorTotal() {
 		this.valorTotal = 0.0;
 		for(PlanoContratado plano: this.planoContratado) {
-			this.valorTotal += plano.getValorTotal();
+			if(plano.getAtivo().equals(true)) {
+				this.valorTotal += plano.getValorTotal();
+			}
 		}
 	}
 

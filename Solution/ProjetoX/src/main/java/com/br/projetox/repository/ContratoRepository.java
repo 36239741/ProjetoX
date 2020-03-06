@@ -24,22 +24,17 @@ public interface ContratoRepository extends JpaRepository<Contrato, Long> {
 
 	@Query("FROM Contrato contrato "
 			+ "WHERE ( lower(contrato.numero) LIKE '%' || lower(:numero) || '%' OR :numero IS NULL) AND "
-			+ "( lower(contrato.nomePaciente) LIKE '%' || lower(:nomePaciente) || '%' OR :nomePaciente IS NULL)")
-	public Page<Contrato> findByFilters(@Param("numero") String numero,
-			@Param("nomePaciente") String nomePaciente,
-			Pageable pageable);
-	
-	@Query("FROM Contrato contrato "
-			+ "WHERE ( lower(contrato.numero) LIKE '%' || lower(:numero) || '%' OR :numero IS NULL) AND "
 			+ "( lower(contrato.nomePaciente) LIKE '%' || lower(:nomePaciente) || '%' OR :nomePaciente IS NULL) AND "
 			+ "contrato.ativo = :ativo")
-	public Page<Contrato> findByFiltersParamActive(@Param("numero") String numero,
+	public Page<Contrato> consultarPorFiltros(@Param("numero") String numero,
 			@Param("nomePaciente") String nomePaciente,
-			Pageable pageable, @Param("ativo") Boolean ativo);
+			@Param("ativo") Boolean ativo,
+			Pageable pageable);
+	
 	
 	@Modifying
 	@Query("UPDATE Contrato contrato SET contrato.biometria = :biometria WHERE contrato.numero = :numeroContrato ")
-	public void saveBiometria(@Param("numeroContrato") String numeroContrato,
+	public void salvarBiometria(@Param("numeroContrato") String numeroContrato,
 							   @Param("biometria") byte[] biometria);
 	
 

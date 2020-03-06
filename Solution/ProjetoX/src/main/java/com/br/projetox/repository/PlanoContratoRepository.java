@@ -22,38 +22,31 @@ public interface PlanoContratoRepository extends JpaRepository<PlanoContratado, 
 			+ "AND plano.contrato.id = :contratoId "
 			+ "AND plano.tipoContrato = :tipoContrato "
 			+ "AND plano.ativo = true")
-	 PlanoContratado findPlanoContratadoAtivoByContratoAndServicoAndTipoContrato(@Param("servicoId") long servicoId ,@Param("contratoId") long contratoId, @Param("tipoContrato") TipoContrato tipoContrato);
+	 PlanoContratado consultarPlanoContratadoAtivoPorServiceIdContratoIdTipoContrato(@Param("servicoId") long servicoId ,@Param("contratoId") long contratoId, @Param("tipoContrato") TipoContrato tipoContrato);
 	
-	@Query("FROM PlanoContratado plano "
-			+ "WHERE "
-			+ "plano.servico.id = :servicoId "
-			+ "AND plano.tipoContrato = :tipoContrato ")
-	PlanoContratado findbyContractTypeAndServiceId(@Param("tipoContrato")TipoContrato tipoContrato, @Param("servicoId") long servicoId);
-	
+
 	@Query("FROM PlanoContratado plano "
 			+ "WHERE "
 			+ "plano.contrato.numero = :numeroContrato "
 			+ "AND plano.ativo = true")
-	List<PlanoContratado> findByContratoId(@Param("numeroContrato") String numeroContrato);
+	List<PlanoContratado> consultarPlanoContratadoPorNumeroContrato(@Param("numeroContrato") String numeroContrato);
 	
 	@Modifying
 	@Query("UPDATE PlanoContratado plano "
 			+ "SET plano.ativo = false "
 			+ "WHERE "
 			+ "plano.id = :planoId")
-	 void deleteLogical(@Param("planoId") long planoId );
+	 Integer deleteLogico(@Param("planoId") long planoId );
 	
 	@Query("FROM PlanoContratado plano "
 			+ "JOIN plano.diaConsulta diaConsulta "
 			+ "WHERE "
 			+ "plano.ativo = true AND diaConsulta.diasSemana = :diasSemana ")
-	List<PlanoContratado> findByDiaConsulta(@Param("diasSemana") DiasSemana diasSemana);
+	List<PlanoContratado> consultarPlanoContratadoPorDiasSemana(@Param("diasSemana") DiasSemana diasSemana);
 	
 	@Query("FROM PlanoContratado plano "
 			+ "where plano.ativo = true")
-	List<PlanoContratado> findAllAtivo();
+	List<PlanoContratado> consultarPlanosContratadosAtivos();
 	
-	@Query(value = "select servico_id as id, sum(sessao) as sessao from plano_contratado where ativo = true group by servico_id ;", nativeQuery = true)
-	List<Map<String,String>> countSessionByPlan();
-	
+
 }

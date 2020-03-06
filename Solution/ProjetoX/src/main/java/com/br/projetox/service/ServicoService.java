@@ -18,15 +18,15 @@ public class ServicoService {
 	@Autowired
 	private ServicoRepository repository;
 	
-	public Servico findServico(String servico) {
+	public Servico consultarServicoPeloNome(String servico) {
 		Servico returnServico = this.repository.findByServicoIgnoreCase(servico);
 		Assert.notNull(returnServico, "Nenhum servico encontrado");
 		return returnServico;
 	}
-	public List<Servico> findAll(){
+	public List<Servico> consultarTodosServicos(){
 		return this.repository.findAll();
 	}
-	public Servico findById(Long id) throws NotFoundException {
+	public Servico consultarServico(Long id) throws NotFoundException {
 		return this.repository.findById(id).orElseThrow(() -> new NotFoundException("Não foi encontrado o servico com o id: " + id));
 	}
 }

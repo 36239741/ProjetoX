@@ -1,5 +1,5 @@
-import { BreadCrumbsModule } from './../../shared/components/bread-crumbs/bread-crumbs.module';
-import { HomeModule } from './../home/home.module';
+import { BreadCrumbsModule } from '../../shared/components/bread-crumbs/bread-crumbs.module';
+import { HomeModule } from '../home/home.module';
 import { RouterModule } from '@angular/router';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';

@@ -55,6 +55,14 @@ INSERT INTO public.plano_contratado(id,
             3, 0, 10.00, 2000.00, null, 
             1, 3,50.00);
 
+INSERT INTO public.plano_contratado(id,
+             created, updated, ativo, horario_entrada, horario_saida, 
+            sessao, tipo_contrato, valor_sessao, valor_total, usuario_id, 
+            contrato_id, servico_id,valor_atendimento)
+    VALUES (9, current_timestamp, null, false,'8:45:00', '19:50:00', 
+            3, 0, 10.00, 2000.00, null, 
+            2, 4,50.00);
+
 
 
 

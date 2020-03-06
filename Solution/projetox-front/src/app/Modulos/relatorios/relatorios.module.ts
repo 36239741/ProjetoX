@@ -1,5 +1,5 @@
 import { MaterialModule } from './../../core/material/material.module';
-import { LayoutModule } from './../Layout/layout.module';
+import { LayoutModule } from '../Layout/layout.module';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 

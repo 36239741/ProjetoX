@@ -18,8 +18,8 @@ public class ServicoController {
 	private ServicoService servicoService;
 	
 	@GetMapping
-	public ResponseEntity<List<Servico>> findAll(){
-		List<Servico> servicoList = this.servicoService.findAll();
+	public ResponseEntity<List<Servico>> consultarTodosServicos(){
+		List<Servico> servicoList = this.servicoService.consultarTodosServicos();
 		return ResponseEntity.ok(servicoList);
 	}
 }

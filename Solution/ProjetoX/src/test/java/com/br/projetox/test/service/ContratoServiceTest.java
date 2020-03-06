@@ -33,14 +33,11 @@ import com.br.projetox.repository.ContratoRepository;
 import com.br.projetox.repository.PlanoContratoRepository;
 import com.br.projetox.repository.ServicoRepository;
 import com.br.projetox.service.ContratoService;
-import com.br.projetox.service.HibernateEnversService;
 
 import javassist.NotFoundException;
 
 public class ContratoServiceTest extends AbstractIntegrationTest {
 
-	@Autowired
-	private HibernateEnversService hibernateEnversService;
 
 	@Autowired
 	private ContratoService service;
@@ -67,12 +64,12 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql" })
 	@Test
 	@WithUserDetails("henrique_nitatori@hotmail.com")
-	public void importPlanilhaContratosTestMustPassVerificandoContratos() throws Exception {
+	public void importarPlanilhaDeContratosTestMustPassVerificandoContratos() throws Exception {
 		String basePath = new File("").getAbsolutePath();
 		FileInputStream fileInputStream = new FileInputStream(
 				basePath + "/src/test/resources/PlanilhasDeTeste/PlanilhaDeDados.xlsx");
 		byte[] arquivoBytes = IOUtils.toByteArray(fileInputStream);
-		this.service.importPlanilhaContratos(new FileTransfer("PlanilhaDeDados.xlsx", "xls", arquivoBytes));
+		this.service.importarPlanilhaDeContratos(new FileTransfer("PlanilhaDeDados.xlsx", "xls", arquivoBytes));
 
 		List<Contrato> contratos = contratoRepository.findAll();
 
@@ -87,13 +84,13 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	 */
 	@Sql({ "/dataset/truncate.sql", "/dataset/Servico.sql" })
 	@Test
-	public void importPlanilhaContratosTestMustPassVerificandoContratosSalvos() throws Exception {
+	public void importarPlanilhaDeContratosTestMustPassVerificandoContratosSalvos() throws Exception {
 		String basePath = new File("").getAbsolutePath();
 		FileInputStream fileInputStream = new FileInputStream(
 				basePath + "/src/test/resources/PlanilhasDeTeste/PlanilhaDeDados.xlsx");
 		byte[] arquivoBytes = IOUtils.toByteArray(fileInputStream);
 		HashMap<String, Integer> map = null;
-		map = this.service.importPlanilhaContratos(new FileTransfer("PlanilhaDeDados.xlsx", "xls", arquivoBytes));
+		map = this.service.importarPlanilhaDeContratos(new FileTransfer("PlanilhaDeDados.xlsx", "xls", arquivoBytes));
 		final int saveContrato = 2;
 
 		Assert.assertNotNull(map);
@@ -103,14 +100,14 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	/* TESTE QUE VERIFICA QUANTOS CONTRATOS FORAM ATUALIZADOS */
 	@Sql({ "/dataset/truncate.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql"})
 	@Test
-	public void importPlanilhaContratosTestMustPassVerificandoContratosAtualizados() throws Exception {
+	public void importarPlanilhaDeContratosTestMustPassVerificandoContratosAtualizados() throws Exception {
 		String basePath = new File("").getAbsolutePath();
 		FileInputStream fileInputStream = new FileInputStream(basePath
 				+ "/src/test/resources/PlanilhasDeTeste/importPlanilhaContratosTestMustPassVerificandoContratosAtualizados.xlsx");
 		byte[] arquivoBytes = IOUtils.toByteArray(fileInputStream);
 		HashMap<String, Integer> map = null;
 
-		map = this.service.importPlanilhaContratos(new FileTransfer(
+		map = this.service.importarPlanilhaDeContratos(new FileTransfer(
 				"importPlanilhaContratosTestMustPassVerificandoContratosAtualizados.xlsx", "xls", arquivoBytes));
 		final int updateContrato = 2;
 		final int saveContrato = 0;
@@ -125,8 +122,8 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	@Sql({ "/dataset/truncate.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql", "/dataset/Usuario.sql",
 			"/dataset/PlanoContratado.sql" })
 	@Test
-	public void capturandoDigitalTestMustPassCapturarDigital() throws Exception {
-		this.service.saveFingerprint("1");
+	public void salvarBiometriaTestMustPassSalvandoUmaBiometria() throws Exception {
+		this.service.salvarBiometria("1");
 		Contrato contrato = this.contratoRepository.findByNumero("1").get();
 		Assert.assertNotNull(contrato.getBiometria());
 	}
@@ -135,8 +132,8 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	@Sql({ "/dataset/truncate.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql", "/dataset/Usuario.sql",
 			"/dataset/PlanoContratado.sql" })
 	@Test
-	public void capturandoDigitalTestMustPassBuscaContratosPelaBiometria() throws Exception {
-		Contrato contrato = this.service.findByBiometria();
+	public void consultarContratosPorBiometriaTestMustPassBuscaContratosPelaBiometria() throws Exception {
+		Contrato contrato = this.service.consultarContratosPorBiometria();
 		Assert.assertNotNull(contrato);
 	}
 
@@ -144,9 +141,9 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	@Sql({ "/dataset/truncate.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql", "/dataset/Usuario.sql",
 			"/dataset/PlanoContratado.sql" })
 	@Test
-	public void calcularValorDescontoMustPassCalculaOValorDoDescontoEDistribuiNosPlanosContratados() throws Exception {
+	public void atribuirDescontoMustPassCalculaOValorDoDescontoEDistribuiNosPlanosContratados() throws Exception {
 		final Double desconto = 10.0;
-		this.service.calcularDesconto("1", desconto);
+		this.service.atribuirDesconto("1", desconto);
 		Contrato contrato = this.contratoRepository.findById(1L).get();
 		Assert.assertEquals(desconto, contrato.getDesconto());
 	}
@@ -154,13 +151,13 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	/* TESTE QUE VERIFICA QUANTOS CONTRATOS FORAM ATUALIZADOS */
 	@Sql({ "/dataset/truncate.sql", "/dataset/Servico.sql", })
 	@Test
-	public void importPlanilhaContratosTestMustPassVerificandoPlanosContratados() throws Exception {
+	public void importarPlanilhaDeContratosTestMustPassVerificandoPlanosContratados() throws Exception {
 		String basePath = new File("").getAbsolutePath();
 		FileInputStream fileInputStream = new FileInputStream(basePath
 				+ "/src/test/resources/PlanilhasDeTeste/importPlanilhaContratosTestMustPassVerificandoPlanosContratados.xlsx");
 		byte[] arquivoBytes = IOUtils.toByteArray(fileInputStream);
 		final int numerosPlanosContratados = 14;
-		this.service.importPlanilhaContratos(new FileTransfer(
+		this.service.importarPlanilhaDeContratos(new FileTransfer(
 				"importPlanilhaContratosTestMustPassVerificandoPlanosContratados.xlsx", "xls", arquivoBytes));
 
 		List<PlanoContratado> listPlanoContratado = this.planoContratadoRepository.findAll();
@@ -176,12 +173,12 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	 */
 	@Sql({ "/dataset/truncate.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql"})
 	@Test
-	public void importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratado() throws Exception {
+	public void importarPlanilhaDeContratosTestMustPassVerificandoAtualizacaoPlanoContratado() throws Exception {
 		String basePath = new File("").getAbsolutePath();
 		FileInputStream fileInputStream = new FileInputStream(basePath
 				+ "/src/test/resources/PlanilhasDeTeste/importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratado.xlsx");
 		byte[] arquivoBytes = IOUtils.toByteArray(fileInputStream);
-		this.service.importPlanilhaContratos(new FileTransfer(
+		this.service.importarPlanilhaDeContratos(new FileTransfer(
 				"importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratado.xlsx", "xls", arquivoBytes));
 
 		final Optional<Contrato> contrato = this.contratoRepository.findByNumero("1");
@@ -195,7 +192,7 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 		Servico objectServico = this.serviceRepository.findByServicoIgnoreCase(servico);
 
 		PlanoContratado planoContratado = this.planoContratadoRepository
-				.findPlanoContratadoAtivoByContratoAndServicoAndTipoContrato(objectServico.getId(), contratoId,
+				.consultarPlanoContratadoAtivoPorServiceIdContratoIdTipoContrato(objectServico.getId(), contratoId,
 						tipoContrato);
 
 		Assert.assertNotNull(planoContratado);
@@ -209,13 +206,13 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	 */
 	@Sql({ "/dataset/truncate.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql"})
 	@Test
-	public void importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoPeloCampoEntradaESaida()
+	public void importarPlanilhaDeContratosTestMustPassVerificandoAtualizacaoPlanoContratadoPeloCampoEntradaESaida()
 			throws Exception {
 		String basePath = new File("").getAbsolutePath();
 		FileInputStream fileInputStream = new FileInputStream(basePath
 				+ "/src/test/resources/PlanilhasDeTeste/importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoPeloCampoEntradaESaida.xlsx");
 		byte[] arquivoBytes = IOUtils.toByteArray(fileInputStream);
-		this.service.importPlanilhaContratos(new FileTransfer(
+		this.service.importarPlanilhaDeContratos(new FileTransfer(
 				"importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoPeloCampoEntradaESaida.xlsx",
 				"xls", arquivoBytes));
 
@@ -231,7 +228,7 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 		Servico objectServico = this.serviceRepository.findByServicoIgnoreCase(servico);
 
 		PlanoContratado planoContratado = this.planoContratadoRepository
-				.findPlanoContratadoAtivoByContratoAndServicoAndTipoContrato(objectServico.getId(), contratoId,
+				.consultarPlanoContratadoAtivoPorServiceIdContratoIdTipoContrato(objectServico.getId(), contratoId,
 						tipoContrato);
 
 		Assert.assertNotNull(planoContratado);
@@ -246,13 +243,13 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	 */
 	@Sql({ "/dataset/truncate.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql"})
 	@Test
-	public void importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoPeloCampoValorPlano()
+	public void importarPlanilhaDeContratosTestMustPassVerificandoAtualizacaoPlanoContratadoPeloCampoValorPlano()
 			throws Exception {
 		String basePath = new File("").getAbsolutePath();
 		FileInputStream fileInputStream = new FileInputStream(basePath
 				+ "/src/test/resources/PlanilhasDeTeste/importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoPeloCampoValorPlano.xlsx");
 		byte[] arquivoBytes = IOUtils.toByteArray(fileInputStream);
-		this.service.importPlanilhaContratos(new FileTransfer(
+		this.service.importarPlanilhaDeContratos(new FileTransfer(
 				"importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoPeloCampoValorPlano.xlsx",
 				"xls", arquivoBytes));
 
@@ -268,7 +265,7 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 		Servico objectServico = this.serviceRepository.findByServicoIgnoreCase(servico);
 
 		PlanoContratado planoContratado = this.planoContratadoRepository
-				.findPlanoContratadoAtivoByContratoAndServicoAndTipoContrato(objectServico.getId(), contratoId,
+				.consultarPlanoContratadoAtivoPorServiceIdContratoIdTipoContrato(objectServico.getId(), contratoId,
 						tipoContrato);
 
 		Assert.assertNotNull(planoContratado);
@@ -284,13 +281,13 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	@Sql({ "/dataset/truncate.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
 			"/dataset/Usuario.sql" })
 	@Test
-	public void importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoPeloCampoDiasSemana()
+	public void importarPlanilhaDeContratosTestMustPassVerificandoAtualizacaoPlanoContratadoPeloCampoDiasSemana()
 			throws Exception {
 		String basePath = new File("").getAbsolutePath();
 		FileInputStream fileInputStream = new FileInputStream(basePath
 				+ "/src/test/resources/PlanilhasDeTeste/importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoPeloCampoDiasSemana.xlsx");
 		byte[] arquivoBytes = IOUtils.toByteArray(fileInputStream);
-		this.service.importPlanilhaContratos(new FileTransfer(
+		this.service.importarPlanilhaDeContratos(new FileTransfer(
 				"importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoPeloCampoDiasSemana.xlsx",
 				"xls", arquivoBytes));
 
@@ -311,7 +308,7 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 		Servico objectServico = this.serviceRepository.findByServicoIgnoreCase(servico);
 
 		PlanoContratado planoContratado = this.planoContratadoRepository
-				.findPlanoContratadoAtivoByContratoAndServicoAndTipoContrato(objectServico.getId(), contratoId,
+				.consultarPlanoContratadoAtivoPorServiceIdContratoIdTipoContrato(objectServico.getId(), contratoId,
 						tipoContrato);
 
 		Assert.assertNotNull(planoContratado);
@@ -326,13 +323,13 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	@Sql({ "/dataset/truncate.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
 			"/dataset/Usuario.sql" })
 	@Test
-	public void importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoRemovendoDiaDaSemana()
+	public void importarPlanilhaDeContratosTestMustPassVerificandoAtualizacaoPlanoContratadoRemovendoDiaDaSemana()
 			throws Exception {
 		String basePath = new File("").getAbsolutePath();
 		FileInputStream fileInputStream = new FileInputStream(basePath
 				+ "/src/test/resources/PlanilhasDeTeste/importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoRemovendoDiaDaSemana.xlsx");
 		byte[] arquivoBytes = IOUtils.toByteArray(fileInputStream);
-		this.service.importPlanilhaContratos(new FileTransfer(
+		this.service.importarPlanilhaDeContratos(new FileTransfer(
 				"importPlanilhaContratosTestMustPassVerificandoAtualizacaoPlanoContratadoRemovendoDiaDaSemana.xlsx",
 				"xls", arquivoBytes));
 
@@ -348,7 +345,7 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 		Servico objectServico = this.serviceRepository.findByServicoIgnoreCase(servico);
 
 		PlanoContratado planoContratado = this.planoContratadoRepository
-				.findPlanoContratadoAtivoByContratoAndServicoAndTipoContrato(objectServico.getId(),
+				.consultarPlanoContratadoAtivoPorServiceIdContratoIdTipoContrato(objectServico.getId(),
 						contrato.get().getId(), tipoContrato);
 
 		Assert.assertNotNull(planoContratado);
@@ -360,12 +357,12 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	@Sql({ "/dataset/truncate.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql", "/dataset/Usuario.sql",
 			 })
 	@Test
-	public void importPlanilhaContratosTestMustPassVerificandoPerformaceDeImporatacao() throws Exception {
+	public void importarPlanilhaDeContratosTestMustPassVerificandoPerformaceDeImporatacao() throws Exception {
 		String basePath = new File("").getAbsolutePath();
 		FileInputStream fileInputStream = new FileInputStream(basePath
 				+ "/src/test/resources/PlanilhasDeTeste/importPlanilhaContratosTestMustPassVerificandoPerformaceDeImporatacao.xlsx");
 		byte[] arquivoBytes = IOUtils.toByteArray(fileInputStream);
-		this.service.importPlanilhaContratos(new FileTransfer(
+		this.service.importarPlanilhaDeContratos(new FileTransfer(
 				"importPlanilhaContratosTestMustPassVerificandoPerformaceDeImporatacao.xlsx", "xls", arquivoBytes));
 		final int numerosContratosInseridos = 11;
 
@@ -400,48 +397,27 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
 			"/dataset/PlanoContratado.sql" })
 	@Test
-	public void ContratoMustPassVerificandoAdicionandoPlanoContratadoEmContratoExistene() throws Exception {
+	public void importarPlanilhaDeContratosMustPassVerificandoAdicionandoPlanoContratadoEmContratoExistene() throws Exception {
 		String basePath = new File("").getAbsolutePath();
 		FileInputStream fileInputStream = new FileInputStream(basePath
 				+ "/src/test/resources/PlanilhasDeTeste/ContratoMustPassVerificandoAdicionandoPlanoContratadoEmContratoExistene.xlsx");
 		byte[] arquivoBytes = IOUtils.toByteArray(fileInputStream);
-		this.service.importPlanilhaContratos(new FileTransfer(
+		this.service.importarPlanilhaDeContratos(new FileTransfer(
 				"ContratoMustPassVerificandoAdicionandoPlanoContratadoEmContratoExistene.xlsx", "xls", arquivoBytes));
 		PlanoContratado planoContratado = this.planoContratadoRepository
-				.findPlanoContratadoAtivoByContratoAndServicoAndTipoContrato(
+				.consultarPlanoContratadoAtivoPorServiceIdContratoIdTipoContrato(
 						this.serviceRepository.findByServicoIgnoreCase("Psicologia").getId(), 1L, TipoContrato.PLANO);
 
 		Assert.assertNotNull(planoContratado);
 
 	}
-	
-	@WithUserDetails("henrique_nitatori@hotmail.com")
-	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
-			"/dataset/PlanoContratado.sql","/dataset/RegistroTestExportPlanilha.sql","/dataset/Config.sql" })
-	@Test
-	public void valorExecutadoMustPassTestandoOValorExecutadoDoContrato() {
-		final Double valorExecutadoTest = 1090.00;
-		final Double valorExecutado = this.service.valorExecutado(2019, 12, "1");
 		
-		Assert.assertEquals(valorExecutadoTest, valorExecutado);
-	}
 	@WithUserDetails("henrique_nitatori@hotmail.com")
 	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
 			"/dataset/PlanoContratado.sql","/dataset/RegistroTestExportPlanilha.sql","/dataset/Config.sql" })
 	@Test
-	public void valorExecutadoMustPassSemRegistro() {
-		final Double valorExecutadoTest = 0.0;
-		final Double valorExecutado = this.service.valorExecutado(2020, 1, "2");
-		
-		Assert.assertEquals(valorExecutadoTest, valorExecutado);
-	}
-	
-	@WithUserDetails("henrique_nitatori@hotmail.com")
-	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
-			"/dataset/PlanoContratado.sql","/dataset/RegistroTestExportPlanilha.sql","/dataset/Config.sql" })
-	@Test
-	public void montarEntidadeRelatorioMustPassMontandoAEntidadeRelatorio() {
-		List<Contrato> contratos = this.service.montarEntidade(2019, 12);
+	public void consultarRelatorioMensalMustPassConsultarRelatorioMensal() {
+		List<Contrato> contratos = this.service.consultarRelatorioMensal(2019, 12);
 		
 		Assert.assertEquals(3, contratos.size());
 	}
@@ -450,11 +426,11 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
 			"/dataset/PlanoContratado.sql","/dataset/RegistroTestExportPlanilha.sql","/dataset/Config.sql" })
 	@Test
-	public void montarEntidadeRelatorioMustPassVerificandoDadosRetornados() {
+	public void consultarRelatorioMensalMustPassVerificandoDadosRetornados() {
 		final Double valorExecutado = 1090.00;
 		final Double valorDiferenca = 90.00;
 		
-		List<Contrato> contratos = this.service.montarEntidade(2019, 12);
+		List<Contrato> contratos = this.service.consultarRelatorioMensal(2019, 12);
 
 		Assert.assertEquals(3, contratos.size());
 		
@@ -473,9 +449,9 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
 			"/dataset/PlanoContratado.sql","/dataset/RegistroTestExportPlanilha.sql","/dataset/Config.sql" })
 	@Test
-	public void createPlanilhaRelatorioMustPassCriandoUmaPlanilhaDeRelatorio() throws IOException {
+	public void exportarPlanilhaRelatorioMustPassExportando() throws IOException {
 		
-		ByteArrayOutputStream bytePLanilha = this.service.createPlanilhaRelatorio(2019, 12);
+		ByteArrayOutputStream bytePLanilha = this.service.exportarPlanilhaRelatorio(2019, 12);
 		File file = new File("teste.xlsx");
 		FileOutputStream createPlanilha = new FileOutputStream(file);
 		createPlanilha.write(bytePLanilha.toByteArray());
@@ -483,11 +459,41 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 		createPlanilha.close();
 		
 	}
+	
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/RegistroTestExportPlanilha.sql","/dataset/Config.sql" })
+	@Test
+	public void atribuirDescontoContratoMustPassAtribuindoDescontoAoContrato() throws Exception {
+		final Double valorContrato = 13990.000000000002;
+		Contrato contrato = this.service.atribuirDesconto("1", 10.00);
+		
+		Assert.assertNotNull(contrato);
+		Assert.assertEquals(valorContrato, contrato.getValorTotal());
+		
+	}
 
 	/* MUST FAIL */
 	
-	
+	/* Teste para verifica a excessao de nenhum plano cadastrado no contrato */
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/RegistroTestExportPlanilha.sql","/dataset/Config.sql" })
+	@Test(expected = IllegalArgumentException.class)
+	public void atribuirDescontoContratoMustFailAtribuindoDescontoAoContratosemNenhumPlanoCadastrado() throws Exception {
+		this.service.atribuirDesconto("3", 10.00);
+		
+	}
 
+	/* Teste para verificar a excessao de valor do desconto com valor nulo */
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/RegistroTestExportPlanilha.sql","/dataset/Config.sql" })
+	@Test(expected = IllegalArgumentException.class)
+	public void atribuirDescontoContratoMustFailAtribuindoDescontoAoContratoComValorNulo() throws Exception {
+		this.service.atribuirDesconto("1", null);
+		
+	}
 
 	/*
 	 * TESTE PARA VERIFICAR A FALHA QUE OCORRE QUANDO A PLANILHA ESTA INCOMPLETA
@@ -496,13 +502,13 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	@Sql({ "/dataset/truncate.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql", "/dataset/PlanoContratado.sql" })
 	@Test(expected = ImportPlanilhaException.class)
 	@Rollback(false)
-	public void importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletaDiasSemanaFaltando()
+	public void importarPlanilhaDeContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletaDiasSemanaFaltando()
 			throws Exception {
 		String basePath = new File("").getAbsolutePath();
 		FileInputStream fileInputStream = new FileInputStream(basePath
 				+ "/src/test/resources/PlanilhasDeTeste/importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletaDiasSemanaFaltando.xlsx");
 		byte[] arquivoBytes = IOUtils.toByteArray(fileInputStream);
-		this.service.importPlanilhaContratos(new FileTransfer(
+		this.service.importarPlanilhaDeContratos(new FileTransfer(
 				"importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletaDiasSemanaFaltando.xlsx",
 				"xls", arquivoBytes));
 
@@ -515,13 +521,13 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	@Sql({ "/dataset/truncate.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql", "/dataset/PlanoContratado.sql" })
 	@Test(expected = ImportPlanilhaException.class)
 	@Rollback(false)
-	public void importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletasFaltandoSaidaPadrao()
+	public void importarPlanilhaDeContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletasFaltandoSaidaPadrao()
 			throws Exception {
 		String basePath = new File("").getAbsolutePath();
 		FileInputStream fileInputStream = new FileInputStream(basePath
 				+ "/src/test/resources/PlanilhasDeTeste/importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletasFaltandoSaidaPadrao.xlsx");
 		byte[] arquivoBytes = IOUtils.toByteArray(fileInputStream);
-		this.service.importPlanilhaContratos(new FileTransfer(
+		this.service.importarPlanilhaDeContratos(new FileTransfer(
 				"importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletasFaltandoSaidaPadrao.xlsx",
 				"xls", arquivoBytes));
 
@@ -534,13 +540,13 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	@Sql({ "/dataset/truncate.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql", "/dataset/PlanoContratado.sql" })
 	@Test(expected = ImportPlanilhaException.class)
 	@Rollback(false)
-	public void importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletasFaltandoValorDoPlano()
+	public void importarPlanilhaDeContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletasFaltandoValorDoPlano()
 			throws Exception {
 		String basePath = new File("").getAbsolutePath();
 		FileInputStream fileInputStream = new FileInputStream(basePath
 				+ "/src/test/resources/PlanilhasDeTeste/importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletasFaltandoSaidaPadrao.xlsx");
 		byte[] arquivoBytes = IOUtils.toByteArray(fileInputStream);
-		this.service.importPlanilhaContratos(new FileTransfer(
+		this.service.importarPlanilhaDeContratos(new FileTransfer(
 				"importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletasFaltandoValorDoPlano.xlsx",
 				"xls", arquivoBytes));
 
@@ -553,7 +559,7 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	@Sql({ "/dataset/truncate.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql", "/dataset/PlanoContratado.sql" })
 	@Test()
 	@Rollback(false)
-	public void importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletasFaltandoNomePaciente()
+	public void importarPlanilhaDeContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletasFaltandoNomePaciente()
 			throws Exception {
 		String basePath = new File("").getAbsolutePath();
 		FileInputStream fileInputStream = new FileInputStream(basePath
@@ -562,7 +568,7 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 		final String constraintError = "ConstraintViolationException";
 		String constraintViolaton = null;
 		try {
-			this.service.importPlanilhaContratos(new FileTransfer(
+			this.service.importarPlanilhaDeContratos(new FileTransfer(
 					"importPlanilhaContratosTestMustFailVerificandoErroDeImportacaoPorPlanilhaIncompletasFaltandoNomePacient.xlsx",
 					"xls", arquivoBytes));
 		} catch (TransactionSystemException e) {
@@ -575,33 +581,13 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	/* TESTE CALCULA O VALOR DO DESCONTO SEM PLANO */
 	@Sql({ "/dataset/truncate.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql", "/dataset/Usuario.sql",
 			"/dataset/PlanoContratado.sql" })
-	@Test(expected = ContratoException.class)
-	public void calcularValorDescontoMustFailContratoSemPlano() throws Exception {
+	@Test(expected = IllegalArgumentException.class)
+	public void atribuirDescontoMustFailContratoSemPlano() throws Exception {
 		final Double desconto = 10.0;
-		this.service.calcularDesconto("3", desconto);
+		this.service.atribuirDesconto("3", desconto);
 		Contrato contrato = this.contratoRepository.findById(1L).get();
 		Assert.assertEquals(desconto, contrato.getDesconto());
 	}
 
-	/* TESTE CALCULA O VALOR DO DESCONTO E DISTRIBUI ENTRE OS PLANOS */
-	@Sql({ "/dataset/truncate.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql", "/dataset/Usuario.sql",
-			"/dataset/PlanoContratado.sql" })
-	@Test(expected = Exception.class)
-	public void calcularValorDescontoMustFailComDescontoValorNulo() throws Exception {
-		final Double desconto = 0.0;
-		this.service.calcularDesconto("1", desconto);
-		Contrato contrato = this.contratoRepository.findById(1L).get();
-		Assert.assertEquals(desconto, contrato.getDesconto());
-	}
-	
-	/* Procurando contrato sem biometria */
-	@Sql({ "/dataset/truncate.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql", "/dataset/Usuario.sql",
-			"/dataset/PlanoContratado.sql" })
-	@Test(expected = Exception.class)
-	public void findByBiometriaMustFailProcurandoContratoSemBiometria() throws Exception {
-		final Double desconto = 0.0;
-		this.service.calcularDesconto("1", desconto);
-		Contrato contrato = this.contratoRepository.findById(1L).get();
-		Assert.assertEquals(desconto, contrato.getDesconto());
-	}
+
 }

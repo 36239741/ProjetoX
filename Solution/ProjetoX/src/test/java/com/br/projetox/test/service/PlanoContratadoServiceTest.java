@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -47,11 +48,11 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
 			"/dataset/PlanoContratado.sql" })
 	@Test
-	public void findPlanoContratadoAtivoTestMustPass() throws NotFoundException {
+	public void consultarPlanoContratadoAtivoPorServiceIdContratoIdTipoContratoTestMustPassConsultandoUmPlanoContratado() throws NotFoundException {
 		final Long servicoId = this.servicoRepository.findById(4L).orElse(null).getId();
 		final Long contratoId = this.contratoRepository.findById(1L).orElse(null).getId();
 
-		final PlanoContratado plano = this.planoContratoService.findPlanoContratadoAtivo(servicoId, contratoId,
+		final PlanoContratado plano = this.planoContratoService.consultarPlanoContratadoAtivoPorServiceIdContratoIdTipoContrato(servicoId, contratoId,
 				TipoContrato.PLANO);
 
 		Assert.assertNotNull(plano);
@@ -67,12 +68,15 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 	  "/dataset/Servico.sql", "/dataset/Contrato.sql",
 	  "/dataset/PlanoContratado.sql" })
 	  
-	  @Test public void deleteLogicalTestMustPassDeletandoUmPlanoContratado()
+	  @Test public void deleteLogicoTestMustPassDeletandoUmPlanoContratado()
 	  throws NotFoundException { 
-		 this.planoContratoService.deleteLogical("1");
+		 final Double valorTotalContrato = -1000.00;
+		 this.planoContratoService.deleteLogico("1");
 		 PlanoContratado plano = this.planoContratadoRepository.findById(Long.parseLong("1")).get();
+		 Optional<Contrato> contrato = this.contratoRepository.findByNumero("1");
 		 Assert.assertEquals(false, plano.getAtivo());
-	  }
+		 Assert.assertEquals(valorTotalContrato, contrato.get().getValorTotal());
+		 }
 	 
 		/*
 		 * BUSCA TODOS OS PLANOS DE UM DIA DA SEMANA
@@ -85,10 +89,10 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 		  "/dataset/DiaConsulta.sql",
 		  "/dataset/DiaConsulta-PlanoContratado.sql"})
 		  
-		  @Test public void findByDiasSemanaTestMustPassBuscaTodosPlanosPeloDiaDaSemana()
+		  @Test public void consultarContratoPorDiasSemanaTestMustPassBuscaTodosPlanosPeloDiaDaSemana()
 		  { 
 			 DiasSemana returnDiasSemana = null;
-			 List<PlanoContratado> plano = this.planoContratoService.findByDiaConsulta(DiasSemana.QUINTA);
+			 List<PlanoContratado> plano = this.planoContratoService.consultarContratoPorDiasSemana(DiasSemana.QUINTA);
 			 for(PlanoContratado planos : plano) {
 				 returnDiasSemana = planos.getDiaConsulta().get(0).getDiasSemana();
 			 }
@@ -98,21 +102,23 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 	 
 
 	/*
-	 * VERIFICA O RETORNO DA FUNCAO QUE CALCULA O TOTAL DO VALOR DO TIPO PLANO E
-	 * PARTICULAR
+	Verifica o retorno da funcao consultarSomaTotalPlanosAtivos verificando o valor total de plano tipo plano e particular
+	e a soma dos dois
 	 */
 	@WithUserDetails("henrique_nitatori@hotmail.com")
 	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
 			"/dataset/PlanoContratado.sql" })
 	@Test
-	public void findTotalActiveContractsMustPassVerificandoRetornoDaFuncao() throws NotFoundException {
-		final Double particular = 4000.00;
-		final Double plano = 2000.00;
-		Map<String, Double> map = this.planoContratoService.findTotalActiveContracts();
+	public void consultarSomaTotalPlanosAtivosMustPassVerificandoRetornoDaFuncao() throws NotFoundException {
+		final Double particular = 8000.00;
+		final Double plano = 6000.00;
+		final Double total = 14000.00;
+		Map<String, Double> map = this.planoContratoService.consultarSomaTotalPlanosAtivos();
 
 		Assert.assertNotNull(map);
-		Assert.assertEquals(map.get("Particular"), plano);
-		Assert.assertEquals(map.get("Plano"), particular);
+		Assert.assertEquals(plano,map.get("particular"));
+		Assert.assertEquals(particular,map.get("plano"));
+		Assert.assertEquals(total ,map.get("total"));
 
 	}
 
@@ -140,7 +146,7 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 		dias.add(dia1);
 		dias.add(dia2);
 		Servico servico = this.servicoRepository.findByServicoIgnoreCase(map.get("servico").toString());
-		PlanoContratado planoContratado = this.planoContratoService.mapPlanoContratado(map);
+		PlanoContratado planoContratado = this.planoContratoService.mapearPlanoContratado(map);
 		Assert.assertNotNull(planoContratado);
 		Assert.assertEquals(dias, planoContratado.getDiaConsulta());
 		Assert.assertEquals(LocalTime.parse(map.get("horarioEntrada").toString()), planoContratado.getHorarioEntrada());
@@ -178,7 +184,7 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 		dia2.setDiasSemana(DiasSemana.TERCA);
 		dias.add(dia1);
 		dias.add(dia2);
-		this.planoContratoService.savePlanoContratato(map);
+		this.planoContratoService.salvarPlanoContratado(map);
 		Contrato contrato = this.contratoRepository.findByNumero("1").get();
 		final Double valorTotalContrato = 2000.00;
 		Assert.assertEquals(valorTotalContrato, contrato.getValorTotal());
@@ -211,9 +217,9 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 		dia2.setDiasSemana(DiasSemana.TERCA);
 		dias.add(dia1);
 		dias.add(dia2);
-		this.planoContratoService.updatePlanoContrato(map);
+		this.planoContratoService.atualizarPlanoContratado(map);
 		Servico servico = this.servicoRepository.findByServicoIgnoreCase(map.get("servico").toString());
-		PlanoContratado findPlanoContratado = this.planoContratoService.findPlanoContratadoAtivo(servico.getId(),
+		PlanoContratado findPlanoContratado = this.planoContratoService.consultarPlanoContratadoAtivoPorServiceIdContratoIdTipoContrato(servico.getId(),
 				Long.parseLong(map.get("numeroContrato").toString()), TipoContrato.PLANO);
 		Assert.assertNotNull(findPlanoContratado);
 		Assert.assertEquals(LocalTime.parse(map.get("horarioEntrada").toString()),
@@ -248,9 +254,9 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 		dia2.setDiasSemana(DiasSemana.TERCA);
 		dias.add(dia1);
 		dias.add(dia2);
-		this.planoContratoService.updatePlanoContrato(map);
+		this.planoContratoService.atualizarPlanoContratado(map);
 		Servico servico = this.servicoRepository.findByServicoIgnoreCase(map.get("servico").toString());
-		PlanoContratado findPlanoContratado = this.planoContratoService.findPlanoContratadoAtivo(servico.getId(),
+		PlanoContratado findPlanoContratado = this.planoContratoService.consultarPlanoContratadoAtivoPorServiceIdContratoIdTipoContrato(servico.getId(),
 				Long.parseLong(map.get("numeroContrato").toString()), TipoContrato.PLANO);
 		Assert.assertNotNull(findPlanoContratado);
 		Assert.assertEquals(LocalTime.parse(map.get("horarioSaida").toString()), findPlanoContratado.getHorarioSaida());
@@ -285,9 +291,9 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 		dia2.setDiasSemana(DiasSemana.TERCA);
 		dias.add(dia1);
 		dias.add(dia2);
-		this.planoContratoService.updatePlanoContrato(map);
+		this.planoContratoService.atualizarPlanoContratado(map);
 		Servico servico = this.servicoRepository.findByServicoIgnoreCase(map.get("servico").toString());
-		PlanoContratado findPlanoContratado = this.planoContratoService.findPlanoContratadoAtivo(servico.getId(),
+		PlanoContratado findPlanoContratado = this.planoContratoService.consultarPlanoContratadoAtivoPorServiceIdContratoIdTipoContrato(servico.getId(),
 				Long.parseLong(map.get("numeroContrato").toString()), TipoContrato.PARTICULAR);
 		Assert.assertNotNull(findPlanoContratado);
 		Assert.assertEquals(TipoContrato.PARTICULAR, findPlanoContratado.getTipoContrato());
@@ -296,22 +302,28 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 	/* VERIFICA O RETORNO DE LISTA DE PLANO CONTRATADO */
 	@WithUserDetails("henrique_nitatori@hotmail.com")
 	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
-			"/dataset/PlanoContratado.sql" })
+			"/dataset/PlanoContratado.sql","/dataset/DiaConsulta.sql", "/dataset/DiaConsulta-PlanoContratado.sql","/dataset/Registro.sql" })
 	@Test
-	public void findbyContractIdTestMustPassVerificandoABuscaPorContrato() {
+	public void consultarPlanoContratadoAtivoPorContratoTestMustPassVerificandoABuscaPorContrato() {
+		final Double saldoMensal = 500.00;
 		final String numeroContrato = "1";
-		List<PlanoContratado> planoContratado = this.planoContratoService.findAllPlanoContratadoByContratoId(numeroContrato);
-
+		List<PlanoContratado> planoContratado = this.planoContratoService.consultarPlanoContratadoAtivoPorContrato(numeroContrato);
+		
 		Assert.assertNotNull(planoContratado);
-		Assert.assertEquals(3, planoContratado.size());
+		
+		Assert.assertEquals(saldoMensal, planoContratado.get(1).getSaldoMensal());
+		Assert.assertEquals(DiasSemana.QUINTA, planoContratado.get(0).getDiaConsulta().get(0).getDiasSemana());
+		Assert.assertEquals(DiasSemana.SEXTA, planoContratado.get(0).getDiaConsulta().get(1).getDiasSemana());
+		Assert.assertEquals(7, planoContratado.size());
 	}
+	
 
 	/* TESTE DE BUSCA DE TODOS OS PLANOS CONTRTADOS */
 	@Test
-	public void findAllMustPass() {
-		final List<PlanoContratado> planoContratado = this.planoContratoService.findAll();
+	public void consultarPlanosContratadosMustPassBuscandoTodosPlanosContratadosCadastrados() {
+		final List<PlanoContratado> planoContratado = this.planoContratoService.consultarPlanosContratados();
 		Assert.assertNotNull(planoContratado);
-		Assert.assertEquals(3, planoContratado.size());
+		Assert.assertEquals(6, planoContratado.size());
 		;
 
 	}
@@ -324,8 +336,8 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 			"/dataset/PlanoContratado.sql",
 			"/dataset/DiaConsulta.sql"})
 	@Test
-	public void findByBiometriaTestMustPassVerificaABiometriaERetornaOsTodosPlanosContratados() throws Exception  {
-			List<PlanoContratado> list = this.planoContratoService.findByBiometria();
+	public void consultarContratoPorBiometriaTestMustPassVerificaABiometriaERetornaOsTodosPlanosContratados() throws Exception  {
+			List<PlanoContratado> list = this.planoContratoService.consultarContratoPorBiometria();
 			Assert.assertNotNull(list);
 	}
 		
@@ -337,9 +349,9 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 			"/dataset/DiaConsulta.sql",
 			"/dataset/RegistroTestExportPlanilha.sql"})
 	@Test
-	public void valorExecutadoMustPassVerificandoOValorExecutadoNoMes() {
-		final Double valorExecutado = 2090.00;
-		Double valorRetornado = this.planoContratoService.saldoMensal(2019, 12, 2L);
+	public void consultarSaldoMensalMustPassVerificandoOValorExecutadoNoMes() {
+		final Double valorExecutado = 1090.00;
+		Double valorRetornado = this.planoContratoService.consultarSaldoMensal(2019, 12, 2L, 1L);
 		Assert.assertEquals(valorExecutado, valorRetornado);
 	}
 		
@@ -351,29 +363,13 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 			"/dataset/DiaConsulta.sql",
 			"/dataset/RegistroTestExportPlanilha.sql"})
 	@Test
-	public void valorAtendimentoMustPassVerificandoAtendimento() throws NotFoundException {
+	public void calcularValorAtendimentoMustPassVerificandoAtendimento() throws NotFoundException {
 		final Double atendimento = 50.00;
-		PlanoContratado plano = this.planoContratoService.findById(4L);
+		PlanoContratado plano = this.planoContratoService.consultarPlanoContratadoPorId(4L);
 		plano.calcularValorAtendimento();
 		Assert.assertEquals(atendimento,plano.getValorAtendimento());
 	}
 		
-		@Sql({"/dataset/truncate.sql",
-			"/dataset/Servico.sql",
-			"/dataset/Contrato.sql",
-			"/dataset/Usuario.sql",
-			"/dataset/PlanoContratado.sql",
-			"/dataset/DiaConsulta.sql",
-			"/dataset/RegistroTestExportPlanilha.sql"})
-	@Test
-	public void saldoMensalMustPassVerificandosaldoMensal() throws NotFoundException {
-		final Double saldoMensalTest = 2090.00;
-		Double saldoMensal = this.planoContratoService.saldoMensal(2019,12,2L);
-		Assert.assertEquals(saldoMensalTest, saldoMensal);
-	}
-
-
-	/* MUST FAIL */
 		
 		@Sql({"/dataset/truncate.sql",
 			"/dataset/Servico.sql",
@@ -383,17 +379,43 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 			"/dataset/DiaConsulta.sql",
 			"/dataset/RegistroTestExportPlanilha.sql"})
 	@Test
-	public void saldoMensalMustFailVerificandosaldoMensalSemPlano() throws NotFoundException {
-		final Double saldoMensalTest = 0.0;
-		Double saldoMensal = this.planoContratoService.saldoMensal(2019,12,4L);
-		Assert.assertEquals(saldoMensalTest, saldoMensal);
+	public void consultarSomaTotalPlanosAtivosMustPassVerificaQuantidadePlanoAtivoParticularPlanoETotal() throws NotFoundException {
+		HashMap<String, Double> map = new HashMap<>();
+		final Double valorTotalParticular = 8000.00;
+		final Double valorTotalPlano = 6000.00;
+		final Double somaTotalPlanoParticular = valorTotalParticular + valorTotalPlano;
+		map = this.planoContratoService.consultarSomaTotalPlanosAtivos();
+		Assert.assertNotNull(map);
+		Assert.assertEquals(valorTotalPlano, map.get("particular"));
+		Assert.assertEquals(valorTotalParticular, map.get("plano"));
+		Assert.assertEquals(somaTotalPlanoParticular, map.get("total"));
+		
 	}
+
+	/* MUST FAIL */
+		
+		/*
+		 * DELETA UM PLANO CONTRATADO
+		 */
+		 @WithUserDetails("henrique_nitatori@hotmail.com")
+		  
+		  @Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql",
+		  "/dataset/Servico.sql", "/dataset/Contrato.sql",
+		  "/dataset/PlanoContratado.sql" })
+		 	
+		  @Test(expected = IllegalArgumentException.class) 
+		  public void deleteLogicoTestMustFailDeletandoUmPlanoContratado()
+		  throws NotFoundException { 
+			 this.planoContratoService.deleteLogico("99");
+
+			 }
+
 
 	/* TESTA O METODO SAVE COM PLANO CONTRATADO DUPLICADO */
 	@WithUserDetails("henrique_nitatori@hotmail.com")
 	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
 			"/dataset/PlanoContratado.sql" })
-	@Test(expected = DuplicatePlanoContratadoException.class)
+	@Test(expected = IllegalArgumentException.class)
 	public void mapPlanoContratandoMustFailPlanoContratadoDuplicado() throws NotFoundException {
 		Map<String, Object> map = new HashMap<>();
 		map.put("horarioEntrada", "12:00");
@@ -415,7 +437,7 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 		dia2.setDiasSemana(DiasSemana.TERCA);
 		dias.add(dia1);
 		dias.add(dia2);
-		this.planoContratoService.savePlanoContratato(map);
+		this.planoContratoService.salvarPlanoContratado(map);
 	}
 
 	/* TESTA O METODO QUE MAPEIA UM OBJETO PLANO CONTRATADO ATRAVES DE UM HASHMAP */
@@ -441,7 +463,7 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 		dias.add(dia1);
 		dias.add(dia2);
 		Servico servico = this.servicoRepository.findByServicoIgnoreCase(map.get("servico").toString());
-		PlanoContratado planoContratado = this.planoContratoService.mapPlanoContratado(map);
+		PlanoContratado planoContratado = this.planoContratoService.mapearPlanoContratado(map);
 	}
 	
 		/*TESTE QUE VERIFICA A DIGITAL E RETORNA TODOS PLANOS CONTRATADOS*/
@@ -452,8 +474,8 @@ public class PlanoContratadoServiceTest extends AbstractIntegrationTest {
 			"/dataset/PlanoContratado.sql",
 			"/dataset/DiaConsulta.sql"})
 	@Test(expected = FingerPrintException.class)
-	public void findByBiometriaTestMustFailVerificaABiometriaERetornaOsTodosPlanosContratados() throws Exception  {
-			List<PlanoContratado> list = this.planoContratoService.findByBiometria();
+	public void consultarContratoPorBiometriaTestMustFailVerificaABiometriaERetornaOsTodosPlanosContratados() throws Exception  {
+			List<PlanoContratado> list = this.planoContratoService.consultarContratoPorBiometria();
 			Assert.assertNotNull(list);
 	}
 

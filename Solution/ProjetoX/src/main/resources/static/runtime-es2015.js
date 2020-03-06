@@ -64,7 +64,7 @@
 /******/
 /******/ 	// script path function
 /******/ 	function jsonpScriptSrc(chunkId) {
-/******/ 		return __webpack_require__.p + "" + ({"default~Modulos-Layout-layout-module~app-Modulos-contratos-contratos-module":"default~Modulos-Layout-layout-module~app-Modulos-contratos-contratos-module","app-Modulos-contratos-contratos-module":"app-Modulos-contratos-contratos-module"}[chunkId]||chunkId) + "-es2015.js"
+/******/ 		return __webpack_require__.p + "" + ({"default~Modulos-Layout-layout-module~app-Modulos-contratos-contratos-module~app-Modulos-relatorios-r~4bb3a372":"default~Modulos-Layout-layout-module~app-Modulos-contratos-contratos-module~app-Modulos-relatorios-r~4bb3a372","common":"common","app-Modulos-contratos-contratos-module":"app-Modulos-contratos-contratos-module","app-Modulos-relatorios-relatorios-module":"app-Modulos-relatorios-relatorios-module"}[chunkId]||chunkId) + "-es2015.js"
 /******/ 	}
 /******/
 /******/ 	// The require function

@@ -26,42 +26,37 @@ public class PlanoContratadoController {
 	@Autowired
 	private PlanoContratadoService planoContratadoService;
 	
-	@GetMapping(path = "/valor-total")
+	@GetMapping(path = "/consultar-soma-total-planos")
 	public ResponseEntity<?> findTotalActiveContracts() {
-		HashMap<String, Double> map = this.planoContratadoService.findTotalActiveContracts();
+		HashMap<String, Double> map = this.planoContratadoService.consultarSomaTotalPlanosAtivos();
 		return ResponseEntity.ok(map);
 	}
 
 	
 	 @GetMapping(path = "/find-plano-contratado")
 	 public void findPlanoContratado(@RequestBody Map<String, Object> planoContratado) throws NotFoundException{
-		 this.planoContratadoService.mapPlanoContratado(planoContratado);
+		 this.planoContratadoService.mapearPlanoContratado(planoContratado);
 	  }
 	 
 	 @GetMapping(path = "/find-all")
 	 public ResponseEntity<?> findAllPlanoContratadoByContratoId(@RequestParam("numero-contrato") String numeroContrato){
-		 List<PlanoContratado> list = this.planoContratadoService.findAllPlanoContratadoByContratoId(numeroContrato);
+		 List<PlanoContratado> list = this.planoContratadoService.consultarPlanoContratadoAtivoPorContrato(numeroContrato);
 		 return ResponseEntity.ok(list);
 	 }
 	 
-	 @GetMapping(path = "/hours-by-service")
-	 public Map<String,String> findAllPlanos() throws NumberFormatException, NotFoundException {
-		 return this.planoContratadoService.countSessionByPlan();
-	 }
-
 	@PostMapping
-	public void savePlanoContrato(@RequestBody Map<String, Object> planoContratado) throws NotFoundException{
-		this.planoContratadoService.savePlanoContratato(planoContratado);
+	public void salvarPlanoContratado(@RequestBody Map<String, Object> planoContratado) throws NotFoundException{
+		this.planoContratadoService.salvarPlanoContratado(planoContratado);
 	}
 	
 	@PutMapping
-	public void updatePlanoContrato(@RequestBody Map<String, Object> planoContratado) throws NotFoundException {
-		this.planoContratadoService.updatePlanoContrato(planoContratado);
+	public void atualizarPlanoContratado(@RequestBody Map<String, Object> planoContratado) throws NotFoundException {
+		this.planoContratadoService.atualizarPlanoContratado(planoContratado);
 	}
 	
-	@PutMapping(path = "/delete")
+	@PutMapping(path = "/deletar")
 	public void deleteLogical(@RequestBody String planoContratadoId) {
-		this.planoContratadoService.deleteLogical(planoContratadoId);
+		this.planoContratadoService.deleteLogico(planoContratadoId);
 	}
 }
 

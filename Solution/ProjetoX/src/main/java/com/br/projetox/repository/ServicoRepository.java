@@ -7,4 +7,6 @@ import com.br.projetox.entity.Servico;
 @Repository
 public interface ServicoRepository extends JpaRepository<Servico, Long> {
 	 Servico findByServicoIgnoreCase(String name);
+	 
+	 
 }

@@ -15,16 +15,16 @@ import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.envers.Audited;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+/*Entidade que em forma de planos as consultas que o paciente ira realizar.*/
+
 @Data
 @Entity
-@Audited
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
@@ -40,17 +40,22 @@ public class PlanoContratado extends AbstractEntity implements Serializable{
 	 */
 	private static final long serialVersionUID = 2720110599255732525L;
 
-	/*
-	 * Valor da sessão
-	 */
+	/* Valor pago por uma consulta. */
 	@NotNull
 	private Double valorSessao;
+	
+	/* Horario que o paciente ira realizar a consulta. */
 	@NotNull
 	private LocalTime horarioEntrada;
+	
+	/* Horario de termino da consulta. */
 	@NotNull()
 	private LocalTime horarioSaida;
+	
 	@NotNull
 	private Double valorTotal;
+	
+	/* Numeros de sessoes que serao realizadas no dia da consulta. */
 	@NotNull
 	private int sessao;
 	
@@ -61,7 +66,7 @@ public class PlanoContratado extends AbstractEntity implements Serializable{
 			CascadeType.REMOVE},fetch = FetchType.EAGER)
 	private List<DiaConsulta>  diaConsulta = new ArrayList<DiaConsulta>();
 	
-	
+	/* Tipo do contrato sendo ele plano ou particular. */
 	@Enumerated(EnumType.ORDINAL)
 	private TipoContrato tipoContrato;
 
@@ -71,12 +76,15 @@ public class PlanoContratado extends AbstractEntity implements Serializable{
 	@ManyToOne(targetEntity = Contrato.class,optional = true,fetch = FetchType.LAZY)
 	private Contrato contrato;
 	
+	/* Status de um plano contratado. */
 	@NotNull
 	private Boolean ativo = true;
 	
+	/* Valor por atendimento calculado pelo valor da sessa * numeros de sessoes. */
 	@NotNull
 	private Double valorAtendimento;
 	
+	/* Valor que representa o gasto mensal que o paciente teve em um plano. */
 	@Transient
 	private Double saldoMensal;
 	

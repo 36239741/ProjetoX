@@ -42,74 +42,67 @@ public class ContratoController {
 	private ContratoService service;
 	
 	
-	@GetMapping(path = "/find-by-biometria")
-	public ResponseEntity<Contrato> findByBiometria() throws UnsupportedEncodingException{
-		Contrato contrato = this.service.findByBiometria();
+	@GetMapping(path = "/consultar-contrato-biometria")
+	public ResponseEntity<Contrato> consultarPorBiometria() throws UnsupportedEncodingException{
+		Contrato contrato = this.service.consultarContratosPorBiometria();
 		return ResponseEntity.ok(contrato);
 	}
 	
 	@GetMapping(path = "/cancel-capture")
 	public void cancelCapture() {
-		this.service.cancelCaptureFingerPrint();
+		this.service.cancelarCapturaLeitorBiometria();
 		
 	}
 	
-	@PostMapping(path = "/save-biometria")
-	public void saveFingerprint(@RequestBody String numeroContrato) throws NotFoundException {
-		this.service.saveFingerprint(numeroContrato);
+	@PostMapping(path = "/salvar-biometria")
+	public void salvarBiometria(@RequestBody String numeroContrato) throws NotFoundException {
+		this.service.salvarBiometria(numeroContrato);
 	}
 	
 	@GetMapping
-	public ResponseEntity<Page<Contrato>> findAll(@RequestParam(name = "page" , required = true) Integer page ,
+	public ResponseEntity<Page<Contrato>> consultarContratos(@RequestParam(name = "page" , required = true) Integer page ,
 			@RequestParam(name = "size",required = true)Integer size, @RequestParam(name = "sort") String sort,
 			@RequestParam(name = "atributo") String atributo){
 		Page<Contrato> returnPage = null;
 		Direction direction =null;
 		direction = sort.trim().equals("ASC")? Direction.ASC : Direction.DESC;
-		returnPage = this.service.findAll(page, size,direction,atributo);
+		returnPage = this.service.consultarContratos(page, size,direction,atributo);
 		return ResponseEntity.ok(returnPage);
 	}
 	
-	@PostMapping(path = "/desconto")
-	public Contrato gerarDesconto(@RequestBody String valorDesconto, @RequestParam(name = "numeroContrato") String numeroContrato) throws NumberFormatException, Exception {
-		return this.service.calcularDesconto(numeroContrato, Double.parseDouble(valorDesconto));
+	@PostMapping(path = "/atribuir-desconto")
+	public Contrato atribuirDesconto(@RequestBody String valorDesconto, @RequestParam(name = "numeroContrato") String numeroContrato) throws NumberFormatException, Exception {
+		return this.service.atribuirDesconto(numeroContrato, Double.parseDouble(valorDesconto));
 	}
 	
 	@GetMapping(path = "/{numeroContrato}")
-	public ResponseEntity<Contrato> findBynumeroContrato(@Valid @PathVariable String numeroContrato) throws NotFoundException{
+	public ResponseEntity<Contrato> consultarContrato(@Valid @PathVariable String numeroContrato) throws NotFoundException{
 		Contrato contrato = null;
-		contrato = this.service.findByContractNumber(numeroContrato);
+		contrato = this.service.consultarContrato(numeroContrato);
 		return ResponseEntity.ok(contrato);
 		
 	}
-	@GetMapping(path = "/filter")
-	public ResponseEntity<Page<Contrato>> findByFilters(@RequestParam(name = "numero") String numero,
+	@GetMapping(path = "/filtro-contratos")
+	public ResponseEntity<Page<Contrato>> buscarContratosPorFiltro(@RequestParam(name = "numero") String numero,
 			@RequestParam(name = "nomePaciente") String nomePaciente, @RequestParam(name = "page") int page,
-			@RequestParam(name = "size") int size, @RequestParam(name = "ativo") String ativo, @RequestParam(name = "sort") String sort,
+			@RequestParam(name = "size") int size, @RequestParam(name = "ativo") Boolean ativo, @RequestParam(name = "sort") String sort,
 			@RequestParam(name = "atributo") String atributo){
 		Page<Contrato> pageable = null;
 		Direction direction =null;
 		direction = sort.trim().equals("ASC")? Direction.ASC : Direction.DESC;
-		if(ativo.equals("true") || ativo.equals("false")) {
-			pageable = this.service.findByFiltersParamActive(numero,
-					nomePaciente, 
-					PageRequest.of(page, size,direction, atributo), 
-					Boolean.parseBoolean(ativo));	
-		}
-		else {
-			pageable = this.service.findByFilters(numero, nomePaciente, PageRequest.of(page, size, org.springframework.data.domain.Sort.by(direction, atributo)));
-		}
+		
+		pageable = this.service.consultarContratosPorFiltro(numero, nomePaciente,ativo, PageRequest.of(page, size, org.springframework.data.domain.Sort.by(direction, atributo)));
 		return ResponseEntity.ok(pageable);
 	}
 	@PostMapping
-	public ResponseEntity<?> importContratos(@RequestParam("file") MultipartFile file) throws Exception  {
+	public ResponseEntity<?> importarPlanilhaDeContratos(@RequestParam("file") MultipartFile file) throws Exception  {
 		HashMap<String, Integer> map = null;
 		ResponseEntity<?> responseEntityOK = null;
 		if(file.isEmpty() == false) {
 			/*if(file.getContentType().equalsIgnoreCase("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") || 
 					file.getContentType().equalsIgnoreCase("application/vnd.ms-excel")) {*/
 				FileTransfer fileTransfer = new FileTransfer(file.getName(), file.getContentType(), file.getInputStream());
-				map = this.service.importPlanilhaContratos(fileTransfer);
+				map = this.service.importarPlanilhaDeContratos(fileTransfer);
 				responseEntityOK = ResponseEntity.ok(map);
 				/*}
 			else {
@@ -123,18 +116,18 @@ public class ContratoController {
 		return responseEntityOK;
 	}
 	
-	@GetMapping(path = "/relatorios")
-	public PagedListHolder<Contrato> getRelatorio(@RequestParam("ano") int ano, @RequestParam("mes") int mes,@RequestParam("page") int page,@RequestParam("size") int size) {
-		List<Contrato> contratos = this.service.montarEntidade(ano, mes);
+	@GetMapping(path = "/relatorio-mensal")
+	public PagedListHolder<Contrato> consultarRelatorioMensal(@RequestParam("ano") int ano, @RequestParam("mes") int mes,@RequestParam("page") int page,@RequestParam("size") int size) {
+		List<Contrato> contratos = this.service.consultarRelatorioMensal(ano, mes);
 		PagedListHolder<Contrato>  pageList = new PagedListHolder<>(contratos);
 		pageList.setPage(page);
 		pageList.setPageSize(size);
 		return pageList;
 	}
 	
-	@GetMapping(path = "/export-relatorio")
-	public  ResponseEntity<ByteArrayResource> planilhaRegistrosExport(@RequestParam("ano") int ano, @RequestParam("mes") int mes) throws IOException {
-		ByteArrayOutputStream planilhaRegistro =  this.service.createPlanilhaRelatorio(ano, mes);
+	@GetMapping(path = "/exportar-planilha-relatorio")
+	public  ResponseEntity<ByteArrayResource> exportarPlanilhaRelatorio(@RequestParam("ano") int ano, @RequestParam("mes") int mes) throws IOException {
+		ByteArrayOutputStream planilhaRegistro =  this.service.exportarPlanilhaRelatorio(ano, mes);
 		 HttpHeaders header = new HttpHeaders();
 		 header.set("Content-type","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
          return new ResponseEntity<>(new ByteArrayResource(planilhaRegistro.toByteArray()),

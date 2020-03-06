@@ -6,15 +6,13 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.envers.Audited;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
-@Audited
+
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor

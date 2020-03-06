@@ -35,7 +35,6 @@ import org.springframework.util.Assert;
 
 import com.br.projetox.entity.ConfiguracaoParametro;
 import com.br.projetox.entity.Contrato;
-import com.br.projetox.entity.DiasSemana;
 import com.br.projetox.entity.PlanoContratado;
 import com.br.projetox.entity.Registro;
 import com.br.projetox.entity.Situacao;
@@ -75,13 +74,21 @@ public class RegistroService {
 	 * 
 	 * @throws NumberFormatException , NotFoundException, FingerPrintException
 	 */
-	public Registro saveHorarioEntrada(String numeroContrato, String idPlanocontratado)
+	public Registro salvarHorarioEntrada(String numeroContrato, String idPlanocontratado)
 			throws NumberFormatException, NotFoundException {
-		Contrato contrato = this.contratoService.findByContractNumber(numeroContrato);
-		PlanoContratado planoContratado = this.planoContratadoService.findById(Long.parseLong(idPlanocontratado));
-		Registro findRegistro = this.registroRepository.findByMaxId(contrato.getNumero());
+		Contrato contrato = this.contratoService.consultarContrato(numeroContrato);
+		PlanoContratado planoContratado = this.planoContratadoService.consultarPlanoContratadoPorId(Long.parseLong(idPlanocontratado));
+		
+		Registro findRegistro = this.registroRepository.consultarUltimoRegistroContrato(contrato.getNumero());
 
-		if (findRegistro == null || findRegistro.getDataHoraSaida() != null) {
+		if(findRegistro != null) {
+			
+			Assert.notNull(findRegistro.getDataHoraSaida(), "O contrato com o nome " + contrato.getNomePaciente() + " tem um registro em "
+					+ findRegistro.getDataHoraEntrada().format(DateTimeFormatter.ofPattern("dd-MM-uuuu HH:mm"))
+					+ " que ainda não foi fechado");
+			
+		}
+		
 			Registro registro = new Registro();
 			registro.setContrato(contrato);
 			registro.setPlanoContratado(planoContratado);
@@ -91,11 +98,7 @@ public class RegistroService {
 			this.registroRepository.save(registro);
 			return registro;
 
-		} else {
-			throw new RegistroException("O contrato com o nome " + contrato.getNomePaciente() + " tem um registro em "
-					+ findRegistro.getDataHoraEntrada().format(DateTimeFormatter.ofPattern("dd-MM-uuuu HH:mm"))
-					+ " que ainda não foi fechado");
-		}
+
 	}
 
 	/*
@@ -105,7 +108,7 @@ public class RegistroService {
 	 * 
 	 * @Param dataFinal String - data final da busca
 	 * 
-	 * @Param contratoId String - id do contrato
+	 * @Param numeroContrato String - numero do contrato
 	 * 
 	 * @Param page int - numero da pagina de retorno
 	 * 
@@ -113,24 +116,42 @@ public class RegistroService {
 	 * 
 	 * @return page<Registro>
 	 */
-	public Page<Registro> findByDate(String dataInicial, String dataFinal, String numeroContrato, int page, int size) {
-		if (dataInicial.isEmpty() == false && dataFinal.isEmpty() == false && numeroContrato.isEmpty() == false) {
+	public Page<Registro> consultarRegistrosContratoPelaData(String dataInicial, String dataFinal, String numeroContrato, int page, int size) {
+		Assert.isTrue(!dataInicial.isEmpty(), "Preencha o valor do campo data inicial.");
+		Assert.isTrue(!dataFinal.isEmpty(), "Preencha o valor do campo data final.");
+		Assert.isTrue(!numeroContrato.isEmpty(), "Valor do parâmetro numeroContrato está vazio. ");
+		
 			Pageable pagebale = PageRequest.of(page, size);
-			return this.registroRepository.findByDate(LocalDateTime.parse(dataInicial + "T00:00:00"),
+			return this.registroRepository.consultarRegistroPorDataInicialFinalNumeroContrato(LocalDateTime.parse(dataInicial + "T00:00:00"),
 					LocalDateTime.parse(dataFinal + "T00:00:00"),numeroContrato, pagebale);
-		} else {
-			throw new RegistroException("Campos obrigatório não preenchidos");
-		}
+
 	}
 	
-	public Page<Registro> findByDateAndPLanoId(String dataInicial, String dataFinal, Long planoId, int page, int size) {
-		if (dataInicial.isEmpty() == false && dataFinal.isEmpty() == false) {
+	/* Metodo que consulta os registros de um determinado contrato e plano 
+	 * @Param dataInicial String - data de inicio para busca
+	 * 
+	 * @Param dataFinal String - data final da busca
+	 * 
+	 * @Param contratoId Long - id do contrato
+	 * 
+ 	 * @Param planoId Long - id de um plano
+	 * 
+	 * @Param page int - numero da pagina de retorno
+	 * 
+	 * @Param size int - tamanho da pagina de retorno
+	 * 
+	 * @return page<Registro>*/
+	
+	public Page<Registro> consultarRegistroContratoPelaDataEPlanoId(Long contratoId,String dataInicial, String dataFinal, Long planoId, int page, int size) {
+		Assert.isTrue(!dataInicial.isEmpty(), "Preencha o valor do campo data inicial.");
+		Assert.isTrue(!dataFinal.isEmpty(), "Preencha o valor do campo data final.");
+		Assert.isTrue(planoId > 0 , "Valor do parâmetro planoId é zero. ");
+		Assert.isTrue(contratoId > 0, "Valor do parâmetro contratoId é zero. ");
+		
 			Pageable pagebale = PageRequest.of(page, size);
-			return this.registroRepository.findByDateAndPLanoId(LocalDateTime.parse(dataInicial + "T00:00:00"),
-					LocalDateTime.parse(dataFinal + "T00:00:00"),planoId, pagebale);
-		} else {
-			throw new RegistroException("Campos obrigatório não preenchidos");
-		}
+			return this.registroRepository.consultarRegistroPorDataInicialFinalPlanoIdContratoId(LocalDateTime.parse(dataInicial + "T00:00:00"),
+					LocalDateTime.parse(dataFinal + "T00:00:00"),planoId,contratoId, pagebale);
+
 	}
 
 	/*
@@ -142,15 +163,13 @@ public class RegistroService {
 	 * 
 	 * @throws NotFoundException, FingerPrintException
 	 */
-	public Registro saveHorarioSaida(String numeroContrato) throws NotFoundException {
-		Contrato contrato = this.contratoService.findByContractNumber(numeroContrato);
+	public Registro salvarHorarioSaida(String numeroContrato) throws NotFoundException {
 		ConfiguracaoParametro configParametro = this.configParametrosService.findConfigParametros(1L);
-		Registro findRegistro = this.registroRepository.findByMaxId(contrato.getNumero());
+		Registro findRegistro = this.registroRepository.consultarUltimoRegistroContrato(numeroContrato);
 		
-		Assert.notNull(findRegistro, "Nenhum atendimento aberto para esta biometria.");
-		
-		if (findRegistro.getDataHoraEntrada() != null
-				&& findRegistro.getDataHoraSaida() == null) {
+		Assert.notNull(findRegistro, "Não contêm nenhum registro no contrato do paciente " + findRegistro.getContrato().getNomePaciente() + ".");
+		Assert.isTrue(findRegistro.getDataHoraSaida() == null, "Não contêm nenhum registro de entrada em aberto para o paciente " + findRegistro.getContrato().getNomePaciente() + ".");
+
 			Duration verificaValorAdicional = Duration.between(
 					findRegistro.getPlanoContratado().getHorarioSaida()
 							.plusMinutes(configParametro.getTempoToleranciaAtraso().getMinute()),
@@ -167,35 +186,11 @@ public class RegistroService {
 			findRegistro.setTempoTotal(LocalTime.MIN.plusMinutes(tempoTotal.toMinutes()));
 			findRegistro.setDataHoraSaida(LocalDateTime.now(ZoneId.of("America/Maceio")));
 			this.registroRepository.save(findRegistro);
-		}
+		
 		return findRegistro;
 
 	}
 
-	/*
-	 * Metodo pega o dia da semana do sistema e faz a busca dos planos ativos por
-	 * dia
-	 * 
-	 * @return void
-	 */
-	public void recordTenMinutesAfterPlanTime() {
-		Integer dia = LocalDate.now().getDayOfWeek().getValue();
-		ConfiguracaoParametro config = this.configParametrosService.findConfigParametros(1L);
-		DiasSemana diasSemana = DiasSemana.diasSemanaByOrdinal(dia);
-		List<PlanoContratado> planoContratado = this.planoContratadoService.findByDiaConsulta(diasSemana);
-		Registro registro = new Registro();
-		for (PlanoContratado plano : planoContratado) {
-			registro.setContrato(plano.getContrato());
-			registro.setDataHoraEntrada(LocalDateTime.of(LocalDate.now(), plano.getHorarioEntrada()));
-			registro.setDataHoraSaida(LocalDateTime.of(LocalDate.now(), plano.getHorarioSaida()));
-			registro.setPlanoContratado(plano);
-			registro.setTempoTotal(config.getTempoSessao());
-			registro.setSituacao(Situacao.ATENDIMENTO_NORMAL);
-			registro.setValorTotal(plano.getValorSessao());
-			this.registroRepository.save(registro);
-		}
-
-	}
 
 	/*
 	 * Metodo busca todos registros de um contrato
@@ -208,9 +203,9 @@ public class RegistroService {
 	 * 
 	 * @return Page<Registro>
 	 */
-	public Page<Registro> findAllRegistro(String numeroContrato, int page, int size) {
+	public Page<Registro> consultarTodosRegistros(String numeroContrato, int page, int size) {
 		PageRequest pageable = PageRequest.of(page, size);
-		Page<Registro> registros = this.registroRepository.findAllRegistro(numeroContrato, pageable);
+		Page<Registro> registros = this.registroRepository.consultarRegistros(numeroContrato, pageable);
 
 		for (Registro registro : registros.getContent()) {
 			registro.setSituacao(Situacao.valueOf(registro.getSituacao().toString()));
@@ -231,7 +226,7 @@ public class RegistroService {
 	 */
 	public Registro registrarTrocaDeServico(Long registroId, Double valorSessao) {
 		Registro registro = this.registroRepository.findById(registroId).orElseThrow(
-				() -> new RegistroException("Nenhum registro com esse id: " + registroId + "foi encontrado."));
+				() -> new IllegalArgumentException("Nenhum registro com esse id: " + registroId + "foi encontrado."));
 		
 		Assert.isTrue(registro.getSituacao() == Situacao.ATENDIMENTO_NORMAL, "A situação do registro se encontra diferente de atendimento normal.");
 		Assert.isNull(registro.getDataHoraSaida(), "Este registro já encontra-se fechado.");
@@ -264,19 +259,18 @@ public class RegistroService {
 
 	public Registro registrarAusenciaDoProfisional(Long registroId) {
 		Registro registro = this.registroRepository.findById(registroId).orElseThrow(
-				() -> new RegistroException("Nenhum registro com esse id: " + registroId + "foi encontrado."));
+				() -> new IllegalArgumentException("Nenhum registro com esse id: " + registroId + "foi encontrado."));
+		
+		Assert.isTrue(registro.getSituacao() == Situacao.AUSENCIA_DO_PACIENTE, "Operação inválida, a situação do "
+					+ "registro se encontra diferente de atendimento normal e ausência do paciente.");
+		
+		Assert.isTrue(registro.getDataHoraSaida() != null , "Operação inválida, este registro já possui registro de saída.");
 
-		if (registro.getSituacao() == Situacao.AUSENCIA_DO_PACIENTE) {
 
 			registro.getPlanoContratado().setValorTotal(
 					registro.getPlanoContratado().getValorTotal() - registro.getPlanoContratado().getValorSessao());
 			registro.setSituacao(Situacao.AUSENCIA_DO_PROFISSIONAL);
 			registro.setValorTotal(0D);
-
-		} else {
-			throw new RegistroException("Operação inválida, este registro já possui registro de saída ou a situação do "
-					+ "registro se encontra diferente de atendimento normal e ausência do paciente.");
-		}
 
 		this.registroRepository.save(registro);
 		return registro;
@@ -322,14 +316,14 @@ public class RegistroService {
 	public Registro registrarAusenciaPacienteAutomaticamente(long planoId) throws NotFoundException {
 		Assert.notNull(planoId, "Registro automático de ausência do paciente CANCELADO: Plano não informado.");
 
-		PlanoContratado plano = this.planoContratadoService.findById(planoId);
+		PlanoContratado plano = this.planoContratadoService.consultarPlanoContratadoPorId(planoId);
 		Assert.notNull(plano, "Registro automático de ausência do paciente CANCELADO: Plano não encontrado.");
 
 		Assert.isTrue(plano.getAtivo().equals(true),
 				"Registro automático de ausência do paciente CANCELADO: Plano não ativo.");
 
 		// busca se há um registro aberto para o atendimento
-		Registro findRegistro = this.registroRepository.findByPlanoContratadoAndMaxId(plano.getId());
+		Registro findRegistro = this.registroRepository.consultarUltimoRegistroDoPlano(plano.getId());
 
 		// se não houver registro ou se o mesmo encontrar-se fechado, abre um novo
 		// registrando ausência do paciente
@@ -378,14 +372,14 @@ public class RegistroService {
 	 * 
 	 * @throws RegistroException
 	 */
-	public ByteArrayOutputStream createPlanilhaRegistros(String numeroContrato) throws IOException {
+	public ByteArrayOutputStream exportarPlanilhaDeRegistro(String numeroContrato) throws IOException {
 		XSSFWorkbook workBook = new XSSFWorkbook();
 		XSSFSheet sheet = workBook.createSheet("Registros");
 
 		// criando o cabelho da planilha
 		createHead(this.createCellStyleHead(workBook), sheet);
 
-		List<Registro> registros = this.registroRepository.findAllRegistroList(numeroContrato);
+		List<Registro> registros = this.registroRepository.consultarRegistros(numeroContrato, PageRequest.of(0, Integer.MAX_VALUE)).getContent();
 		if ((registros.isEmpty()))
 			throw new RegistroException("Não existe nenhum registro nesse contrato");
 
@@ -490,7 +484,7 @@ public class RegistroService {
 	 * @return
 	 */
 	public List<Registro> listRegistrosAbertos() {
-		return this.registroRepository.findAbertosAndAtendimentoNormal();
+		return this.registroRepository.consultarRegistrosAbertoAtendimentoNormal();
 	}
 
 }

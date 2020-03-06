@@ -13,6 +13,7 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>ProjetoX</name>
 	<description>Demo project for Spring Boot</description>
+	<packaging>war</packaging>
 	
 	<properties>
 		<java.version>1.8</java.version>
@@ -108,15 +109,22 @@
 			<artifactId>jackson-datatype-hibernate5</artifactId>
 		</dependency>
 
-		<dependency>
-			<groupId>org.flywaydb</groupId>
-			<artifactId>flyway-core</artifactId>
-		</dependency>
-		<dependency>
+<!-- 		<dependency>
     		<groupId>org.hibernate</groupId>
     		<artifactId>hibernate-envers</artifactId>
 			<version>5.3.11.Final</version>
-		</dependency>
+		</dependency> -->
+		<!-- <dependency>
+   			 <groupId>org.flywaydb</groupId>
+    		<artifactId>flyway-core</artifactId>
+    		<version>6.2.3</version>
+		</dependency> -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+			<scope>provided</scope>
+		</dependency> 
+		
 		<dependency>
 			<groupId>cidbio</groupId>
 			<artifactId>CIDBIo</artifactId>

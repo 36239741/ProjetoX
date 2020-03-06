@@ -177,7 +177,7 @@ public class SupportScheduling {
 			break;
 		}
 	    
-	    List<PlanoContratado> planosAtivos =  this.planoService.findByDiaConsulta(diaSemanaTrauzido);
+	    List<PlanoContratado> planosAtivos =  this.planoService.consultarContratoPorDiasSemana(diaSemanaTrauzido);
 	    
 	    for (PlanoContratado planoContratado : planosAtivos) {
 			this.scheduleRegistroAutomaticoAusenciaPaciente(planoContratado);

@@ -20,38 +20,36 @@ public interface RegistroRepository extends JpaRepository<Registro, Long>{
 	
 	Registro findByContrato(Contrato contrato);
 	
-	@Query("FROM Registro registro WHERE registro.contrato.numero = :numeroContrato AND registro.id = "
-			+ "(SELECT max(registro.id) FROM Registro registro) AND registro.contrato.ativo = true")
-	Registro findByMaxId(@Param("numeroContrato") String contratoId);
+	@Query("FROM Registro registro WHERE registro.id = (SELECT max(id) FROM Registro registro where registro.contrato.numero = :numeroContrato)")
+	Registro consultarUltimoRegistroContrato(@Param("numeroContrato") String numeroContrato);
 	
 	@Query("FROM Registro registro WHERE registro.contrato.numero = :numeroContrato")
-	public Page<Registro> findAllRegistro(@Param("numeroContrato") String numeroContrato, Pageable pageable);
+	public Page<Registro> consultarRegistros(@Param("numeroContrato") String numeroContrato, Pageable pageable);
 	
-	@Query("FROM Registro registro WHERE registro.contrato.numero = :numeroContrato")
-	public List<Registro> findAllRegistroList(@Param("numeroContrato") String numeroContrato);
 	
 	@Query("FROM Registro registro WHERE registro.contrato.numero = :numeroContrato AND registro.dataHoraEntrada "
 			+ "BETWEEN :dataInicial AND :dataFinal")
-	public Page<Registro> findByDate(@Param("dataInicial") LocalDateTime dataInicial,
+	public Page<Registro> consultarRegistroPorDataInicialFinalNumeroContrato(@Param("dataInicial") LocalDateTime dataInicial,
 			@Param("dataFinal") LocalDateTime dataFinal,
 			@Param("numeroContrato") String numeroContrato,
 			Pageable pagebale);
 	
-	@Query("FROM Registro registro WHERE registro.planoContratado.id = :planoId AND registro.dataHoraEntrada "
-			+ "BETWEEN :dataInicial AND :dataFinal")
-	public Page<Registro> findByDateAndPLanoId(@Param("dataInicial") LocalDateTime dataInicial,
+	@Query("FROM Registro registro WHERE registro.planoContratado.id = :planoId AND registro.contrato.id = :contratoId AND registro.dataHoraEntrada "
+			+ " BETWEEN :dataInicial AND :dataFinal")
+	public Page<Registro> consultarRegistroPorDataInicialFinalPlanoIdContratoId(@Param("dataInicial") LocalDateTime dataInicial,
 			@Param("dataFinal") LocalDateTime dataFinal,
 			@Param("planoId") Long planoId,
+			@Param("contratoId") Long contratoId,
 			Pageable pagebale);
-	
+
 	
 	@Query("FROM Registro registro WHERE registro.planoContratado.id = :planoId AND registro.id = "
 			+ "(SELECT max(registro.id) FROM Registro registro)")
-	Registro findByPlanoContratadoAndMaxId(@Param("planoId") Long planoId);
+	Registro consultarUltimoRegistroDoPlano(@Param("planoId") Long planoId);
 
 	@Query("FROM Registro registro "
 			+ "WHERE registro.dataHoraSaida IS NULL "
 			+ "AND registro.dataHoraEntrada IS NOT NULL "
 			+ "AND registro.situacao = " + Situacao.SITUACAO_ATENDIMENTO_NORMAL)
-	List<Registro> findAbertosAndAtendimentoNormal();
+	List<Registro> consultarRegistrosAbertoAtendimentoNormal();
 }

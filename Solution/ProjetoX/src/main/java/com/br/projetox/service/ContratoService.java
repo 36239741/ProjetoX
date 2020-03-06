@@ -83,7 +83,7 @@ public class ContratoService {
 	
 	
 	
-	public List<Contrato> findAllContratos(){
+	public List<Contrato> consultarTodosContratos(){
 		return this.repository.findAll();
 	}
 	/*
@@ -100,7 +100,7 @@ public class ContratoService {
 	 * 
 	 * @return Page<contrato>
 	 */
-	public Page<Contrato> findAll(int pageNum, int pageSize, Direction direction, String atributo) {
+	public Page<Contrato> consultarContratos(int pageNum, int pageSize, Direction direction, String atributo) {
 		Page<Contrato> page = null;
 		PageRequest pageable = PageRequest.of(pageNum, pageSize,
 				org.springframework.data.domain.Sort.by(direction, atributo));
@@ -129,8 +129,8 @@ public class ContratoService {
 	 * @return Page<Contrato>
 	 */
 	@Transactional(readOnly = true)
-	public Page<Contrato> findByFilters(String numero, String nomePaciente, PageRequest pageable) {
-		Page<Contrato> page = this.repository.findByFilters(numero, nomePaciente, pageable);
+	public Page<Contrato> consultarContratosPorFiltro(String numero, String nomePaciente,Boolean ativo, PageRequest pageable) {
+		Page<Contrato> page = this.repository.consultarPorFiltros(numero, nomePaciente,ativo,pageable);
 		LocalDate date = LocalDate.now();
 		
 		for(Contrato contrato: page.getContent()) {
@@ -142,35 +142,6 @@ public class ContratoService {
 		return page;
 	}
 
-	/*
-	 * Método de busca que utiliza o campo numero , nomePaciente aonde pode ser
-	 * utilizados em conjunto ou separados
-	 * 
-	 * @param numero String - numero do contrato cadastrado
-	 * 
-	 * @param nomePaciente String - nome do paciente contido no contrato
-	 * 
-	 * @param pageable PageRequet - variavel que contem especificacoes de retorno
-	 * 
-	 * @param ativo boolean - variavel que delimita a busca por estado do contrato
-	 * ativo ou inativo
-	 * 
-	 * @return Page<Contrato>
-	 */
-	public Page<Contrato> findByFiltersParamActive(String numero, String nomePaciente, PageRequest pageable,
-			Boolean ativo) {
-		
-		Page<Contrato> page = this.repository.findByFiltersParamActive(numero, nomePaciente, pageable, ativo);
-		LocalDate date = LocalDate.now();
-		
-		for(Contrato contrato: page.getContent()) {
-			Double valorExecutado = this.valorExecutado(date.getYear(), date.getMonthValue(), contrato.getNumero());
-			contrato.setValorExecutado(valorExecutado);
-			contrato.setDiferenca(contrato.getValorExecutado() - contrato.getValorTotal());
-			contrato.clearToList();
-		}
-		return page;
-	}
 
 	/*
 	 * Método para busca de contratos atraves do numero do contrato cadastrado
@@ -182,7 +153,7 @@ public class ContratoService {
 	 * @throws NotFoundException - retorna a excessao quando nao for encontrado
 	 * nenhum contrato
 	 */
-	public Contrato findByContractNumber(String numeroContrato) throws NotFoundException {
+	public Contrato consultarContrato(String numeroContrato) throws NotFoundException {
 		Contrato contrato = this.repository.findByNumero(numeroContrato).get();
 		Assert.notNull(contrato, "Nenhum contrato encontrado com esse número de contrato:" + numeroContrato);
 		
@@ -204,7 +175,7 @@ public class ContratoService {
 	 * 
 	 * @return HashMap<String, Integer>
 	 */
-	public HashMap<String, Integer> importPlanilhaContratos(FileTransfer file) throws Exception {
+	public HashMap<String, Integer> importarPlanilhaDeContratos(FileTransfer file) throws Exception {
 		List<Contrato> listContrato = new ArrayList<>();
 		Workbook workbook = WorkbookFactory.create(file.getInputStream());
 		Sheet sheet = workbook.getSheetAt(0);
@@ -214,7 +185,7 @@ public class ContratoService {
 			try {
 				Row linha = sheet.getRow(i);
 				if (!(linha == null || linha.getCell(0) == null || linha.getCell(0).toString().equals(""))) {
-					listContrato.add(this.recoveryContractValues(linha));
+					listContrato.add(this.valoresEntidadeContrato(linha));
 				}
 			} catch (Exception e) {
 				throw new ImportPlanilhaException("Erro na linha " + i + "." + e);
@@ -222,7 +193,7 @@ public class ContratoService {
 		}
 
 		workbook.close();
-		return this.saveAndUpdateCount(listContrato);
+		return this.numeroDeContratosSalvosAtualizado(listContrato);
 	}
 
 	/*
@@ -232,13 +203,13 @@ public class ContratoService {
 	 * 
 	 * @return Contrato
 	 */
-	private Contrato recoveryContractValues(Row linha) throws Exception {
+	private Contrato valoresEntidadeContrato(Row linha) throws Exception {
 		Contrato contrato = new Contrato();
 		Double numeroContrato = Double.parseDouble(linha.getCell(NUM_CONTRATO).toString());
 		contrato.setNumero(numeroContrato.intValue() + "");
 		contrato.setNomePaciente(linha.getCell(NOME_PACIENTE).toString());
 
-		return recoverContractedPlans(linha, contrato);
+		return valoresEntidadePlano(linha, contrato);
 
 	}
 
@@ -251,8 +222,8 @@ public class ContratoService {
 	 * 
 	 * @return Contrato
 	 */
-	private Contrato recoverContractedPlans(Row linha, Contrato contrato) {
-		List<Servico> servicos = this.servicoService.findAll();
+	private Contrato valoresEntidadePlano(Row linha, Contrato contrato) {
+		List<Servico> servicos = this.servicoService.consultarTodosServicos();
 		int contator = 2;
 		int atualizarNumeroCelula = 0;
 		while (!(linha.getCell(contator) == null || linha.getCell(contator).toString().equals(""))) {
@@ -281,7 +252,7 @@ public class ContratoService {
 			String[] diasSemana = new String[7];
 			diasSemana = linha.getCell(DIAS_SEMANA + atualizarNumeroCelula).toString().trim().split(",");
 
-			this.checkDaysOfTheWeek(diasSemana).forEach(dias -> planoContratado.getDiaConsulta().add(dias));
+			this.checarDiasSemana(diasSemana).forEach(dias -> planoContratado.getDiaConsulta().add(dias));
 
 			contator += MULTIPLICADOR_PROXIMO_SERVICO;
 			atualizarNumeroCelula += 6;
@@ -305,7 +276,7 @@ public class ContratoService {
 	 * @throws NullPointerException - retorna a excessao quando os valores do array
 	 * nao atender nenhum else if com a verificacao
 	 */
-	public List<DiaConsulta> checkDaysOfTheWeek(String diasSemana[]) {
+	public List<DiaConsulta> checarDiasSemana(String diasSemana[]) {
 		List<DiaConsulta> listDiasConsulta = new ArrayList<>();
 		for (int i = 0; i < diasSemana.length; i++) {
 			if (diasSemana[i] != null) {
@@ -339,7 +310,7 @@ public class ContratoService {
 	 * 
 	 * @return HashMap<string,integer> - contagem de contratos salvos e atualizados
 	 */
-	private HashMap<String, Integer> saveAndUpdateCount(List<Contrato> contratos) {
+	private HashMap<String, Integer> numeroDeContratosSalvosAtualizado(List<Contrato> contratos) {
 		int update = 0;
 		int save = 0;
 		Optional<Contrato> findContrato = null;
@@ -349,7 +320,7 @@ public class ContratoService {
 				findContrato.get().setNomePaciente(contratos.get(i).getNomePaciente());
 				findContrato.get().calcularValorTotal();
 				findContrato.get().setValorTotal(contratos.get(i).getValorTotal());
-				checkContractedPlan(contratos, findContrato, i);
+				checarPlanoContratado(contratos, findContrato, i);
 				this.repository.save(findContrato.get());
 				update += 1;
 			} else {
@@ -364,30 +335,39 @@ public class ContratoService {
 		return map;
 	}
 	
-	public Contrato calcularDesconto(String numeroContrato, Double desconto) throws Exception {
-		List<PlanoContratado> plano = this.planoContratadoService.findAllPlanoContratadoByContratoId(numeroContrato);
-		Double valorDesconto = 0.0;
+	/*
+	 * Metodo faz a atribuicao de um deminado valor desconto informado pelo usuario no contrato
+	 * 
+	 * @Param numeroContrato - String
+	 * 
+	 * @Param desconto - Double
+	 * 
+	 * @return Contrato
+	 */
+	
+	public Contrato atribuirDesconto(String numeroContrato, Double desconto) throws Exception {
+		List<PlanoContratado> plano = this.planoContratadoService.consultarPlanoContratadoAtivoPorContrato(numeroContrato);
+		
 		Double valorTotalContrato = 0.0;
-		if (plano.isEmpty()) {
-			throw new ContratoException("Esse contrato nao possui nenhum plano");
-		} else {
-			if (desconto != null && desconto != 0.0) {
+		Assert.isTrue(!plano.isEmpty(), "Esse contrato nao possui nenhum plano contratado.");
+		Assert.notNull(desconto, "O valor de desconto é nulo");
+		
+				Double valorDesconto = 0.0;
+			/* valor do desconto divido pelo total de planos contratados do contrato */
 				valorDesconto = desconto / plano.size();
+				
 				for (PlanoContratado planos : plano) {
 					planos.setValorTotal(planos.getValorTotal() - valorDesconto);
 					valorTotalContrato += planos.getValorTotal();
 				}
-				Contrato contrato = this.findByContractNumber(numeroContrato);
+				Contrato contrato = this.consultarContrato(numeroContrato);
 				contrato.setDesconto(desconto);
 				contrato.setValorTotal(valorTotalContrato);
 				return this.repository.save(contrato);
-			} else {
-				throw new ContratoException("O valor de desconto é nullo");
-			}
+
 
 		}
 
-	}
 
 	/*
 	 * Metodo que verifica se existe um plano contratado ja cadastrado no contrato
@@ -403,10 +383,10 @@ public class ContratoService {
 	 * @return void
 	 */
 	
-	private void checkContractedPlan(List<Contrato> contratos, Optional<Contrato> findContrato, int i) {
+	private void checarPlanoContratado(List<Contrato> contratos, Optional<Contrato> findContrato, int i) {
 		for (PlanoContratado planoContratado : contratos.get(i).getPlanoContratado()) {
-			Long servicoId = this.servicoService.findServico(planoContratado.getServico().getServico()).getId();
-			PlanoContratado findPlanoContratado = this.planoContratadoService.findPlanoContratadoAtivo(servicoId,
+			Long servicoId = this.servicoService.consultarServicoPeloNome(planoContratado.getServico().getServico()).getId();
+			PlanoContratado findPlanoContratado = this.planoContratadoService.consultarPlanoContratadoAtivoPorServiceIdContratoIdTipoContrato(servicoId,
 					findContrato.get().getId(), planoContratado.getTipoContrato());
 			if (findPlanoContratado != null) {
 				findPlanoContratado.setDiaConsulta(planoContratado.getDiaConsulta());
@@ -438,11 +418,11 @@ public class ContratoService {
 	 * 
 	 * @throws FingerPrintException
 	 */
-	public void saveFingerprint(String contractNumber) throws NotFoundException {
+	public void salvarBiometria(String contractNumber) throws NotFoundException {
 		Template templateMerge = this.fingerPrint.captureThreeFingerPrint();
 		byte[] binary;
 		binary = templateMerge.getTemplate().getBytes();
-		this.repository.saveBiometria(contractNumber, binary);
+		this.repository.salvarBiometria(contractNumber, binary);
 	}
 
 	/*
@@ -452,7 +432,7 @@ public class ContratoService {
 	 * 
 	 * @return Boolean - retorna true se sucesso e false se falhar
 	 */
-	public Contrato findByBiometria() throws UnsupportedEncodingException {
+	public Contrato consultarContratosPorBiometria() throws UnsupportedEncodingException {
 		ImageAndTemplate imgAndTemplate = null;
 		List<Contrato> listContrato = null;
 		Contrato returnContrato = null;
@@ -466,18 +446,18 @@ public class ContratoService {
 				} 
 			}
 		}
-		Assert.notNull(returnContrato, "Nenhum plano disponível para esta biometria.");
+		Assert.notNull(returnContrato, "Nenhum plano cadastrado nessa biometria.");
 		return returnContrato;
 	}
 	
-	public Double valorExecutado(int ano,int mes, String numeroContrato) {
+	private Double valorExecutado(int ano,int mes, String numeroContrato) {
 		
 		LocalDate dataInicial = LocalDate.of(ano,mes,1);
 
 		LocalDate ultimoDiaMes = dataInicial.withDayOfMonth(dataInicial.lengthOfMonth());
 		LocalDate dataFinal = LocalDate.of(ano,mes,ultimoDiaMes.getDayOfMonth());
 		
-		List<Registro> registros = this.registroService.findByDate(dataInicial.toString(), dataFinal.toString(),numeroContrato, 0, 32 ).getContent();
+		List<Registro> registros = this.registroService.consultarRegistrosContratoPelaData(dataInicial.toString(), dataFinal.toString(),numeroContrato, 0, 32 ).getContent();
 		
 		
 		Double valorExecutado = 0.0;
@@ -492,8 +472,8 @@ public class ContratoService {
 		
 	}
 	
-	public List<Contrato> montarEntidade(int ano , int mes) {
-		List<Contrato> contratos = this.findAllContratos();
+	public List<Contrato> consultarRelatorioMensal(int ano , int mes) {
+		List<Contrato> contratos = this.consultarTodosContratos();
 		
 		List<Contrato> listContratos = new ArrayList<>();
 		for(Contrato contrato: contratos) {
@@ -504,14 +484,14 @@ public class ContratoService {
 		return listContratos;
 	}
 	
-	public ByteArrayOutputStream createPlanilhaRelatorio(int ano, int mes) throws IOException {
+	public ByteArrayOutputStream exportarPlanilhaRelatorio(int ano, int mes) throws IOException {
 		XSSFWorkbook workBook = new XSSFWorkbook();
 		XSSFSheet sheet = workBook.createSheet("Relatorios");
 
 		// criando o cabelho da planilha
-		createHead(this.createCellStyleHead(workBook), sheet);
+		criarCabecalho(this.estiloCelulaCabecalho(workBook), sheet);
 
-		List<Contrato> contratos = this.montarEntidade(ano, mes);
+		List<Contrato> contratos = this.consultarRelatorioMensal(ano, mes);
 
 		Locale locale = new Locale("pt", "BR");
 		NumberFormat numberFormat = NumberFormat.getCurrencyInstance(locale);
@@ -523,7 +503,7 @@ public class ContratoService {
 			XSSFRow row = sheet.createRow(i);
 			// style das celulas
 
-			CellStyle style = this.createCellStyleDefault(workBook, contrato);
+			CellStyle style = this.estiloDefaultCelulas(workBook, contrato);
 			
 			row.createCell(0).setCellValue(contrato.getNumero());
 			row.createCell(1).setCellValue(contrato.getNomePaciente());
@@ -552,7 +532,7 @@ public class ContratoService {
 		return stream;
 	}
 	
-	private Cell createHead(CellStyle style, XSSFSheet sheet) {
+	private Cell criarCabecalho(CellStyle style, XSSFSheet sheet) {
 		Cell cell;
 		Row cabecalho = sheet.createRow(0);
 		cell = cabecalho.createCell(0);
@@ -574,7 +554,7 @@ public class ContratoService {
 		return cell;
 	}
 	
-	private CellStyle createCellStyleHead(Workbook workBook) {
+	private CellStyle estiloCelulaCabecalho(Workbook workBook) {
 		Font font = workBook.createFont();
 		font.setFontHeightInPoints((short) 16);
 		font.setColor(IndexedColors.WHITE.getIndex());
@@ -592,7 +572,7 @@ public class ContratoService {
 		return style;
 	}
 	
-	private CellStyle createCellStyleDefault(Workbook workBook, Contrato contrato) {
+	private CellStyle estiloDefaultCelulas(Workbook workBook, Contrato contrato) {
 		Font font = workBook.createFont();
 		font.setFontHeightInPoints((short) 14);
 		font.setColor(IndexedColors.BLACK.getIndex());
@@ -615,7 +595,7 @@ public class ContratoService {
 		return style;
 	}
 	
-	public void cancelCaptureFingerPrint() {
+	public void cancelarCapturaLeitorBiometria() {
 		this.fingerPrint.cancelCapture();
 	}
 

@@ -1,43 +1,51 @@
 
     <mat-drawer-container class="drawer-container">
-        <mat-drawer mode="over"  class="drawer" #drawer>
+
+        <mat-drawer mode="over"  #drawer>
             <div *ngFor="let itens of listMenu">
                 <button mat-stroked-button 
                 isIconButton="true"
                 [routerLink]="itens.link"
                 [matTooltip]="itens.toolTip"
+                class="button-menu"
+                fxLayoutAlign="start center"
                 >
                     <mat-icon>{{ itens.menuIcon }}</mat-icon>
-                    <span>{{ itens.menuName }}</span>
+                    {{ itens.menuName }}
                 </button>
             </div>
         </mat-drawer>
+
         <mat-drawer-content class="drawer-content">
             <mat-toolbar color="primary" class="mat-toolbar">
-                <mat-toolbar-row class="toolbar-row"> 
+                <mat-toolbar-row 
+                class="toolbar-row"
+                fxLayout="row" 
+                fxLayoutAlign="space-between center"> 
+
                     <section class="menu">
                         <button mat-icon-button (click)="drawer.toggle()"><mat-icon>menu</mat-icon></button>
-                        <img src="../../../assets/img/logo-simbolo.png" class="logo">
+                        <img src="./assets/img/logo-simbolo.png" class="logo">
                         <h3>{{ title }}</h3>
                     </section>
-                    <section class="sair">
-                        <a (click)="logout()" >Sair</a>
-                    </section>
+
+                        <a (click)="logout()" class="sair">Sair</a>
+                    
                 </mat-toolbar-row>
             </mat-toolbar>
 
-            <div class="card-container">
                 <mat-card class="card">
+
                     <mat-card-header class="card-header">
                         <mat-card-title>
                             <app-bread-crumbs></app-bread-crumbs>
                         </mat-card-title> 
                     </mat-card-header>
+
                         <mat-card-content class="card-content">
                             <router-outlet></router-outlet>
                         </mat-card-content>
                 </mat-card>
-            </div>
 
 
         </mat-drawer-content>

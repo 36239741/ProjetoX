@@ -8,11 +8,13 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import com.br.projetox.entity.Contrato;
 import com.br.projetox.entity.DiaConsulta;
@@ -21,7 +23,6 @@ import com.br.projetox.entity.PlanoContratado;
 import com.br.projetox.entity.Registro;
 import com.br.projetox.entity.Servico;
 import com.br.projetox.entity.TipoContrato;
-import com.br.projetox.exception.DuplicatePlanoContratadoException;
 import com.br.projetox.exception.MapPlanoContratadoException;
 import com.br.projetox.repository.PlanoContratoRepository;
 
@@ -45,18 +46,24 @@ public class PlanoContratadoService {
 	
 
 
-	public PlanoContratado findById(Long id) throws NotFoundException {
+	public PlanoContratado consultarPlanoContratadoPorId(Long id) throws NotFoundException {
 		return this.planoContraRepository.findById(id).orElseThrow(() -> 
-		new NotFoundException("Nenhum plano encontrado com esse id: " + id) );
+		new NotFoundException("Plano contratado não encontrado.") );
 	}
 	
-	public void deleteLogical(String planoContratadoId) {
-		this.planoContraRepository.deleteLogical(Long.parseLong(planoContratadoId));
-		PlanoContratado planoContratado = this.planoContraRepository.findById(Long.parseLong(planoContratadoId)).get();
-		Double totalContrato = planoContratado.getContrato().getValorTotal() - planoContratado.getValorTotal();
-		planoContratado.getContrato().setValorTotal(totalContrato);
-		this.planoContraRepository.save(planoContratado);
-	}
+	public void deleteLogico(String planoContratadoId) {
+		this.planoContraRepository.deleteLogico(Long.parseLong(planoContratadoId));
+		Optional<PlanoContratado> planoContratado = this.planoContraRepository.findById(Long.parseLong(planoContratadoId));
+		
+		Assert.isTrue(planoContratado.isPresent(), "Plano contratado não encontrado.");
+		
+			Double totalContrato = planoContratado.get().getContrato().getValorTotal() - planoContratado.get().getValorTotal();
+			planoContratado.get().getContrato().setValorTotal(totalContrato);
+			this.planoContraRepository.save(planoContratado.get());
+		
+		
+		}
+		
 
 	/*
 	 * Método pega todos planos contratados ativos , de um determinado contrato
@@ -65,8 +72,8 @@ public class PlanoContratadoService {
 	 * 
 	 * @return List<PlanoContratado>
 	 */
-	public List<PlanoContratado> findAllPlanoContratadoByContratoId(String numeroContrato) {
-		List<PlanoContratado> listPlanos = this.planoContraRepository.findByContratoId(numeroContrato);
+	public List<PlanoContratado> consultarPlanoContratadoAtivoPorContrato(String numeroContrato) {
+		List<PlanoContratado> listPlanos = this.planoContraRepository.consultarPlanoContratadoPorNumeroContrato(numeroContrato);
 		LocalDate data = LocalDate.now();
 		for (PlanoContratado planos : listPlanos) {
 			Collections.sort(planos.getDiaConsulta(), new Comparator<DiaConsulta>() {
@@ -76,7 +83,7 @@ public class PlanoContratadoService {
 
 				}
 			});
-			planos.setSaldoMensal(this.saldoMensal(data.getYear(), data.getMonthValue(),planos.getId()));
+			planos.setSaldoMensal(this.consultarSaldoMensal(data.getYear(), data.getMonthValue(),planos.getId(),planos.getContrato().getId()));
 		}
 		return listPlanos;
 	}
@@ -92,7 +99,7 @@ public class PlanoContratadoService {
 	 * @throws NotFoundException - e exibida quando nao foi encontrado nenhum
 	 * contrato
 	 */
-	public PlanoContratado mapPlanoContratado(Map<String, Object> mapPlanoContratado) throws NotFoundException {
+	public PlanoContratado mapearPlanoContratado(Map<String, Object> mapPlanoContratado) throws NotFoundException {
 		try {
 			PlanoContratado planoContratado = new PlanoContratado();
 			planoContratado.setHorarioEntrada(LocalTime.parse(mapPlanoContratado.get("horarioEntrada").toString()));
@@ -103,18 +110,18 @@ public class PlanoContratadoService {
 			String[] diaConsulta = new String[7];
 			diaConsulta = list.toArray(diaConsulta);
 
-			List<DiaConsulta> listDiaConsulta = this.contratoService.checkDaysOfTheWeek(diaConsulta);
+			List<DiaConsulta> listDiaConsulta = this.contratoService.checarDiasSemana(diaConsulta);
 			planoContratado.setDiaConsulta(listDiaConsulta);
 
 			Contrato contrato = this.contratoService
-					.findByContractNumber(mapPlanoContratado.get("numeroContrato").toString());
+					.consultarContrato(mapPlanoContratado.get("numeroContrato").toString());
 			planoContratado.setContrato(contrato);
 			if (mapPlanoContratado.get("tipoContrato").toString().toLowerCase().equals("plano")) {
 				planoContratado.setTipoContrato(TipoContrato.PLANO);
 			} else {
 				planoContratado.setTipoContrato(TipoContrato.PARTICULAR);
 			}
-			Servico servico = this.servicoService.findServico(mapPlanoContratado.get("servico").toString());
+			Servico servico = this.servicoService.consultarServicoPeloNome(mapPlanoContratado.get("servico").toString());
 			planoContratado.setServico(servico);
 			planoContratado.setValorTotal(Double.parseDouble(mapPlanoContratado.get("valorTotal").toString()));
 			return planoContratado;
@@ -132,20 +139,20 @@ public class PlanoContratadoService {
 	 * 
 	 * @return void
 	 */
-	public void savePlanoContratato(Map<String, Object> mapPlanoContratado) throws NotFoundException {
-		PlanoContratado savePlanoContratado = this.mapPlanoContratado(mapPlanoContratado);
-		PlanoContratado findPlanoContratado = this.findPlanoContratadoAtivo(savePlanoContratado.getServico().getId(),
+	public void salvarPlanoContratado(Map<String, Object> mapPlanoContratado) throws NotFoundException {
+		PlanoContratado savePlanoContratado = this.mapearPlanoContratado(mapPlanoContratado);
+		PlanoContratado findPlanoContratado = this.consultarPlanoContratadoAtivoPorServiceIdContratoIdTipoContrato(savePlanoContratado.getServico().getId(),
 				savePlanoContratado.getContrato().getId(), savePlanoContratado.getTipoContrato());
-		if (findPlanoContratado == null) {
+		
+		Assert.isTrue(findPlanoContratado == null, "Existe um plano contratado cadastrado com as mesmas características.");
+		
 			savePlanoContratado.calcularValorAtendimento();
 			this.planoContraRepository.save(savePlanoContratado);
 			Contrato contrato = this.contratoService
-					.findByContractNumber(mapPlanoContratado.get("numeroContrato").toString());
+					.consultarContrato(mapPlanoContratado.get("numeroContrato").toString());
 			contrato.setValorTotal(contrato.getValorTotal() + savePlanoContratado.getValorTotal());
 			this.contratoService.saveContrato(contrato);
-		} else {
-			throw new DuplicatePlanoContratadoException("Plano contratado duplicado");
-		}
+
 	}
 
 	/*
@@ -156,16 +163,16 @@ public class PlanoContratadoService {
 	 * 
 	 * @return void
 	 */
-	private void contractUpdateValor(Map<String, Object> mapPlanoContratado) throws NotFoundException {
+	private void updateValorTotalContrato(Map<String, Object> mapPlanoContratado) throws NotFoundException {
 		Double totalContral = 0.0;
 
 		List<PlanoContratado> list = this.planoContraRepository
-				.findByContratoId(mapPlanoContratado.get("numeroContrato").toString());
+				.consultarPlanoContratadoPorNumeroContrato(mapPlanoContratado.get("numeroContrato").toString());
 		for (PlanoContratado planoContratado : list) {
 			totalContral += planoContratado.getValorTotal();
 		}
 		Contrato contrato = this.contratoService
-				.findByContractNumber(mapPlanoContratado.get("numeroContrato").toString());
+				.consultarContrato(mapPlanoContratado.get("numeroContrato").toString());
 		contrato.setValorTotal(totalContral);
 		this.contratoService.saveContrato(contrato);
 	}
@@ -179,28 +186,19 @@ public class PlanoContratadoService {
 	 * @throws NotFoundException - e exibida quando nao foi encontrado nenhum
 	 * contrato
 	 */
-	public void updatePlanoContrato(Map<String, Object> mapPlanoContratado) throws NotFoundException {
-		PlanoContratado planoContratado = this.mapPlanoContratado(mapPlanoContratado);
+	public void atualizarPlanoContratado(Map<String, Object> mapPlanoContratado) throws NotFoundException {
+		PlanoContratado planoContratado = this.mapearPlanoContratado(mapPlanoContratado);
 		planoContratado.setId(Long.parseLong(mapPlanoContratado.get("id").toString()));
 		planoContratado.calcularValorAtendimento();
 		planoContratado.calcularValorSessao();
 		this.planoContraRepository.save(planoContratado);
-		this.contractUpdateValor(mapPlanoContratado);
+		this.updateValorTotalContrato(mapPlanoContratado);
 	}
 
-	public List<PlanoContratado> findAll() {
-		return this.planoContraRepository.findAllAtivo();
+	public List<PlanoContratado> consultarPlanosContratados() {
+		return this.planoContraRepository.consultarPlanosContratadosAtivos();
 	}
-	public Map<String,String> countSessionByPlan() throws NumberFormatException, NotFoundException {
-		List<Map<String,String>> map =this.planoContraRepository.countSessionByPlan();
-		Map<String, String> mapServico = new HashMap<>();;
-		Servico servico = null;
-		for(Map<String,String> maps: map) {
-			servico = this.servicoService.findById(Long.parseLong(maps.get("id")));
-			mapServico.put(servico.getServico(), maps.get("sessao"));
-		}
-		return mapServico;
-	}
+	
 
 	/*
 	 * Método que soma os totais dos planos contratatos ativos separando eles por
@@ -208,36 +206,26 @@ public class PlanoContratadoService {
 	 * 
 	 * @return map HashMap<String,Double> - retorna os valores por chave valor
 	 */
-	public HashMap<String, Double> findTotalActiveContracts() {
+	public HashMap<String, Double> consultarSomaTotalPlanosAtivos() {
 		HashMap<String, Double> map = new HashMap<>();
 		Double valorTotalPlanoParticular = 0.0;
 		Double valorTotalPlano = 0.0;
+		
 		for (PlanoContratado planoContratado : this.planoContraRepository.findAll()) {
-			if (planoContratado.getTipoContrato().equals(TipoContrato.PARTICULAR) && planoContratado.getAtivo() == true
-					&& planoContratado.getContrato().getAtivo() == true) {
+			if (planoContratado.getTipoContrato().equals(TipoContrato.PARTICULAR) && planoContratado.getAtivo().equals(true)
+					&& planoContratado.getContrato().getAtivo().equals(true)) {
 				valorTotalPlanoParticular += planoContratado.getValorTotal();
 			} else if (planoContratado.getTipoContrato().equals(TipoContrato.PLANO)
-					&& planoContratado.getAtivo() == true && planoContratado.getContrato().getAtivo() == true) {
+					&& planoContratado.getAtivo().equals(true) && planoContratado.getContrato().getAtivo().equals(true)) {
 				valorTotalPlano += planoContratado.getValorTotal();
 			}
-
 		}
-		map.put("Particular", valorTotalPlanoParticular);
-		map.put("Plano", valorTotalPlano);
+		Double somaParticularPlano = 0.0;
+		somaParticularPlano = valorTotalPlanoParticular + valorTotalPlano;
+		map.put("particular", valorTotalPlanoParticular);
+		map.put("plano", valorTotalPlano);
+		map.put("total", somaParticularPlano);
 		return map;
-	}
-
-	/*
-	 * Método que busca um plano contratado por tipo e pelo servico
-	 * 
-	 * @param tipoContrato TipoContrato - parametro que mostra tipo do contrato
-	 * 
-	 * @param serviceId long - parametro que tem o id do servico
-	 * 
-	 * @return PlanoContratado
-	 */
-	public PlanoContratado findbyContractTypeAndServiceId(TipoContrato tipoContrato, long serviceId) {
-		return this.planoContraRepository.findbyContractTypeAndServiceId(tipoContrato, serviceId);
 	}
 
 	/*
@@ -252,19 +240,19 @@ public class PlanoContratadoService {
 	 * @return PlanoContratado
 	 */
 	@Transactional(readOnly = true)
-	public PlanoContratado findPlanoContratadoAtivo(long servicoId, long contratoId, TipoContrato tipoContrato) {
-		return this.planoContraRepository.findPlanoContratadoAtivoByContratoAndServicoAndTipoContrato(servicoId,
+	public PlanoContratado consultarPlanoContratadoAtivoPorServiceIdContratoIdTipoContrato(long servicoId, long contratoId, TipoContrato tipoContrato) {
+		return this.planoContraRepository.consultarPlanoContratadoAtivoPorServiceIdContratoIdTipoContrato(servicoId,
 				contratoId, tipoContrato);
 	}
 	
-	public Double saldoMensal(int ano,int mes,Long planoId) {
+	public Double consultarSaldoMensal(int ano,int mes,Long planoId, Long contratoId) {
 		
 		LocalDate dataInicial = LocalDate.of(ano,mes,1);
 
 		LocalDate ultimoDiaMes = dataInicial.withDayOfMonth(dataInicial.lengthOfMonth());
 		LocalDate dataFinal = LocalDate.of(ano,mes,ultimoDiaMes.getDayOfMonth());
 		
-		Page<Registro> registros = this.registroService.findByDateAndPLanoId(dataInicial.toString(), dataFinal.toString(), planoId, 0, 32);
+		Page<Registro> registros = this.registroService.consultarRegistroContratoPelaDataEPlanoId(contratoId,dataInicial.toString(), dataFinal.toString(), planoId, 0, 32);
 		
 		Double valorExecutado = 0.0;
 		
@@ -285,14 +273,14 @@ public class PlanoContratadoService {
 	 * 
 	 * @return List<PlanoContratado> - retorna todos os planosContratados
 	 */
-	public List<PlanoContratado> findByBiometria() throws NotFoundException, UnsupportedEncodingException {
-		Contrato contrato = this.contratoService.findByBiometria();
-		return this.planoContraRepository.findByContratoId(contrato.getNumero());
+	public List<PlanoContratado> consultarContratoPorBiometria() throws NotFoundException, UnsupportedEncodingException {
+		Contrato contrato = this.contratoService.consultarContratosPorBiometria();
+		return this.planoContraRepository.consultarPlanoContratadoPorNumeroContrato(contrato.getNumero());
 	}
 	
 
-	public List<PlanoContratado> findByDiaConsulta(DiasSemana diasSemana){
-		return this.planoContraRepository.findByDiaConsulta(diasSemana);
+	public List<PlanoContratado> consultarContratoPorDiasSemana(DiasSemana diasSemana){
+		return this.planoContraRepository.consultarPlanoContratadoPorDiasSemana(diasSemana);
 	}
 	
 	

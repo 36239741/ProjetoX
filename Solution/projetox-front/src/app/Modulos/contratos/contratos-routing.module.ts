@@ -1,4 +1,4 @@
-import { LayoutComponent } from './../Layout/layout.component';
+import { LayoutComponent } from '../Layout/layout.component';
 import { VisualizarContratosComponent } from './visualizar-contratos/visualizar-contratos.component';
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
