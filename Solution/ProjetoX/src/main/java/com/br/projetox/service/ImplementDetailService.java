@@ -16,6 +16,14 @@ public class ImplementDetailService implements UserDetailsService {
 	@Autowired
 	private UsuarioRepository repository;
 	
+	
+	/*
+	 * Metodo que faz o login do usuario
+	 * 
+	 * @param email
+	 * 
+	 * @return UserDetails
+	 */
 	@Transactional(readOnly = true)
 	@Override
 	public UserDetails loadUserByUsername(String email)  {

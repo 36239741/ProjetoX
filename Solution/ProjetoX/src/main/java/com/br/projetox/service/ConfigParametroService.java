@@ -11,7 +11,14 @@ public class ConfigParametroService {
 	@Autowired
 	private ConfigParametrosRepository configRepository;
 	
-	public ConfiguracaoParametro findConfigParametros(Long configId){
+	/*
+	 * Metodo consulta as configuracoes do sistema
+	 * 
+	 * @param configId
+	 * 
+	 * @return ConfiguracaoParametro
+	 */
+	public ConfiguracaoParametro consultarConfiguracaoPorId(Long configId){
 		return this.configRepository.findById(configId).get();
 	}
 }

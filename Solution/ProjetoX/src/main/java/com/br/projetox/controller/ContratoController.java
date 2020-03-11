@@ -48,9 +48,9 @@ public class ContratoController {
 		return ResponseEntity.ok(contrato);
 	}
 	
-	@GetMapping(path = "/cancel-capture")
-	public void cancelCapture() {
-		this.service.cancelarCapturaLeitorBiometria();
+	@GetMapping(path = "/cancelar-captura-leitor")
+	public void cancelarCapturaLeitor() {
+		this.service.cancelarCapturaBiometria();
 		
 	}
 	
@@ -62,38 +62,32 @@ public class ContratoController {
 	@GetMapping
 	public ResponseEntity<Page<Contrato>> consultarContratos(@RequestParam(name = "page" , required = true) Integer page ,
 			@RequestParam(name = "size",required = true)Integer size, @RequestParam(name = "sort") String sort,
-			@RequestParam(name = "atributo") String atributo){
-		Page<Contrato> returnPage = null;
+			@RequestParam(name = "atributo") String atributo,@RequestParam(name = "nomePaciente") String nomePaciente,
+			@RequestParam(name = "statusContrato") Boolean statusContrato,@RequestParam(name = "numeroContrato") String numeroContrato){
+		
 		Direction direction =null;
 		direction = sort.trim().equals("ASC")? Direction.ASC : Direction.DESC;
-		returnPage = this.service.consultarContratos(page, size,direction,atributo);
-		return ResponseEntity.ok(returnPage);
+		PageRequest pageable = PageRequest.of(page, size,
+				org.springframework.data.domain.Sort.by(direction, atributo));
+		
+		Page<Contrato> contratos = null;
+		contratos = this.service.consultarTodosContratos(numeroContrato,nomePaciente,statusContrato,pageable);
+		return ResponseEntity.ok(contratos);
 	}
 	
 	@PostMapping(path = "/atribuir-desconto")
-	public Contrato atribuirDesconto(@RequestBody String valorDesconto, @RequestParam(name = "numeroContrato") String numeroContrato) throws NumberFormatException, Exception {
+	public Contrato atribuirDesconto(@RequestParam(name = "valorDesconto") String valorDesconto, @RequestParam(name = "numeroContrato") String numeroContrato) throws Exception {
 		return this.service.atribuirDesconto(numeroContrato, Double.parseDouble(valorDesconto));
 	}
 	
 	@GetMapping(path = "/{numeroContrato}")
 	public ResponseEntity<Contrato> consultarContrato(@Valid @PathVariable String numeroContrato) throws NotFoundException{
 		Contrato contrato = null;
-		contrato = this.service.consultarContrato(numeroContrato);
+		contrato = this.service.consultarContratoPorNumeroContrato(numeroContrato);
 		return ResponseEntity.ok(contrato);
 		
 	}
-	@GetMapping(path = "/filtro-contratos")
-	public ResponseEntity<Page<Contrato>> buscarContratosPorFiltro(@RequestParam(name = "numero") String numero,
-			@RequestParam(name = "nomePaciente") String nomePaciente, @RequestParam(name = "page") int page,
-			@RequestParam(name = "size") int size, @RequestParam(name = "ativo") Boolean ativo, @RequestParam(name = "sort") String sort,
-			@RequestParam(name = "atributo") String atributo){
-		Page<Contrato> pageable = null;
-		Direction direction =null;
-		direction = sort.trim().equals("ASC")? Direction.ASC : Direction.DESC;
-		
-		pageable = this.service.consultarContratosPorFiltro(numero, nomePaciente,ativo, PageRequest.of(page, size, org.springframework.data.domain.Sort.by(direction, atributo)));
-		return ResponseEntity.ok(pageable);
-	}
+
 	@PostMapping
 	public ResponseEntity<?> importarPlanilhaDeContratos(@RequestParam("file") MultipartFile file) throws Exception  {
 		HashMap<String, Integer> map = null;
@@ -102,7 +96,7 @@ public class ContratoController {
 			/*if(file.getContentType().equalsIgnoreCase("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") || 
 					file.getContentType().equalsIgnoreCase("application/vnd.ms-excel")) {*/
 				FileTransfer fileTransfer = new FileTransfer(file.getName(), file.getContentType(), file.getInputStream());
-				map = this.service.importarPlanilhaDeContratos(fileTransfer);
+				map = this.service.importarPlanilhaContratos(fileTransfer);
 				responseEntityOK = ResponseEntity.ok(map);
 				/*}
 			else {

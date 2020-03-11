@@ -62,22 +62,21 @@ public class RegistroService {
 
 
 	/*
-	 * @Metodo que salva o horario de entrada do paciente atraves da digital, nao
-	 * permite que salva outra entrada enquanto estivar um horario em aberto
+	 * Metodo salva o horario de entrada do paciente, para registrar um horari de entrada o ultimo registro do contrato
+	 * dever estar fechado
 	 * 
-	 * @oaram numeroContrato String - numero que costa no contrato
+	 * @oaram numeroContrato 
 	 * 
-	 * @param idPlanoContratado String - id do plano contratado que sera inserido o
-	 * horario de entrada
+	 * @param idPlanoContratado 
 	 * 
-	 * @return void
+	 * @return Registro
 	 * 
-	 * @throws NumberFormatException , NotFoundException, FingerPrintException
+	 * @throws NumberFormatException , NotFoundException, 
 	 */
-	public Registro salvarHorarioEntrada(String numeroContrato, String idPlanocontratado)
+	public Registro salvarHorarioEntrada(String numeroContrato, long idPlanocontratado)
 			throws NumberFormatException, NotFoundException {
-		Contrato contrato = this.contratoService.consultarContrato(numeroContrato);
-		PlanoContratado planoContratado = this.planoContratadoService.consultarPlanoContratadoPorId(Long.parseLong(idPlanocontratado));
+		Contrato contrato = this.contratoService.consultarContratoPorNumeroContrato(numeroContrato);
+		PlanoContratado planoContratado = this.planoContratadoService.consultarPlanoContratadoPorId(1L);
 		
 		Registro findRegistro = this.registroRepository.consultarUltimoRegistroContrato(contrato.getNumero());
 
@@ -85,7 +84,7 @@ public class RegistroService {
 			
 			Assert.notNull(findRegistro.getDataHoraSaida(), "O contrato com o nome " + contrato.getNomePaciente() + " tem um registro em "
 					+ findRegistro.getDataHoraEntrada().format(DateTimeFormatter.ofPattern("dd-MM-uuuu HH:mm"))
-					+ " que ainda não foi fechado");
+					+ " que ainda não foi fechado.");
 			
 		}
 		
@@ -102,7 +101,7 @@ public class RegistroService {
 	}
 
 	/*
-	 * Metodo que busca os registros pela data
+	 * Metodo que busca os registros pela data inicial e final que se encontra no horario de entrada de um registro cadastrado 
 	 * 
 	 * @Param dataInicial String - data de inicio para busca
 	 * 
@@ -142,7 +141,7 @@ public class RegistroService {
 	 * 
 	 * @return page<Registro>*/
 	
-	public Page<Registro> consultarRegistroContratoPelaDataEPlanoId(Long contratoId,String dataInicial, String dataFinal, Long planoId, int page, int size) {
+	public Page<Registro> consultarRegistroMensal(Long contratoId,String dataInicial, String dataFinal, Long planoId, int page, int size) {
 		Assert.isTrue(!dataInicial.isEmpty(), "Preencha o valor do campo data inicial.");
 		Assert.isTrue(!dataFinal.isEmpty(), "Preencha o valor do campo data final.");
 		Assert.isTrue(planoId > 0 , "Valor do parâmetro planoId é zero. ");
@@ -155,45 +154,54 @@ public class RegistroService {
 	}
 
 	/*
-	 * Metodo que salva o horario de saida de um paciente atraves da digital
+	 * Metodo que salva o horario de saida de um paciente e verifica se o horario de saida foi ultrapassado e se for o caso
+	 * insere o valor de tolerancia ao valor total do registro, para efetuar o registro de saida, tem que ter um registro em aberto
 	 * 
-	 * @oaram numeroContrato String - numero que costa no contrato
+	 * @oaram numeroContrato String
 	 * 
 	 * @return Registro
 	 * 
 	 * @throws NotFoundException, FingerPrintException
 	 */
 	public Registro salvarHorarioSaida(String numeroContrato) throws NotFoundException {
-		ConfiguracaoParametro configParametro = this.configParametrosService.findConfigParametros(1L);
-		Registro findRegistro = this.registroRepository.consultarUltimoRegistroContrato(numeroContrato);
+		ConfiguracaoParametro configParametro = this.configParametrosService.consultarConfiguracaoPorId(1L);
+		Registro consultarRegistro = this.registroRepository.consultarUltimoRegistroContrato(numeroContrato);
 		
-		Assert.notNull(findRegistro, "Não contêm nenhum registro no contrato do paciente " + findRegistro.getContrato().getNomePaciente() + ".");
-		Assert.isTrue(findRegistro.getDataHoraSaida() == null, "Não contêm nenhum registro de entrada em aberto para o paciente " + findRegistro.getContrato().getNomePaciente() + ".");
-
+		Assert.notNull(consultarRegistro, "Não contêm nenhum registro no contrato de número " + numeroContrato + ".");
+		Assert.isTrue(consultarRegistro.getDataHoraSaida() == null, "Não contêm nenhum registro de entrada em aberto para o paciente " + consultarRegistro.getContrato().getNomePaciente() + ".");
+			
+		// compara o horario de saida + tempo de tolerancia com o horario atual
 			Duration verificaValorAdicional = Duration.between(
-					findRegistro.getPlanoContratado().getHorarioSaida()
-							.plusMinutes(configParametro.getTempoToleranciaAtraso().getMinute()),
+					LocalTime.now(ZoneId.of("America/Maceio")),
+					consultarRegistro.getPlanoContratado().getHorarioSaida()
+							.plusMinutes(configParametro.getTempoToleranciaAtraso().getMinute())
+					);
+		/*
+		 * verifica se o tempo te tolerancia foi excedido, se for excedido adiciona o
+		 * valor excedente se nao adiciona o valor do atendimento no valor total do registro
+		 */
+			Double valorAdicionalTolerancia = (verificaValorAdicional.toMinutes() > 0) ? consultarRegistro.getPlanoContratado().getValorAtendimento()
+					+ (verificaValorAdicional.toMinutes() + configParametro.getTempoToleranciaAtraso().getMinute())
+					* configParametro.getValorMinutoAdicional() : consultarRegistro.getPlanoContratado().getValorAtendimento();
+			
+			consultarRegistro.setValorTotal(valorAdicionalTolerancia);
+			
+			
+			Duration tempoTotal = Duration.between(consultarRegistro.getDataHoraEntrada().toLocalTime(),
 					LocalTime.now(ZoneId.of("America/Maceio")));
-			if (verificaValorAdicional.toMinutes() > 0) {
-				findRegistro.setValorTotal(findRegistro.getPlanoContratado().getValorAtendimento()
-						+ (verificaValorAdicional.toMinutes() + configParametro.getTempoToleranciaAtraso().getMinute())
-								* configParametro.getValorMinutoAdicional());
-			} else {
-				findRegistro.setValorTotal(findRegistro.getPlanoContratado().getValorAtendimento());
-			}
-			Duration tempoTotal = Duration.between(findRegistro.getDataHoraEntrada().toLocalTime(),
-					LocalTime.now(ZoneId.of("America/Maceio")));
-			findRegistro.setTempoTotal(LocalTime.MIN.plusMinutes(tempoTotal.toMinutes()));
-			findRegistro.setDataHoraSaida(LocalDateTime.now(ZoneId.of("America/Maceio")));
-			this.registroRepository.save(findRegistro);
+			
+			consultarRegistro.setTempoTotal(LocalTime.MIN.plusMinutes(tempoTotal.toMinutes()));
+			consultarRegistro.setDataHoraSaida(LocalDateTime.now(ZoneId.of("America/Maceio")));
+			
+			this.registroRepository.save(consultarRegistro);
 		
-		return findRegistro;
+		return consultarRegistro;
 
 	}
 
 
 	/*
-	 * Metodo busca todos registros de um contrato
+	 * Metodo busca todos registros de um contrato pelo numeroContrato
 	 * 
 	 * @param numeroContrato String - numero do contratado cadastrado
 	 * 
@@ -203,7 +211,7 @@ public class RegistroService {
 	 * 
 	 * @return Page<Registro>
 	 */
-	public Page<Registro> consultarTodosRegistros(String numeroContrato, int page, int size) {
+	public Page<Registro> consultarTodosRegistrosDoContrato(String numeroContrato, int page, int size) {
 		PageRequest pageable = PageRequest.of(page, size);
 		Page<Registro> registros = this.registroRepository.consultarRegistros(numeroContrato, pageable);
 
@@ -221,14 +229,17 @@ public class RegistroService {
 	 * paciente se ausentou, e o paciente preferiu pela troca pontual do serviço.
 	 * Nesse caso, o operador deve indicar qual o serviço escolhido para a
 	 * substituição pontual.
+	 * 
 	 * @param situacaoRegistro
 	 * @param valorSessao
+	 * 
+	 * @return Registro
 	 */
-	public Registro registrarTrocaDeServico(Long registroId, Double valorSessao) {
+	public Registro registrarAlteracaoServico(Long registroId, Double valorSessao) {
 		Registro registro = this.registroRepository.findById(registroId).orElseThrow(
 				() -> new IllegalArgumentException("Nenhum registro com esse id: " + registroId + "foi encontrado."));
 		
-		Assert.isTrue(registro.getSituacao() == Situacao.ATENDIMENTO_NORMAL, "A situação do registro se encontra diferente de atendimento normal.");
+		Assert.isTrue(registro.getSituacao() == Situacao.ATENDIMENTO_NORMAL, "Para fazer a alteração do serviço, o registro deve se encontrar na situação de atendimento normal.");
 		Assert.isNull(registro.getDataHoraSaida(), "Este registro já encontra-se fechado.");
 
 		registro.setValorTotal(valorSessao * registro.getPlanoContratado().getSessao());
@@ -237,17 +248,6 @@ public class RegistroService {
 
 	}
 
-	
-
-	
-	
-	public Situacao verificarSituacao(String situacaoRegistro) {
-		return Situacao.valueOf(situacaoRegistro);
-	}
-
-	public TipoContrato verificarTipoContrato(Registro registro) {
-		return registro.getPlanoContratado().getTipoContrato();
-	}
 
 	/*
 	 * O operador dosistema poderá alterar a situação de um registro diário que
@@ -255,20 +255,22 @@ public class RegistroService {
 	 * 
 	 * 
 	 * @param registroId
+	 * 
+	 * @return Registro
 	 */
 
 	public Registro registrarAusenciaDoProfisional(Long registroId) {
 		Registro registro = this.registroRepository.findById(registroId).orElseThrow(
 				() -> new IllegalArgumentException("Nenhum registro com esse id: " + registroId + "foi encontrado."));
 		
-		Assert.isTrue(registro.getSituacao() == Situacao.AUSENCIA_DO_PACIENTE, "Operação inválida, a situação do "
-					+ "registro se encontra diferente de atendimento normal e ausência do paciente.");
+		Assert.isTrue(registro.getSituacao().equals(Situacao.AUSENCIA_DO_PACIENTE), "Para declarar ausência do profissional o registro deve se encontrar em ausência do paciente.");
 		
-		Assert.isTrue(registro.getDataHoraSaida() != null , "Operação inválida, este registro já possui registro de saída.");
+		Assert.isTrue(registro.getDataHoraSaida() != null , "Para declarar ausência do profissional o registro deve se encontrar fechado.");
 
 
 			registro.getPlanoContratado().setValorTotal(
 					registro.getPlanoContratado().getValorTotal() - registro.getPlanoContratado().getValorSessao());
+			
 			registro.setSituacao(Situacao.AUSENCIA_DO_PROFISSIONAL);
 			registro.setValorTotal(0D);
 
@@ -360,27 +362,25 @@ public class RegistroService {
 	}
 
 	/*
-	 * cria uma planilha contendo todos os registros do contrato se nehum nome for
-	 * designado para a planilha seu nome default sera Registros-do-contrato-numero
-	 * + Numero do Contrato
+	 * Metodo exporta uma planilha xlsx contendo todos registros de  um contrato
 	 * 
 	 * @param numeroContrato String
 	 * 
-	 * @param nomeArquivo String
 	 * 
-	 * @return
+	 * @return ByteArrayOutputStream
 	 * 
 	 * @throws RegistroException
 	 */
-	public ByteArrayOutputStream exportarPlanilhaDeRegistro(String numeroContrato) throws IOException {
+	public ByteArrayOutputStream exportarRegistrosEntradaSaida(String numeroContrato) throws IOException {
 		XSSFWorkbook workBook = new XSSFWorkbook();
 		XSSFSheet sheet = workBook.createSheet("Registros");
 
 		// criando o cabelho da planilha
-		createHead(this.createCellStyleHead(workBook), sheet);
+		criarCabecalho(this.criarEstiloDeEcelulaCabecalho(workBook), sheet);
 
 		List<Registro> registros = this.registroRepository.consultarRegistros(numeroContrato, PageRequest.of(0, Integer.MAX_VALUE)).getContent();
-		if ((registros.isEmpty()))
+		
+		if (registros.isEmpty())
 			throw new RegistroException("Não existe nenhum registro nesse contrato");
 
 		Locale locale = new Locale("pt", "BR");
@@ -390,7 +390,8 @@ public class RegistroService {
 		int i = 1;
 		for (Registro registro : registros) {
 			XSSFRow row = sheet.createRow(i);
-			row.setRowStyle(this.createCellStyleDefault(workBook));
+			row.setRowStyle(this.criarEstiloCelulaPadrao(workBook));
+
 			row.createCell(0).setCellValue(
 					registro.getDataHoraEntrada().format(DateTimeFormatter.ofPattern("dd-MM-uuuu HH:mm")).toString());
 
@@ -412,12 +413,13 @@ public class RegistroService {
 				row.createCell(4).setCellValue(numberFormat.format(registro.getValorTotal()));
 
 			} else {
-				row.createCell(4).setCellValue("");
+				row.createCell(4).setCellValue("R$: " + 0);
 			}
 			i++;
 		}
 		for(int contador = 0; contador <= 4; contador++) {
 			sheet.autoSizeColumn(contador);
+			
 		}
 		
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -428,8 +430,9 @@ public class RegistroService {
 
 		return stream;
 	}
-
-	private CellStyle createCellStyleHead(Workbook workBook) {
+	
+	/* Estilo das celulas do cabecalho */
+	private CellStyle criarEstiloDeEcelulaCabecalho(Workbook workBook) {
 		Font font = workBook.createFont();
 		font.setFontHeightInPoints((short) 16);
 		font.setColor(IndexedColors.WHITE.getIndex());
@@ -447,7 +450,8 @@ public class RegistroService {
 		return style;
 	}
 
-	private CellStyle createCellStyleDefault(Workbook workBook) {
+	/* Estilo padrao das celulas */
+	private CellStyle criarEstiloCelulaPadrao(Workbook workBook) {
 		Font font = workBook.createFont();
 		font.setFontHeightInPoints((short) 12);
 		font.setColor(IndexedColors.BLACK.getIndex());
@@ -456,8 +460,9 @@ public class RegistroService {
 		style.setFont(font);
 		return style;
 	}
-
-	private Cell createHead(CellStyle style, XSSFSheet sheet) {
+	
+	/* Cabecalho da planilha dos registros */
+	private Cell criarCabecalho(CellStyle style, XSSFSheet sheet) {
 		Cell cell;
 		Row cabecalho = sheet.createRow(0);
 		cell = cabecalho.createCell(0);

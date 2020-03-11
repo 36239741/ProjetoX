@@ -22,6 +22,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+/*Entidade que representa o cadastro do usuario do sistema*/
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -30,27 +31,24 @@ import lombok.NoArgsConstructor;
 @Data
 public class Usuario extends AbstractEntity  implements UserDetails, Serializable {
 	
-	/*
-	 * ATRIBUTOS
-	 */	
-	
-	/**
-	 * 
-	 */
+
 
 	private static final long serialVersionUID = 30474420772499602L;
 
-
+	/* Email de cadastro do usuario, utilizado para realizar o login. */
 	@NotBlank
 	@Column(unique = true)
 	private String email;
 	
+	/* Senha do usuario */
 	@NotBlank
 	private String senha;
 	
+	/* Representa o tipo de regra que o usuario se encaixa. */
 	@Enumerated(EnumType.ORDINAL)
 	private AuthorityType authorityType;
-
+	
+	/* Recupera a regra que usuario se encaixa */
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		Collection<GrantedAuthority> authority = AuthorityUtils.createAuthorityList(this.getAuthorityType().toString());

@@ -52,6 +52,7 @@ public class PlanoContratado extends AbstractEntity implements Serializable{
 	@NotNull()
 	private LocalTime horarioSaida;
 	
+	/* Valor total do plano contratado. */
 	@NotNull
 	private Double valorTotal;
 	
@@ -59,7 +60,7 @@ public class PlanoContratado extends AbstractEntity implements Serializable{
 	@NotNull
 	private int sessao;
 	
-
+	/* Associacao com a entidade diaConsulta. */
 	@OneToMany(targetEntity = DiaConsulta.class,cascade = {
 			CascadeType.PERSIST,
 			CascadeType.MERGE,
@@ -73,7 +74,7 @@ public class PlanoContratado extends AbstractEntity implements Serializable{
 	@ManyToOne(targetEntity = Servico.class,optional = false,fetch = FetchType.EAGER)
 	private Servico servico;
 	
-	@ManyToOne(targetEntity = Contrato.class,optional = true,fetch = FetchType.LAZY)
+	@ManyToOne(targetEntity = Contrato.class,optional = true,fetch = FetchType.EAGER)
 	private Contrato contrato;
 	
 	/* Status de um plano contratado. */
@@ -89,10 +90,12 @@ public class PlanoContratado extends AbstractEntity implements Serializable{
 	private Double saldoMensal;
 	
 	
+	/* Metodo que calcular o valor da sessao. */
 	public void calcularValorSessao() {
 		this.valorSessao = this.valorTotal / this.sessao;
 	}
 	
+	/* Metodo que calcula o valor da consulta realizada no dia. */
 	public void calcularValorAtendimento() {
 		this.valorAtendimento = this.valorSessao * this.sessao;
 	}

@@ -45,7 +45,7 @@ import com.br.projetox.entity.TipoContrato;
 import com.br.projetox.exception.ContratoException;
 import com.br.projetox.exception.ImportPlanilhaException;
 import com.br.projetox.repository.ContratoRepository;
-import com.br.projetox.util.FingerPrintUtil;
+import com.br.projetox.util.BiometriaUlil;
 
 import CIDBio.ImageAndTemplate;
 import CIDBio.Template;
@@ -65,7 +65,7 @@ public class ContratoService {
 	private ContratoRepository repository;
 
 	@Autowired
-	private FingerPrintUtil fingerPrint;
+	private BiometriaUlil biometria;
 	
 	@Autowired
 	private RegistroService registroService;
@@ -81,102 +81,58 @@ public class ContratoService {
 	private static final Integer MULTIPLICADOR_PROXIMO_SERVICO = 6;
 
 	
+
 	
-	
-	public List<Contrato> consultarTodosContratos(){
-		return this.repository.findAll();
-	}
 	/*
-	 * Método para a busca de todos os contratos com ordenacao
+	 * Método que consulta todos contratos, aonde podem ser filtrados por nomePaciente e numero.
 	 * 
-	 * @param pageNum int - numero da pagina
-	 * 
-	 * @param pageSize int - total de contratos retornado por pagina
-	 * 
-	 * @param direction Direction - tipo de ordenacao ASC ou DESC
-	 * 
-	 * @param atributo String - atributo da entidade que sera referencia para
-	 * ordenacao
+	 * @param pageRequest
+	 * @param numero
+	 * @param nomePaciente
+	 * @ativo
 	 * 
 	 * @return Page<contrato>
 	 */
-	public Page<Contrato> consultarContratos(int pageNum, int pageSize, Direction direction, String atributo) {
-		Page<Contrato> page = null;
-		PageRequest pageable = PageRequest.of(pageNum, pageSize,
-				org.springframework.data.domain.Sort.by(direction, atributo));
-		page = this.repository.findAll(pageable);
-		LocalDate date = LocalDate.now();
+	public Page<Contrato> consultarTodosContratos(String numero, String nomePaciente,Boolean ativo, PageRequest pageRequest) {
+		Page<Contrato> page  = this.repository.consultarContratos(numero, nomePaciente,ativo,pageRequest);
+				
 		for(Contrato contrato: page.getContent()) {
-			Double valorExecutado = this.valorExecutado(date.getYear(), date.getMonthValue(), contrato.getNumero());
-			contrato.setValorExecutado(valorExecutado);
-			contrato.setDiferenca(contrato.getValorExecutado() - contrato.getValorTotal());
-			contrato.clearToList();
+			contrato.calcularValorExecutado();
+			contrato.calcularDiferenca();
 		}
 		return page;
 	}
 
 
-	/*
-	 * Método de busca que utiliza o campo numero , nomePaciente aonde pode ser
-	 * utilizados em conjunto ou separados
-	 * 
-	 * @param numero String - numero do contrato cadastrado
-	 * 
-	 * @param nomePaciente String - nome do paciente contido no contrato
-	 * 
-	 * @param pageable PageRequet - variavel que contem especificacoes de retorno
-	 * 
-	 * @return Page<Contrato>
-	 */
-	@Transactional(readOnly = true)
-	public Page<Contrato> consultarContratosPorFiltro(String numero, String nomePaciente,Boolean ativo, PageRequest pageable) {
-		Page<Contrato> page = this.repository.consultarPorFiltros(numero, nomePaciente,ativo,pageable);
-		LocalDate date = LocalDate.now();
-		
-		for(Contrato contrato: page.getContent()) {
-			Double valorExecutado = this.valorExecutado(date.getYear(), date.getMonthValue(), contrato.getNumero());
-			contrato.setValorExecutado(valorExecutado);
-			contrato.setDiferenca(contrato.getValorExecutado() - contrato.getValorTotal());
-			contrato.clearToList();
-		}
-		return page;
-	}
-
 
 	/*
-	 * Método para busca de contratos atraves do numero do contrato cadastrado
+	 * Método que consulta um contrato pelo numero
 	 * 
-	 * @param numeroContrato String - numero do contrato salvo
+	 * @param numeroContrato
 	 * 
 	 * @return contrato
-	 * 
-	 * @throws NotFoundException - retorna a excessao quando nao for encontrado
-	 * nenhum contrato
-	 */
-	public Contrato consultarContrato(String numeroContrato) throws NotFoundException {
-		Contrato contrato = this.repository.findByNumero(numeroContrato).get();
-		Assert.notNull(contrato, "Nenhum contrato encontrado com esse número de contrato:" + numeroContrato);
-		
-		LocalDate date = LocalDate.now();
-		Double valorExecutado = this.valorExecutado(date.getYear(), date.getMonthValue(), contrato.getNumero());
-		contrato.setValorExecutado(valorExecutado);
-		contrato.getPlanoContratado().clear();
+	 * */
+	public Contrato consultarContratoPorNumeroContrato(String numeroContrato) {
+		Contrato contrato = this.repository.findByNumero(numeroContrato).orElseThrow(()
+				-> new IllegalArgumentException("Nenhum contrato encontrado com esse número de contrato: " + numeroContrato));
+			
+		contrato.calcularValorExecutado();
+		contrato.calcularDiferenca();
 		
 		return contrato;
 
 	}
 
 	/*
-	 * Método que recebe a planilha de dados e faz aas contagens das linhas e a
-	 * percorre, suportando somente os formatos xlxs e xls
+	 *	Metodo que faz a importacao de uma planilha xlsx que contem as informacoes dos contratos assim preenchendo as entidades
+	 *	e posteriormente persiste no banco e retorna o numero de contratos novos e os contratos atualizados
 	 * 
-	 * @param file FileTransfer - contem a planinhla de dados , tipo da variavel da
-	 * biblioteca do DWR
+	 * @param file
 	 * 
 	 * @return HashMap<String, Integer>
 	 */
-	public HashMap<String, Integer> importarPlanilhaDeContratos(FileTransfer file) throws Exception {
-		List<Contrato> listContrato = new ArrayList<>();
+	public HashMap<String, Integer> importarPlanilhaContratos(FileTransfer file) throws Exception {
+		List<Contrato> listaContrato = new ArrayList<>();
 		Workbook workbook = WorkbookFactory.create(file.getInputStream());
 		Sheet sheet = workbook.getSheetAt(0);
 		final int numeroLinhas = sheet.getPhysicalNumberOfRows();
@@ -185,158 +141,109 @@ public class ContratoService {
 			try {
 				Row linha = sheet.getRow(i);
 				if (!(linha == null || linha.getCell(0) == null || linha.getCell(0).toString().equals(""))) {
-					listContrato.add(this.valoresEntidadeContrato(linha));
+					//Recupera os valores da planilha
+					Contrato contrato = new Contrato();
+					Double numeroContrato = Double.parseDouble(linha.getCell(NUM_CONTRATO).toString());
+					contrato.setNumero(numeroContrato.intValue() + "");
+					contrato.setNomePaciente(linha.getCell(NOME_PACIENTE).toString());
+					int contator = 2;
+					int atualizarNumeroCelula = 0;
+					while (!(linha.getCell(contator) == null || linha.getCell(contator).toString().equals(""))) {
+						PlanoContratado planoContratado = new PlanoContratado();
+						String[] planoServico = new String[2];
+						planoServico = linha.getCell(PLANO + atualizarNumeroCelula).toString().trim().split("-");
+						planoContratado.setTipoContrato(
+								(planoServico[0].trim().equals("Particular") ? TipoContrato.PARTICULAR : TipoContrato.PLANO));
+						Servico servico = this.servicoService.consultarServicoPeloNome(planoServico[1].trim());
+								planoContratado.setServico(servico);
+
+						Double numeroSessoes = Double.parseDouble(linha.getCell(NUMERO_SESSOES + atualizarNumeroCelula).toString());
+						planoContratado.setSessao(numeroSessoes.intValue());
+						planoContratado
+								.setValorTotal(Double.parseDouble(linha.getCell(VALOR_PLANO + atualizarNumeroCelula).toString()));
+						planoContratado.calcularValorSessao();
+						String[] horaEntrada = linha.getCell(ENTRADA_PADRAO + atualizarNumeroCelula).toString().trim().split(":");
+						planoContratado.setHorarioEntrada(
+								LocalTime.of(Integer.parseInt(horaEntrada[0]), Integer.parseInt(horaEntrada[1]))); //
+						String[] horaSaida = linha.getCell(SAIDA_PADRAO + atualizarNumeroCelula).toString().trim().split(":");
+						planoContratado
+								.setHorarioSaida(LocalTime.of(Integer.parseInt(horaSaida[0]), Integer.parseInt(horaSaida[1])));// linha.getCell(ENTRADA_SAIDA).toString
+						String[] diasSemana = new String[7];
+						diasSemana = linha.getCell(DIAS_SEMANA + atualizarNumeroCelula).toString().trim().split(",");
+						Assert.notNull(diasSemana[0], "O campo dias da semana não foi preenchido. ");
+						
+						for(String diaSemana: diasSemana) {
+							DiaConsulta diaConsulta = new DiaConsulta();
+							diaConsulta.setDiasSemana(DiasSemana.criarListDiasSemana(diaSemana));
+							planoContratado.getDiaConsulta().add(diaConsulta);
+						}
+						
+						contator += MULTIPLICADOR_PROXIMO_SERVICO;
+						atualizarNumeroCelula += 6;
+						planoContratado.calcularValorAtendimento();
+						planoContratado.setContrato(contrato);
+						contrato.getPlanoContratado().add(planoContratado);
+					}
+					contrato.calcularValorTotal();
+					listaContrato.add(contrato);
 				}
 			} catch (Exception e) {
 				throw new ImportPlanilhaException("Erro na linha " + i + "." + e);
 			}
 		}
-
 		workbook.close();
-		return this.numeroDeContratosSalvosAtualizado(listContrato);
-	}
-
-	/*
-	 * Método que recupera os valores do contrato
-	 * 
-	 * @param linha Row - recebe as linhas das planilha
-	 * 
-	 * @return Contrato
-	 */
-	private Contrato valoresEntidadeContrato(Row linha) throws Exception {
-		Contrato contrato = new Contrato();
-		Double numeroContrato = Double.parseDouble(linha.getCell(NUM_CONTRATO).toString());
-		contrato.setNumero(numeroContrato.intValue() + "");
-		contrato.setNomePaciente(linha.getCell(NOME_PACIENTE).toString());
-
-		return valoresEntidadePlano(linha, contrato);
-
-	}
-
-	/*
-	 * Método que recupera os valores dos planos contratados
-	 * 
-	 * @param linha Row - recebe as linhas da planilha
-	 * 
-	 * @param contrato Contrato - recebe o contrato para insercao do plano
-	 * 
-	 * @return Contrato
-	 */
-	private Contrato valoresEntidadePlano(Row linha, Contrato contrato) {
-		List<Servico> servicos = this.servicoService.consultarTodosServicos();
-		int contator = 2;
-		int atualizarNumeroCelula = 0;
-		while (!(linha.getCell(contator) == null || linha.getCell(contator).toString().equals(""))) {
-			PlanoContratado planoContratado = new PlanoContratado();
-			String[] planoServico = new String[2];
-			planoServico = linha.getCell(PLANO + atualizarNumeroCelula).toString().trim().split("-");
-			planoContratado.setTipoContrato(
-					(planoServico[0].trim().equals("Particular") ? TipoContrato.PARTICULAR : TipoContrato.PLANO));
-			for (Servico servico : servicos) {
-				if (servico.getServico().equals(planoServico[1].trim())) {
-					planoContratado.setServico(servico);
-					break;
+	
+		int atualizado = 0;
+		int salvo = 0;
+		Optional<Contrato> consultarContrato = null;
+		for (int i = 0; i < listaContrato.size(); i++) {
+			//Verifica se o contrato existe 
+			consultarContrato = this.repository.findByNumero(listaContrato.get(i).getNumero());
+			if (consultarContrato.isPresent()) {
+				consultarContrato.get().setNomePaciente(listaContrato.get(i).getNomePaciente());
+				consultarContrato.get().calcularValorTotal();
+				consultarContrato.get().setValorTotal(listaContrato.get(i).getValorTotal());
+				
+				for(PlanoContratado plano : listaContrato.get(i).getPlanoContratado()) {
+					Servico servico = this.servicoService.consultarServicoPeloNome(plano.getServico().getServico());
+					
+					//Verifica se o planoContratado existe
+					PlanoContratado planoContratado = this.planoContratadoService.
+					consultarPlanoContratadoAtivoPorServiceIdContratoIdTipoContrato(servico.getId(),
+							listaContrato.get(i).getNumero(), plano.getTipoContrato());
+					
+					if(planoContratado != null) {
+						planoContratado.setDiaConsulta(plano.getDiaConsulta());
+						planoContratado.setHorarioEntrada(plano.getHorarioEntrada());
+						planoContratado.setHorarioSaida(plano.getHorarioSaida());
+						planoContratado.setServico(plano.getServico());
+						planoContratado.setSessao(plano.getSessao());
+						planoContratado.setTipoContrato(plano.getTipoContrato());
+						planoContratado.setValorTotal(plano.getValorTotal());
+						planoContratado.setValorSessao(plano.getValorSessao());
+						planoContratado.setValorAtendimento(plano.getValorAtendimento());
+						this.planoContratadoService.atualizarPlanoContratado(planoContratado);
+					}
 				}
-			}
-			Double numeroSessoes = Double.parseDouble(linha.getCell(NUMERO_SESSOES + atualizarNumeroCelula).toString());
-			planoContratado.setSessao(numeroSessoes.intValue());
-			planoContratado
-					.setValorTotal(Double.parseDouble(linha.getCell(VALOR_PLANO + atualizarNumeroCelula).toString()));
-			planoContratado.calcularValorSessao();
-			String[] horaEntrada = linha.getCell(ENTRADA_PADRAO + atualizarNumeroCelula).toString().trim().split(":");
-			planoContratado.setHorarioEntrada(
-					LocalTime.of(Integer.parseInt(horaEntrada[0]), Integer.parseInt(horaEntrada[1]))); //
-			String[] horaSaida = linha.getCell(SAIDA_PADRAO + atualizarNumeroCelula).toString().trim().split(":");
-			planoContratado
-					.setHorarioSaida(LocalTime.of(Integer.parseInt(horaSaida[0]), Integer.parseInt(horaSaida[1])));// linha.getCell(ENTRADA_SAIDA).toString
-			String[] diasSemana = new String[7];
-			diasSemana = linha.getCell(DIAS_SEMANA + atualizarNumeroCelula).toString().trim().split(",");
-
-			this.checarDiasSemana(diasSemana).forEach(dias -> planoContratado.getDiaConsulta().add(dias));
-
-			contator += MULTIPLICADOR_PROXIMO_SERVICO;
-			atualizarNumeroCelula += 6;
-			planoContratado.calcularValorAtendimento();
-			planoContratado.setContrato(contrato);
-			contrato.getPlanoContratado().add(planoContratado);
-		}
-		contrato.calcularValorTotal();
-
-		return contrato;
-	}
-
-	/*
-	 * Método verifica os dias da semana vindo da planilha
-	 * 
-	 * @param diasSemana String[] - um array de String contendo os dias da semana
-	 * informados
-	 * 
-	 * @return List<DiaConsulta>
-	 * 
-	 * @throws NullPointerException - retorna a excessao quando os valores do array
-	 * nao atender nenhum else if com a verificacao
-	 */
-	public List<DiaConsulta> checarDiasSemana(String diasSemana[]) {
-		List<DiaConsulta> listDiasConsulta = new ArrayList<>();
-		for (int i = 0; i < diasSemana.length; i++) {
-			if (diasSemana[i] != null) {
-				DiaConsulta diaConsulta = new DiaConsulta();
-				if (diasSemana[i].equals("SEG")) {
-					diaConsulta.setDiasSemana(DiasSemana.SEGUNDA);
-				} else if (diasSemana[i].equals("TER")) {
-					diaConsulta.setDiasSemana(DiasSemana.TERCA);
-				} else if (diasSemana[i].equals("QUA")) {
-					diaConsulta.setDiasSemana(DiasSemana.QUARTA);
-				} else if (diasSemana[i].equals("QUI")) {
-					diaConsulta.setDiasSemana(DiasSemana.QUINTA);
-				} else if (diasSemana[i].equals("SEX")) {
-					diaConsulta.setDiasSemana(DiasSemana.SEXTA);
-				} else if (diasSemana[i].equals("SAB")) {
-					diaConsulta.setDiasSemana(DiasSemana.SABADO);
-				} else {
-					throw new ContratoException("Nenhum dia da Consulta informado");
-				}
-
-				listDiasConsulta.add(diaConsulta);
-			}
-		}
-		return listDiasConsulta;
-	}
-
-	/*
-	 * Metodo que salva ou atualiza os contratos
-	 * 
-	 * @param contratos List<> - lista contendo os contratos
-	 * 
-	 * @return HashMap<string,integer> - contagem de contratos salvos e atualizados
-	 */
-	private HashMap<String, Integer> numeroDeContratosSalvosAtualizado(List<Contrato> contratos) {
-		int update = 0;
-		int save = 0;
-		Optional<Contrato> findContrato = null;
-		for (int i = 0; i < contratos.size(); i++) {
-			findContrato = this.repository.findByNumero(contratos.get(i).getNumero());
-			if (findContrato.isPresent()) {
-				findContrato.get().setNomePaciente(contratos.get(i).getNomePaciente());
-				findContrato.get().calcularValorTotal();
-				findContrato.get().setValorTotal(contratos.get(i).getValorTotal());
-				checarPlanoContratado(contratos, findContrato, i);
-				this.repository.save(findContrato.get());
-				update += 1;
+				listaContrato.get(i).calcularValorTotal();
+				this.repository.save(consultarContrato.get());
+				atualizado += 1;
 			} else {
-				this.repository.save(contratos.get(i));
-				save += 1;
+				this.repository.save(listaContrato.get(i));
+				salvo += 1;
 			}
 
 		}
 		HashMap<String, Integer> map = new HashMap<>();
-		map.put("update", update);
-		map.put("save", save);
+		map.put("atualizado", atualizado);
+		map.put("salvo", salvo);
 		return map;
 	}
+
+
 	
 	/*
-	 * Metodo faz a atribuicao de um deminado valor desconto informado pelo usuario no contrato
+	 * Metodo atribui um desconto ao contrato com, o valor e informado pelo usuario 
 	 * 
 	 * @Param numeroContrato - String
 	 * 
@@ -346,70 +253,32 @@ public class ContratoService {
 	 */
 	
 	public Contrato atribuirDesconto(String numeroContrato, Double desconto) throws Exception {
-		List<PlanoContratado> plano = this.planoContratadoService.consultarPlanoContratadoAtivoPorContrato(numeroContrato);
-		
-		Double valorTotalContrato = 0.0;
+		List<PlanoContratado> plano = this.planoContratadoService.consultarPlanosDisponiveisDoContrato(numeroContrato);
+
 		Assert.isTrue(!plano.isEmpty(), "Esse contrato nao possui nenhum plano contratado.");
 		Assert.notNull(desconto, "O valor de desconto é nulo");
 		
-				Double valorDesconto = 0.0;
+				
+				Double valorTotalContrato = 0.0;
 			/* valor do desconto divido pelo total de planos contratados do contrato */
+				Double valorDesconto = 0.0;
 				valorDesconto = desconto / plano.size();
 				
 				for (PlanoContratado planos : plano) {
 					planos.setValorTotal(planos.getValorTotal() - valorDesconto);
 					valorTotalContrato += planos.getValorTotal();
 				}
-				Contrato contrato = this.consultarContrato(numeroContrato);
+				Contrato contrato = this.consultarContratoPorNumeroContrato(numeroContrato);
 				contrato.setDesconto(desconto);
 				contrato.setValorTotal(valorTotalContrato);
 				return this.repository.save(contrato);
 
-
 		}
 
-
-	/*
-	 * Metodo que verifica se existe um plano contratado ja cadastrado no contrato
-	 * ,se exister e le ira fazer o update se nao ira salvar o novo plano
-	 * 
-	 * @param contratos List<Contratos> - contem os contratos a serem verificados
-	 * 
-	 * @param contrato Optional<Contrato> - contem o contrato especifico para fazer
-	 * a busca do plano contratado
-	 * 
-	 * @param i int - contador do for
-	 * 
-	 * @return void
-	 */
-	
-	private void checarPlanoContratado(List<Contrato> contratos, Optional<Contrato> findContrato, int i) {
-		for (PlanoContratado planoContratado : contratos.get(i).getPlanoContratado()) {
-			Long servicoId = this.servicoService.consultarServicoPeloNome(planoContratado.getServico().getServico()).getId();
-			PlanoContratado findPlanoContratado = this.planoContratadoService.consultarPlanoContratadoAtivoPorServiceIdContratoIdTipoContrato(servicoId,
-					findContrato.get().getId(), planoContratado.getTipoContrato());
-			if (findPlanoContratado != null) {
-				findPlanoContratado.setDiaConsulta(planoContratado.getDiaConsulta());
-				findPlanoContratado.setHorarioEntrada(planoContratado.getHorarioEntrada());
-				findPlanoContratado.setHorarioSaida(planoContratado.getHorarioSaida());
-				findPlanoContratado.setServico(planoContratado.getServico());
-				findPlanoContratado.setSessao(planoContratado.getSessao());
-				findPlanoContratado.setTipoContrato(planoContratado.getTipoContrato());
-				findPlanoContratado.setValorTotal(planoContratado.getValorTotal());
-				findPlanoContratado.calcularValorSessao();
-				findContrato.get().getPlanoContratado().add(findPlanoContratado);
-			} else {
-				planoContratado.calcularValorSessao();
-				planoContratado.setContrato(findContrato.get());
-				findContrato.get().getPlanoContratado().add(planoContratado);
-			}
-
-		}
-	}
 
 	/*
 	 * Metodo captura tres vezes a digital, realiza um merge nas tres imagens e
-	 * salva no banco em forma de bytes o template da biometria
+	 * salva no banco o template da biometria em forma de bytes 
 	 * 
 	 * @param String contractNumber - Numero do contrato, que sera cadastrado a
 	 * biometria
@@ -418,15 +287,16 @@ public class ContratoService {
 	 * 
 	 * @throws FingerPrintException
 	 */
-	public void salvarBiometria(String contractNumber) throws NotFoundException {
-		Template templateMerge = this.fingerPrint.captureThreeFingerPrint();
+	public void salvarBiometria(String numeroContrato) throws NotFoundException {
+		Template templateMerge = this.biometria.capturarTresVezesADigital();
 		byte[] binary;
 		binary = templateMerge.getTemplate().getBytes();
-		this.repository.salvarBiometria(contractNumber, binary);
+		this.repository.salvarBiometria(numeroContrato, binary);
 	}
 
+	
 	/*
-	 * Metodo verifica se uma digital lida corresponde a salva no banco
+	 * Metodo busca um contrato pela digital do paciente
 	 * 
 	 * @Param String numeroContrato - numero do contrato a ser consultado
 	 * 
@@ -437,54 +307,56 @@ public class ContratoService {
 		List<Contrato> listContrato = null;
 		Contrato returnContrato = null;
 		listContrato = this.repository.findAll();
-		imgAndTemplate = this.fingerPrint.captureFingerPrint();
+		imgAndTemplate = this.biometria.capturarBiometria();
 		for (Contrato contrato : listContrato) {
 			if (contrato.getBiometria() != null) {
-				Boolean match = this.fingerPrint.verifyFingerprint(contrato.getBiometria(), imgAndTemplate);
+				Boolean match = this.biometria.verificarDigital(contrato.getBiometria(), imgAndTemplate);
 				if (Boolean.TRUE.equals(match)) {
 					returnContrato = contrato;
 				} 
 			}
 		}
-		Assert.notNull(returnContrato, "Nenhum plano cadastrado nessa biometria.");
+		Assert.notNull(returnContrato, "Nenhum contrato cadastrado com essa biometria.");
 		return returnContrato;
 	}
 	
-	private Double valorExecutado(int ano,int mes, String numeroContrato) {
-		
-		LocalDate dataInicial = LocalDate.of(ano,mes,1);
 
+	/*
+	 * Metodo consulta o relatorio mensal dos contratos pelo mes e ano indicado pelo usuario
+	 * 
+	 * @param mes
+	 * @param ano
+	 * 
+	 * @return List<Contrato>
+	 */
+	public List<Contrato> consultarRelatorioMensal(int mes, int ano) {
+		List<Contrato> contratos = this.repository.findAll();
+		LocalDate dataInicial = LocalDate.of(ano,mes,1);
 		LocalDate ultimoDiaMes = dataInicial.withDayOfMonth(dataInicial.lengthOfMonth());
-		LocalDate dataFinal = LocalDate.of(ano,mes,ultimoDiaMes.getDayOfMonth());
-		
-		List<Registro> registros = this.registroService.consultarRegistrosContratoPelaData(dataInicial.toString(), dataFinal.toString(),numeroContrato, 0, 32 ).getContent();
-		
-		
-		Double valorExecutado = 0.0;
-		
-		for(Registro registro : registros) {
-			if(registro.getValorTotal() != null) {
-				valorExecutado += registro.getValorTotal();
-			}
-		}
-		
-		return valorExecutado;
-		
-	}
-	
-	public List<Contrato> consultarRelatorioMensal(int ano , int mes) {
-		List<Contrato> contratos = this.consultarTodosContratos();
-		
-		List<Contrato> listContratos = new ArrayList<>();
+		LocalDate dataFinal = LocalDate.of(ano, mes,ultimoDiaMes.getDayOfMonth());
+
 		for(Contrato contrato: contratos) {
-			contrato.setValorExecutado(this.valorExecutado(ano, mes, contrato.getNumero()));
-			contrato.setDiferenca(contrato.getValorExecutado() - contrato.getValorTotal());
-			listContratos.add(contrato);
+			Page<Registro> registrosMensais = this.registroService.
+					consultarRegistrosContratoPelaData(dataInicial.toString(), dataFinal.toString(), contrato.getNumero(), 0, 32);
+			contrato.getRegistro().clear();
+			for(Registro registro: registrosMensais.getContent()) {
+				contrato.getRegistro().add(registro);
+			}
+			contrato.calcularValorExecutado();
+			contrato.calcularDiferenca();
 		}
-		return listContratos;
+		return contratos;
 	}
 	
-	public ByteArrayOutputStream exportarPlanilhaRelatorio(int ano, int mes) throws IOException {
+	
+	/* Metodo exporta uma planilha xlsx do relatorio mensal correspondente ao mes e o ano indicado pelo usuario
+	 * 
+	 * @param mes
+	 * @param ano
+	 * 
+	 * @return ByteArrayOutputStream
+	 * */ 
+	public ByteArrayOutputStream exportarPlanilhaRelatorio(int mes, int ano) throws IOException {
 		XSSFWorkbook workBook = new XSSFWorkbook();
 		XSSFSheet sheet = workBook.createSheet("Relatorios");
 
@@ -503,7 +375,7 @@ public class ContratoService {
 			XSSFRow row = sheet.createRow(i);
 			// style das celulas
 
-			CellStyle style = this.estiloDefaultCelulas(workBook, contrato);
+			CellStyle style = this.estiloPadraoCelulas(workBook, contrato);
 			
 			row.createCell(0).setCellValue(contrato.getNumero());
 			row.createCell(1).setCellValue(contrato.getNomePaciente());
@@ -532,6 +404,7 @@ public class ContratoService {
 		return stream;
 	}
 	
+	/* Cabecalho da planilha do relatorio mensal */
 	private Cell criarCabecalho(CellStyle style, XSSFSheet sheet) {
 		Cell cell;
 		Row cabecalho = sheet.createRow(0);
@@ -554,6 +427,8 @@ public class ContratoService {
 		return cell;
 	}
 	
+	
+	/* Estilo de celula do cabecalho */
 	private CellStyle estiloCelulaCabecalho(Workbook workBook) {
 		Font font = workBook.createFont();
 		font.setFontHeightInPoints((short) 16);
@@ -572,18 +447,29 @@ public class ContratoService {
 		return style;
 	}
 	
-	private CellStyle estiloDefaultCelulas(Workbook workBook, Contrato contrato) {
+	/*
+	 * Estilo de padrao das celulas e colori as celulas conforme o valor da
+	 * diferenca 
+	 * 
+	 * ValorExecutado > ValorTotal Verde 
+	 * 
+	 * ValorExecutado < ValorTotal Vermelho 
+	 * 
+	 * ValorExecutado = ValorTotal Azul
+	 * 
+	 * @return CellStyle
+	 */
+	private CellStyle estiloPadraoCelulas(Workbook workBook, Contrato contrato) {
 		Font font = workBook.createFont();
 		font.setFontHeightInPoints((short) 14);
 		font.setColor(IndexedColors.BLACK.getIndex());
 		
 		CellStyle style = workBook.createCellStyle();
-		Double diferenca = contrato.getValorExecutado() - contrato.getValorTotal();
-		if(diferenca < 0.0) {
+		if(contrato.getValorExecutado() < contrato.getValorTotal()) {
 			
 			style.setFillForegroundColor(IndexedColors.RED1.getIndex());
 		}
-		else if (diferenca > 0.0) {
+		else if (contrato.getValorExecutado() > contrato.getValorTotal()) {
 			style.setFillForegroundColor(IndexedColors.GREEN.getIndex());
 		}
 		else {
@@ -595,13 +481,21 @@ public class ContratoService {
 		return style;
 	}
 	
-	public void cancelarCapturaLeitorBiometria() {
-		this.fingerPrint.cancelCapture();
+	/* Metodo cancela a captura do leitor 
+	 * 
+	 * @return void
+	 * */
+	public void cancelarCapturaBiometria() {
+		this.biometria.cancelCapture();
 	}
 
-
-	public void saveContrato(Contrato contrato) {
-		this.repository.save(contrato);
+	/*
+	 * Metodo que salva um contrato
+	 * 
+	 * @return Contrato
+	 */
+	public Contrato salvarContrato(Contrato contrato) {
+		return this.repository.save(contrato);
 		
 	}
 

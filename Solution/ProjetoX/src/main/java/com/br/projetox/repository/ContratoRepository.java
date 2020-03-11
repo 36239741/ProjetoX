@@ -25,8 +25,8 @@ public interface ContratoRepository extends JpaRepository<Contrato, Long> {
 	@Query("FROM Contrato contrato "
 			+ "WHERE ( lower(contrato.numero) LIKE '%' || lower(:numero) || '%' OR :numero IS NULL) AND "
 			+ "( lower(contrato.nomePaciente) LIKE '%' || lower(:nomePaciente) || '%' OR :nomePaciente IS NULL) AND "
-			+ "contrato.ativo = :ativo")
-	public Page<Contrato> consultarPorFiltros(@Param("numero") String numero,
+			+ "contrato.ativo = :ativo ")
+	public Page<Contrato> consultarContratos(@Param("numero") String numero,
 			@Param("nomePaciente") String nomePaciente,
 			@Param("ativo") Boolean ativo,
 			Pageable pageable);

@@ -30,8 +30,8 @@ public class ResgistroController {
 	private RegistroService registroService;
 	
 	@PostMapping(path = "/salvar-registro-entrada")
-	public Registro saveHorarioEntrada(@RequestBody Map<String, Object> map) throws NumberFormatException, NotFoundException {
-		 return this.registroService.salvarHorarioEntrada(map.get("numeroContrato").toString(), map.get("idPlanoContratado").toString());
+	public Registro saveHorarioEntrada(@RequestParam(name = "numeroContrato") String numeroContrato, @RequestParam(name = "idPlanoContratado") long idPlanoContratado) throws NumberFormatException, NotFoundException {
+		 return this.registroService.salvarHorarioEntrada(numeroContrato,idPlanoContratado);
 		 
 	}
 	
@@ -41,28 +41,30 @@ public class ResgistroController {
 	}
 	
 	@GetMapping(path = "/consultar-registros")
-	public Page<Registro> findAllRegistro(@RequestParam(name = "page" , required = true) Integer page ,
+	public Page<Registro> consultarRegistros(@RequestParam(name = "page" , required = true) Integer page ,
 			@RequestParam(name = "size",required = true)Integer size, @RequestParam(name= "numeroContrato") String numeroContrato){
-		return this.registroService.consultarTodosRegistros(numeroContrato, page, size);
+		return this.registroService.consultarTodosRegistrosDoContrato(numeroContrato, page, size);
 	}
 	
 	@GetMapping(path = "/ausencia-profissional")
-	public Registro findAllRegistro(@RequestParam(name = "registroId") String registroId){
+	public Registro registrarAusenciaProfissional(@RequestParam(name = "registroId") String registroId){
 		return this.registroService.registrarAusenciaDoProfisional(Long.parseLong(registroId));
 	}
-	@GetMapping(path = "/trocar-servico")
-	public Registro findAllRegistro(@RequestParam(name = "registroId") String registroId, @RequestParam(name = "valorSessao") String valorSessao){
+	@GetMapping(path = "/registrar-alteracao-servico")
+	public Registro registrarAlteracaoServico(@RequestParam(name = "registroId") String registroId, @RequestParam(name = "valorSessao") String valorSessao){
 		Assert.notNull(valorSessao, "Informe o valor do serviço.");
-		return this.registroService.registrarTrocaDeServico(Long.parseLong(registroId), Double.valueOf(valorSessao));
+		return this.registroService.registrarAlteracaoServico(Long.parseLong(registroId), Double.valueOf(valorSessao));
 	}
+	
 	@GetMapping(path = "/consultar-registros-data")
-	public Page<Registro> findByDate(@RequestParam(name = "dataInicial") String dataInicial, @RequestParam(name = "dataFinal") String dataFinal,
+	public Page<Registro> consultarRegistrosContratoPelaData(@RequestParam(name = "dataInicial") String dataInicial, @RequestParam(name = "dataFinal") String dataFinal,
 			@RequestParam(name = "numeroContrato") String numeroContrato, @RequestParam(name = "page") int page, @RequestParam(name = "size") int size){
 		return this.registroService.consultarRegistrosContratoPelaData(dataInicial, dataFinal, numeroContrato, page, size);
 	}
+	
 	@GetMapping(path = "/exportar-planilha-registro")
-	public  ResponseEntity<ByteArrayResource> exportarPlanilhaDeRegistro(@RequestParam(name = "numeroContrato") String numeroContrato) throws IOException {
-		ByteArrayOutputStream planilhaRegistro =  this.registroService.exportarPlanilhaDeRegistro(numeroContrato);
+	public  ResponseEntity<ByteArrayResource> exportarRegistrosEntradaSaida(@RequestParam(name = "numeroContrato") String numeroContrato) throws IOException {
+		ByteArrayOutputStream planilhaRegistro =  this.registroService.exportarRegistrosEntradaSaida(numeroContrato);
 		 HttpHeaders header = new HttpHeaders();
 		 header.set("Content-type","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
          return new ResponseEntity<>(new ByteArrayResource(planilhaRegistro.toByteArray()),

@@ -1,8 +1,7 @@
 package com.br.projetox.entity;
 
 import java.io.Serializable;
-
-
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,12 +63,14 @@ public class Contrato extends AbstractEntity implements Serializable {
 	/* Valor do desconto especificado pelo admnistrador do sistema. */
 	private Double desconto;
 	
+	/* Associacao com a entidade PlanoContratado */
 	@JsonIgnoreProperties("contrato")
 	@OneToMany(targetEntity = PlanoContratado.class,cascade = {CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.MERGE}, fetch = FetchType.LAZY,mappedBy = "contrato")
 	private List<PlanoContratado> planoContratado = new ArrayList<PlanoContratado>();
 	
+	/* Associacao com a entidade Registro */
 	@JsonIgnoreProperties("contrato")
-	@OneToMany(targetEntity = PlanoContratado.class,cascade = {CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.MERGE}, fetch = FetchType.LAZY,mappedBy = "contrato")
+	@OneToMany(targetEntity = Registro.class,cascade = {CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.MERGE}, fetch = FetchType.LAZY,mappedBy = "contrato")
 	private List<Registro> registro = new ArrayList<Registro>();
 	
 	/* Status do contrato. */
@@ -91,6 +92,7 @@ public class Contrato extends AbstractEntity implements Serializable {
 	@Transient 
 	private Double diferenca;
 	
+	/* Metodo que faz o calculo do valor total do contrato */
 	public void calcularValorTotal() {
 		this.valorTotal = 0.0;
 		for(PlanoContratado plano: this.planoContratado) {
@@ -100,13 +102,17 @@ public class Contrato extends AbstractEntity implements Serializable {
 		}
 	}
 
-	
-	public void clearToList() {
+	/* Metodo que limpa a lista de plano contratado */
+	public void limparListaPlanoContratado() {
 		this.planoContratado.clear();
 	}
 	
-    
-	public TipoContrato getTipoContratoTransient() {
+	/* Metodo que limpa a lista de plano contratado */
+	public void limparListaRegistro() {
+		this.registro.clear();;
+	}
+	/* Metodo que identifica o tipo do contrato em Plano, Particular, Misto */
+	public TipoContrato identificarTipoContrato() {
 		int contratoPlanoParticular = 0;
 		int contratoPlano = 0;
 		
@@ -131,7 +137,25 @@ public class Contrato extends AbstractEntity implements Serializable {
 		
 		return this.tipoContratoTransient;
 	}
-
 	
+	/* Metodo calcula o valor executado de um contrato */
+	public void calcularValorExecutado() {
+		this.valorExecutado = 0.0;
+		if(!this.registro.isEmpty()) {
+			for(Registro registros: this.registro) {
+				if(registros.getValorTotal() != null) {
+					this.valorExecutado += registros.getValorTotal();
+				}
+					
+			}
+		}
+
+	}
+	
+	/* Metodo calcula a diferenca entre o valor total e o valor executado */
+	public void calcularDiferenca() {
+		this.diferenca = Math.abs(this.valorTotal - this.valorExecutado);
+		
+	}
 	
 }

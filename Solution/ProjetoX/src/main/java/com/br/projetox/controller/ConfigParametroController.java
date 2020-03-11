@@ -18,8 +18,8 @@ public class ConfigParametroController {
 	private ConfigParametroService configService;
 	
 	@GetMapping(path = "/{configId}")
-	public ResponseEntity<?> findConfigParametros(@PathVariable String configId){
-		ConfiguracaoParametro configParametros = this.configService.findConfigParametros(Long.parseLong(configId));
+	public ResponseEntity<?> consultarConfiguracao(@PathVariable String configId){
+		ConfiguracaoParametro configParametros = this.configService.consultarConfiguracaoPorId(Long.parseLong(configId));
 		return ResponseEntity.ok(configParametros);
 	}
 }

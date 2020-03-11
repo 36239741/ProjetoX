@@ -19,10 +19,10 @@ public interface PlanoContratoRepository extends JpaRepository<PlanoContratado, 
 	@Query("FROM PlanoContratado plano "
 			+ "WHERE "
 			+ "plano.servico.id = :servicoId "
-			+ "AND plano.contrato.id = :contratoId "
+			+ "AND plano.contrato.numero = :numeroContrato "
 			+ "AND plano.tipoContrato = :tipoContrato "
 			+ "AND plano.ativo = true")
-	 PlanoContratado consultarPlanoContratadoAtivoPorServiceIdContratoIdTipoContrato(@Param("servicoId") long servicoId ,@Param("contratoId") long contratoId, @Param("tipoContrato") TipoContrato tipoContrato);
+	 PlanoContratado consultarPlanoContratadoAtivoPorServiceIdContratoIdTipoContrato(@Param("servicoId") long servicoId ,@Param("numeroContrato") String numeroContrato, @Param("tipoContrato") TipoContrato tipoContrato);
 	
 
 	@Query("FROM PlanoContratado plano "
@@ -36,7 +36,7 @@ public interface PlanoContratoRepository extends JpaRepository<PlanoContratado, 
 			+ "SET plano.ativo = false "
 			+ "WHERE "
 			+ "plano.id = :planoId")
-	 Integer deleteLogico(@Param("planoId") long planoId );
+	 Integer removerPlanoContratado(@Param("planoId") long planoId );
 	
 	@Query("FROM PlanoContratado plano "
 			+ "JOIN plano.diaConsulta diaConsulta "

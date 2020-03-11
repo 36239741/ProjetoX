@@ -11,8 +11,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-@Data
+/*Entidade que representa os servicos oferecidos pela empresa*/
 
+@Data
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -28,9 +29,12 @@ public class Servico extends AbstractEntity implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = -6794652905640725604L;
-
+	
+	/* Nome de um servico ofertado */
 	@NotNull
 	@Column(unique = true)
 	private String servico;
+	
+	/* Valor cobrado pelo servico */
 	private Double valor;
 }

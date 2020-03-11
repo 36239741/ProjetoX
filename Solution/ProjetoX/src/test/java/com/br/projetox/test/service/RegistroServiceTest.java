@@ -1,8 +1,5 @@
 package com.br.projetox.test.service;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -10,6 +7,8 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
@@ -20,12 +19,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.jdbc.Sql;
 
-import com.br.projetox.entity.ConfiguracaoParametro;
+import com.br.projetox.entity.Contrato;
 import com.br.projetox.entity.Registro;
 import com.br.projetox.entity.Situacao;
-import com.br.projetox.entity.TipoContrato;
 import com.br.projetox.exception.RegistroException;
-import com.br.projetox.repository.ConfigParametrosRepository;
+import com.br.projetox.repository.ContratoRepository;
 import com.br.projetox.repository.RegistroRepository;
 import com.br.projetox.service.RegistroService;
 
@@ -37,400 +35,163 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 	private RegistroService registroService;
 	
 	@Autowired
-	private ConfigParametrosRepository configRepository;
+	private ContratoRepository contratoRepository;
 	
 	@Autowired
 	private RegistroRepository registroRepository;
 	
-	/* SALVA UM HORARIO DE ENTRADA */
-	@WithUserDetails("henrique_nitatori@hotmail.com")
-	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
-			"/dataset/PlanoContratado.sql", "/dataset/Registro.sql" })
-	@Test
-	public void salvarHorarioEntradaTestMustPassSalvaUmHorarioDeEntrada() throws NotFoundException {
-		final Long registroId = 1L;
-		final Double valorAtendimento = 5000.00;
-		Registro registro =this.registroService.salvarHorarioEntrada("1", "9");
-		Assert.assertNotNull(registro);
-		Assert.assertEquals(registroId, registro.getPlanoContratado().getId());
-		Assert.assertEquals(valorAtendimento,registro.getValorTotal());
-		Assert.assertEquals(Situacao.ATENDIMENTO_NORMAL, registro.getSituacao());
-	}
-	
-	/* SALVA UM HORARIO DE SAIDA */
+	/* Teste que registra a ausencia do profissional*/
 	@WithUserDetails("henrique_nitatori@hotmail.com")
 	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
 			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
 	@Test
-	public void salvarHorarioSaidaTestMustPassSalvaUmHorarioDeSaida() throws NotFoundException {
-		Registro registro = this.registroService.salvarHorarioSaida("3");
-		Assert.assertNotNull(registro);
-
-	}
-
-
-
-	/* TESTA A BUSCA DE REGISTROS ATRAVES DE DATAS */
-	@WithUserDetails("henrique_nitatori@hotmail.com")
-	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
-			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
-	@Test
-	public void consultarRegistrosContratoPelaDataMustPassBuscandoRegistroAtravesDeData() throws NotFoundException {
-		Page<Registro> page = this.registroService.consultarRegistrosContratoPelaData("2019-12-05","2019-12-06","1", 0, 1);
-		Assert.assertNotNull(page.getContent());
-		Assert.assertEquals(1, page.getTotalElements());
-
-	}
-
-
-	
-	
-	/* SALVA UM HORARIO DE SAIDA E TESTA O VALOR DO ACRESCIMO DO VALOR TOTAL */
-	@WithUserDetails("henrique_nitatori@hotmail.com")
-	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
-			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
-	@Test
-	public void salvarHorarioSaidaTestMustPassTestaOAcrescimoNoValorTotal() throws NotFoundException {
-		
-		Registro registro = this.registroService.salvarHorarioSaida("2");
-		ConfiguracaoParametro configParametro = this.configRepository.findById(1L).get();
-		Duration duration = Duration.between(registro.getPlanoContratado().getHorarioSaida(),  registro.getDataHoraSaida().toLocalTime());
-		Double minutosAdicional = registro.getPlanoContratado().getValorAtendimento() + (duration.toMinutes() * configParametro.getValorMinutoAdicional());
+	public void registrarAusenciaDoProfisionalMustPass() throws IOException, NumberFormatException, NotFoundException {
+		final Double valorTotalRegistro = 0.0;
+		final Double valorTotalPlano = 1990.00;
+		Registro registro = this.registroService.registrarAusenciaDoProfisional(5L);
 		
 		Assert.assertNotNull(registro);
-		Assert.assertEquals(minutosAdicional, registro.getValorTotal());
-
+		Assert.assertEquals(Situacao.AUSENCIA_DO_PROFISSIONAL, registro.getSituacao());
+		Assert.assertEquals(valorTotalRegistro, registro.getValorTotal());
+		Assert.assertEquals(valorTotalPlano, registro.getPlanoContratado().getValorTotal());
 	}
 	
-	/* SALVA UM HORARIO DE SAIDA E TESTA O VALOR DO ACRESCIMO DO VALOR TOTAL */
+	/* Teste que faz uma alteracao no servico de um registro*/
 	@WithUserDetails("henrique_nitatori@hotmail.com")
 	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
 			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
 	@Test
-	public void salvarHorarioSaidaTestMustPassSemAtraso() throws NotFoundException {
+	public void registrarAlteracaoServicoMustPass() throws IOException, NumberFormatException, NotFoundException {
+		final Double valorSessao = 50.00;
+		final Long registroId = 15L;
+		final Double valorTotalRegistro = 150.00;
+		final Situacao situacaoRegistro = Situacao.TROCA_DE_SERVICO;
+		Registro registro = this.registroService.registrarAlteracaoServico(registroId, valorSessao);
+		Assert.assertNotNull(registro);
+		Assert.assertEquals(registroId, registro.getId());
+		Assert.assertEquals(valorTotalRegistro, registro.getValorTotal());
+		Assert.assertEquals(situacaoRegistro, registro.getSituacao());
+			
+	}
+	
+	/* Teste que salva um horario de saida de um paciente e verifica o tempo total da consulta*/
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
+	@Test
+	public void salvarHorarioSaidaMustPassTestandoOTempoTotalDaConsulta() throws IOException, NumberFormatException, NotFoundException {
+		Registro ultimoRegistro = this.registroRepository.consultarUltimoRegistroContrato("1");
 		
-		Registro registro = this.registroService.salvarHorarioSaida("2");
+		Duration tempoTotal = Duration.between(ultimoRegistro.getDataHoraEntrada().toLocalTime(),
+				LocalTime.now(ZoneId.of("America/Maceio")));
 		
-		ConfiguracaoParametro configParametro = this.configRepository.findById(1L).get();
-		Duration duration = Duration.between(registro.getPlanoContratado().getHorarioSaida(),  registro.getDataHoraSaida().toLocalTime());
-		Double minutosAdicional = registro.getPlanoContratado().getValorAtendimento() + (duration.toMinutes() * configParametro.getValorMinutoAdicional());
+		Registro registro = this.registroService.salvarHorarioSaida("1");
 		
 		Assert.assertNotNull(registro);
-		Assert.assertEquals(registro.getValorTotal(), minutosAdicional);
-
+		Assert.assertEquals(LocalTime.MIN.plusMinutes(tempoTotal.toMinutes()), registro.getTempoTotal());
+			
+			
 	}
 	
-	/* BUSCA TODOS REGISTROS DE UM CONTRATO */
+	/* Teste que salva um horario de saida de um paciente com valor de tolerancia incluso*/
 	@WithUserDetails("henrique_nitatori@hotmail.com")
 	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
 			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
 	@Test
-	public void consultarTodosRegistrosMustPassBuscaTodosRegistrosDeUmContrato() throws NotFoundException {
-		final Integer numeroRegistro = 10;
-		Page<Registro> registro = this.registroService.consultarTodosRegistros("1", 0, 10);
-		Assert.assertNotNull(registro.getContent());
-		Assert.assertEquals(numeroRegistro, Integer.valueOf( registro.getContent().size()));
-
-	}
-	
-	
-	/* Testa o tipo do contrato */
-	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
-		"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
-	@WithUserDetails("henrique_nitatori@hotmail.com")
-	@Test
-	public void verificarTipoContratoMustPassTestandoTipoDoContratoPlano(){
-		final TipoContrato tipoContratoTest = TipoContrato.PLANO;
-		TipoContrato tipoContrato = this.registroService.verificarTipoContrato(this.registroRepository.findById(2L).get());
-		Assert.assertEquals(tipoContratoTest, tipoContrato);
-	}
-	
-	/* Testa o tipo do contrato */
-	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
-		"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
-	@WithUserDetails("henrique_nitatori@hotmail.com")
-	@Test
-	public void verificarTipoContratoMustPassTestandoTipoDoContratoParticular(){
-		final TipoContrato tipoContratoTest = TipoContrato.PARTICULAR;
-		TipoContrato tipoContrato = this.registroService.verificarTipoContrato(this.registroRepository.findById(1L).get());
-		Assert.assertEquals(tipoContratoTest, tipoContrato);
-	}
-	
-	/* Testa a situacao do contrato */
-	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
-		"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
-	@WithUserDetails("henrique_nitatori@hotmail.com")
-	@Test
-	public void verificarSituacaoMustPassTestandoASituacaoDoContratoAtendimentoNormal(){
-		final Situacao tipoSituacaoTest = Situacao.ATENDIMENTO_NORMAL;
-		Situacao situacao = this.registroService.verificarSituacao("ATENDIMENTO_NORMAL");
-		Assert.assertEquals(tipoSituacaoTest, situacao);
-	}
-	
-	/* Testa a situacao do contrato */
-	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
-		"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
-	@WithUserDetails("henrique_nitatori@hotmail.com")
-	@Test
-	public void verificarSituacaoMustPassTestandoASituacaoDoContratoTrocaDeServico(){
-		final Situacao tipoSituacaoTest = Situacao.TROCA_DE_SERVICO;
-		Situacao situacao = this.registroService.verificarSituacao("TROCA_DE_SERVICO");
-		Assert.assertEquals(tipoSituacaoTest, situacao);
-	}
-	
-	/* Testa a situacao do contrato */
-	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
-		"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
-	@WithUserDetails("henrique_nitatori@hotmail.com")
-	@Test
-	public void verificarSituacaoMustPassTestandoASituacaoDoContratoAusenciaPaciente(){
-		final Situacao tipoSituacaoTest = Situacao.AUSENCIA_DO_PACIENTE;
-		Situacao situacao = this.registroService.verificarSituacao("AUSENCIA_DO_PACIENTE");
-		Assert.assertEquals(tipoSituacaoTest, situacao);
-	}
-	
-	/* Testa a situacao do contrato */
-	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
-		"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
-	@WithUserDetails("henrique_nitatori@hotmail.com")
-	@Test
-	public void verificarSituacaoMustPassTestandoASituacaoDoContratoAusenciaDoProfissional(){
-		final Situacao tipoSituacaoTest = Situacao.AUSENCIA_DO_PROFISSIONAL;
-		Situacao situacao = this.registroService.verificarSituacao("AUSENCIA_DO_PROFISSIONAL");
-		Assert.assertEquals(tipoSituacaoTest, situacao);
-	}
-	
-	/* Testa o desconto do plano */
-	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
-		"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
-	@WithUserDetails("henrique_nitatori@hotmail.com")
-	@Test
-	public void registrarTrocaDeServicoMustPassTestandoOValorDoRegistroaAtualizado(){
-		final Double valorTotal = 10000.00;
-		Registro registro = this.registroService.registrarTrocaDeServico(1L, 2000.00D);
-		Assert.assertEquals(valorTotal, registro.getValorTotal());
-
-	}
-	
-	
-	/* Testa a da situacao do contrato para  ausencia do profissional */
-	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
-		"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
-	@WithUserDetails("henrique_nitatori@hotmail.com")
-	@Test
-	public void registrarAusenciaDoProfisionalMustPassTestandoATrocaDaSituacaoParaAusenciaDoProfissionalComSituacaoAusenciaDoPaciente(){
-		final Double valorDoPlanoAtualizado = 1990.00;
-		final Situacao situacao = Situacao.AUSENCIA_DO_PROFISSIONAL;
-		Registro registro = this.registroService.registrarAusenciaDoProfisional(12L);
-		Assert.assertEquals(valorDoPlanoAtualizado, registro.getPlanoContratado().getValorTotal());
-		Assert.assertEquals(situacao, registro.getSituacao());
-	}
-	
-	/* Testa a troca da situacao do contrato para troca de servico */
-	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
-		"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
-	@WithUserDetails("henrique_nitatori@hotmail.com")
-	@Test
-	public void registrarTrocaDeServicoStatusMustPassTestandoATrocaDeServico(){
-		final Double valorTotalDoPlano = 10000.00;
-		Registro registro = this.registroService.registrarTrocaDeServico(1L, 2000.00D);
-		Assert.assertEquals(valorTotalDoPlano, registro.getValorTotal());
-		Assert.assertEquals(Situacao.TROCA_DE_SERVICO, registro.getSituacao());
-		assertEquals(valorTotalDoPlano, registro.getValorTotal());
-	}
-	
-	/* TENTAR CRIAR UMA PLANILHA SEM REGISTROS NO CONTRATO */
-	@WithUserDetails("henrique_nitatori@hotmail.com")
-	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
-			"/dataset/PlanoContratado.sql","/dataset/RegistroTestExportPlanilha.sql","/dataset/Config.sql" })
-	@Test()
-	public void exportarPlanilhaDeRegistroTestMustPassCriaUmaPlanilhaComOsRegistros() throws NotFoundException, IOException {
+	public void salvarHorarioSaidaMustPassTestandoValorTolerancia() throws IOException, NumberFormatException, NotFoundException {
+		Registro ultimoRegistro = this.registroRepository.consultarUltimoRegistroContrato("1");
 		
-		ByteArrayOutputStream bytePLanilha = this.registroService.exportarPlanilhaDeRegistro("1");
+		Duration verificarMinutosAdicionais = Duration.between(
+				LocalTime.now(ZoneId.of("America/Maceio")),
+				ultimoRegistro.getPlanoContratado().getHorarioSaida().plusMinutes(5));
+		
+		final Double valorUltrapassado = (verificarMinutosAdicionais.toMinutes() > 0) ? 
+				((verificarMinutosAdicionais.toMinutes() + 5) * 2.30) + ultimoRegistro.getPlanoContratado().getValorAtendimento()  : 
+					ultimoRegistro.getPlanoContratado().getValorAtendimento(); 
+			
+			Registro registro = this.registroService.salvarHorarioSaida("1");
+			Assert.assertNotNull(registro);
+			Assert.assertEquals(valorUltrapassado, registro.getValorTotal());
+	}
+	
+	/* Teste que salva um horario de saida de um paciente*/
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
+	@Test
+	public void salvarHorarioSaidaMustPass() throws IOException, NumberFormatException, NotFoundException {
+			Registro registro = this.registroService.salvarHorarioSaida("1");
+			Assert.assertNotNull(registro);
+			Assert.assertEquals(LocalDateTime.now(ZoneId.of("America/Maceio")).toLocalTime().format(DateTimeFormatter.ofPattern("hh:mm")) , registro.getDataHoraSaida().toLocalTime().format(DateTimeFormatter.ofPattern("hh:mm")));
+			Assert.assertEquals(LocalDateTime.now(ZoneId.of("America/Maceio")).toLocalDate() , registro.getDataHoraSaida().toLocalDate());
+	}
+	
+	/* Teste que verifica a consulta dos registro mensais de um plano contratado*/
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
+	@Test
+	public void consultarRegistroMensalMustPassConsultandoRegistroMensal() throws IOException, NumberFormatException, NotFoundException {
+			
+			LocalDate data = LocalDate.now();
+			LocalDate dataInicial = LocalDate.of(data.getYear(),data.getMonthValue(),1);
+			LocalDate ultimoDiaMes = dataInicial.withDayOfMonth(dataInicial.lengthOfMonth());
+			LocalDate dataFinal = LocalDate.of(data.getYear(), data.getMonthValue(),ultimoDiaMes.getDayOfMonth());
+			
+			Page<Registro> registros = this.registroService.consultarRegistroMensal(2L, dataInicial.toString(), dataFinal.toString(), 10L, 0, 32);
+			
+			Assert.assertNotNull(registros.getContent());
+			Assert.assertEquals(2, registros.getContent().size());
+	}
+	
+	/* Teste que verifica o registro do horario de entrada do paciente*/
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
+	@Test
+	public void salvarHorarioEntradaMustPassRegistrandoHorarioEntrada() throws IOException, NumberFormatException, NotFoundException {
+			final LocalTime horarioEntrada = LocalTime.of(LocalDateTime.now(ZoneId.of("America/Maceio")).getHour(), LocalDateTime.now(ZoneId.of("America/Maceio")).getMinute());
+			final Situacao situacaoAtendimento = Situacao.ATENDIMENTO_NORMAL;
+			final Double valorAtendimento = 5000.00;
+			Registro registro = this.registroService.salvarHorarioEntrada("2", 10L);
+			Assert.assertNotNull(registro);
+			Contrato contrato = this.contratoRepository.findById(2L).get();
+			
+			final LocalTime horarioEntradaRegistro =  LocalTime.of(LocalDateTime.now(ZoneId.of("America/Maceio")).getHour(), LocalDateTime.now(ZoneId.of("America/Maceio")).getMinute());;
+			
+			Assert.assertEquals(valorAtendimento, registro.getValorTotal());
+			Assert.assertEquals(situacaoAtendimento, registro.getSituacao());
+			Assert.assertEquals(contrato.getNumero(), registro.getContrato().getNumero());
+			Assert.assertEquals(contrato.getNomePaciente(), registro.getContrato().getNomePaciente());
+			Assert.assertEquals(horarioEntrada,horarioEntradaRegistro );
+	}
+	
+	/* Teste que verifica a exportacao de registro de entrada e saida de um contrato*/
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
+	@Test
+	public void exportarRegistrosEntradaSaidaMustPassExportandoRegistroEntradaSaidaDeUmContrato() throws IOException {
+		ByteArrayOutputStream bytePLanilha = this.registroService.exportarRegistrosEntradaSaida("1");
 		File file = new File("teste.xlsx");
 		FileOutputStream createPlanilha = new FileOutputStream(file);
 		createPlanilha.write(bytePLanilha.toByteArray());
 		createPlanilha.flush();
 		createPlanilha.close();
-
 	}
-	/* TESTA A BUSCA DE REGISTROS ATRAVES DE DATAS */
+	
+	
+	/* Teste que verifica a busca de todos os contratos de um registro */
 	@WithUserDetails("henrique_nitatori@hotmail.com")
 	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
 			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
 	@Test
-	public void consultarRegistroContratoPelaDataEPlanoIddMustPassConsultandoRegistrosPelaDataEPlanoId() throws NotFoundException {
-		Page<Registro> page = this.registroService.consultarRegistroContratoPelaDataEPlanoId(1L, "2019-12-05", "2019-12-09", 1L, 0, 1);
-		Assert.assertNotNull(page.getContent());
-		Assert.assertEquals(1, page.getTotalElements());
-
-	}
-	
-	
-	
-	/* MUST FAIL */
-	/* SALVA UM HORARIO DE SAIDA SEM NENHUM REGISTRO PARA O CONTRATO*/
-	@WithUserDetails("henrique_nitatori@hotmail.com")
-	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
-			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
-	@Test(expected = IllegalArgumentException.class)
-	public void salvarHorarioSaidaTestMustFailSalvaUmHorarioDeSaidaSemRegistroEmAberto() throws NotFoundException {
-		this.registroService.salvarHorarioSaida("1");
-
-	}
-	
-
-	
-	/* Testa a consulta de registro com contratoId nulo */
-
-	@WithUserDetails("henrique_nitatori@hotmail.com")
-	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
-			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
-	@Test(expected = NullPointerException.class)
-	public void consultarRegistroContratoPelaDataEPlanoIddMustFailConsultandoRegistroContratoIdNulo() throws NotFoundException {
-		this.registroService.consultarRegistroContratoPelaDataEPlanoId(null, "2019-12-05", "2019-12-09", 1L, 0, 1);
-
-	}
-	/* Testa a consulta de registro com contratoId 0 */
-	@WithUserDetails("henrique_nitatori@hotmail.com")
-	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
-			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
-	@Test(expected = IllegalArgumentException.class)
-	public void consultarRegistroContratoPelaDataEPlanoIddMustFailConsultandoRegistroSemContratoId() throws NotFoundException {
-		this.registroService.consultarRegistroContratoPelaDataEPlanoId(0L, "2019-12-05", "2019-12-09", 1L, 0, 1);
-
-	}
-
-	/* Testa a consulta de registro com planoId 0 */
-	@WithUserDetails("henrique_nitatori@hotmail.com")
-	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
-			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
-	@Test(expected = IllegalArgumentException.class)
-	public void consultarRegistroContratoPelaDataEPlanoIddMustFailConsultandoRegistroSemPlanoId() throws NotFoundException {
-		this.registroService.consultarRegistroContratoPelaDataEPlanoId(1L, "2019-12-05", "2019-12-09", 0L, 0, 1);
-	}
-	
-	/* Testa a troca da situacao do contrato para troca de servico */
-	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
-		"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
-	@WithUserDetails("henrique_nitatori@hotmail.com")
-	@Test(expected = IllegalArgumentException.class)
-	public void registrarTrocaDeServicoStatusMustFailTestandoATrocaDeServicoComHorariodeSaidaPreenchido(){
-		this.registroService.registrarTrocaDeServico(10L, 2000.00D);
-	}
-	/* Testa a troca da situacao do contrato para troca de servico */
-	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
-		"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
-	@WithUserDetails("henrique_nitatori@hotmail.com")
-	@Test(expected = IllegalArgumentException.class)
-	public void registrarTrocaDeServicoStatusMustFailTestandoATrocaDeServicoComSituacaoDoRegistroDiferenteDeAtendimentoNoraml(){
-		this.registroService.registrarTrocaDeServico(12L, 2000.00D);
-	}
-	/* Testa a troca da situacao do contrato para troca de servico */
-	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
-		"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
-	@WithUserDetails("henrique_nitatori@hotmail.com")
-	@Test(expected = IllegalArgumentException.class)
-	public void registrarTrocaDeServicoStatusMustFailTestandoATrocaDeServicoComIdInexistente(){
-		this.registroService.registrarTrocaDeServico(19L, 2000.00D);
-	}
-	
-	/* Testa a da situacao do contrato para  ausencia do profissional */
-	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
-		"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
-	@WithUserDetails("henrique_nitatori@hotmail.com")
-	@Test(expected = IllegalArgumentException.class)
-	public void registrarAusenciaDoProfisionalMustFailTestandoATrocaDaSituacaoParaAusenciaDoProfissionalComSituacaoAtendimentoNormalEHoraDeSaidaPreenchida(){
-		this.registroService.registrarAusenciaDoProfisional(5L);
-	}
-	
-	/* Testa a da situacao do contrato para  ausencia do profissional */
-	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
-		"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
-	@WithUserDetails("henrique_nitatori@hotmail.com")
-	@Test(expected = IllegalArgumentException.class)
-	public void registrarAusenciaDoProfisionalMustFailTestandoATrocaDaSituacaoParaAusenciaDoProfissionalComSituacaoTrocaDeServico(){
-		this.registroService.registrarAusenciaDoProfisional(8L);
-	}
-	
-	/* Testa a situacao do contrato */
-	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
-		"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
-	@WithUserDetails("henrique_nitatori@hotmail.com")
-	@Test(expected = IllegalArgumentException.class)
-	public void verificarSituacaoMustFailTestandoASituacaoDoContratoInvalida(){
-		this.registroService.verificarSituacao("SITUACAO_INVALIDA");
-	}
-	
-	/* SALVA UM HORARIO DE ENTRADA COM UM REGISTRO ABERTO */
-	@WithUserDetails("henrique_nitatori@hotmail.com")
-	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
-			"/dataset/PlanoContratado.sql","/dataset/Registro.sql" })
-	@Test(expected = IllegalArgumentException.class)
-	public void salvarHorarioEntradaTestMustFailSalvaUmHorarioDeEntradaComUmRegistroAberto() throws NotFoundException {
-		this.registroService.salvarHorarioEntrada("2", "9");
-	}
-	
-	/* SALVA UM HORARIO DE SAIDA */
-	@WithUserDetails("henrique_nitatori@hotmail.com")
-	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
-			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
-	@Test(expected = IllegalArgumentException.class)
-	public void saveHorarioEntradaAtivoTestMustFaillTentaSalvarUmHorarioDeSaidaSemHorarioEmAberto() throws NotFoundException {
-		this.registroService.salvarHorarioSaida("1");
-	}
-	
-
-	
-	/* TESTA A BUSCA DE REGISTROS ATRAVES DE DATAS SEM O CAMPO DATA INICIAL */
-	@WithUserDetails("henrique_nitatori@hotmail.com")
-	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
-			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
-	@Test(expected = IllegalArgumentException.class)
-	public void consultarRegistrosContratoPelaDataMustFaillBuscandoRegistroSemOCampoDeDataInicial() throws NotFoundException {
-		Page<Registro> page = this.registroService.consultarRegistrosContratoPelaData("","2019-12-06","1", 0, 1);
-		Assert.assertNotNull(page.getContent());
-		Assert.assertEquals(1, page.getTotalElements());
-
-	}
-	
-	/* TESTA A BUSCA DE REGISTROS ATRAVES DE DATAS SEM O CAMPO DATA FINAL */
-	@WithUserDetails("henrique_nitatori@hotmail.com")
-	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
-			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
-	@Test(expected = IllegalArgumentException.class)
-	public void consultarRegistrosContratoPelaDataMustFaillBuscandoRegistroSemOCampoDeDataFinal() throws NotFoundException {
-		Page<Registro> page = this.registroService.consultarRegistrosContratoPelaData("2019-12-04","","1", 0, 1);
-		Assert.assertNotNull(page.getContent());
-		Assert.assertEquals(1, page.getTotalElements());
-
-	}
-	
-	/* TENTAR CRIAR UMA PLANILHA SEM REGISTROS NO CONTRATO */
-	@WithUserDetails("henrique_nitatori@hotmail.com")
-	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
-			"/dataset/PlanoContratado.sql","/dataset/RegistroTestExportPlanilha.sql","/dataset/Config.sql" })
-	@Test(expected = RegistroException.class)
-	public void exportarPlanilhaDeRegistroTestMustFailTentaCriarUmaPlanilhaSemRegistro() throws NotFoundException, IOException {
+	public void consultarRegistrosMustPassBuscandoTodosRegistrosDeUmContrato() {
+		final int totalRegistros = 15;
+		Page<Registro> registros = this.registroService.consultarTodosRegistrosDoContrato("1", 0, 10);
 		
-		ByteArrayOutputStream bytePLanilha = this.registroService.exportarPlanilhaDeRegistro("3");
-		File file = new File("teste.xlsx");
-		FileOutputStream createPlanilha = new FileOutputStream(file);
-		BufferedOutputStream bos = new BufferedOutputStream(createPlanilha);
-		bos.write(bytePLanilha.toByteArray());
-		bos.flush();
-		bos.close();
-
-	}
-	/* TESTA A BUSCA DE REGISTROS ATRAVES DE DATAS SEM O CAMPO CONTRATO ID */
-	@WithUserDetails("henrique_nitatori@hotmail.com")
-	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
-			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
-	@Test(expected = IllegalArgumentException.class)
-	public void consultarRegistrosContratoPelaDataMustFaillBuscandoRegistroSemOCampoContratoId() throws NotFoundException {
-		Page<Registro> page = this.registroService.consultarRegistrosContratoPelaData("2019-12-04","2019-12-06","", 0, 1);
-		Assert.assertNotNull(page.getContent());
-		Assert.assertEquals(1, page.getTotalElements());
+		Assert.assertNotNull(registros);
+		Assert.assertEquals(totalRegistros, registros.getTotalElements());
 
 	}
 
@@ -445,7 +206,7 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 	public void listRegistrosAbertosMustPass() {
 		final List<Registro> registrosAbertos = this.registroService.listRegistrosAbertos();
 		Assert.assertNotNull(registrosAbertos);
-		Assert.assertEquals(6, registrosAbertos.size());
+		Assert.assertEquals(7, registrosAbertos.size());
 
 	}
 	
@@ -466,6 +227,99 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 		Assert.assertNotNull(registro.getDataHoraSaida());
 		LocalDateTime dataHoraSaida = LocalDateTime.of(LocalDate.now(), LocalTime.of(17, 10, 0));
 		Assert.assertTrue(registro.getDataHoraSaida().equals(dataHoraSaida));
+
+	}
+	
+	//***************************************************** Must Fail ****************************************************************************************
+	
+	/* Teste que verifica o registro de ausencia do profissional com o horario de saida preenchido*/
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
+	@Test(expected = IllegalArgumentException.class)
+	public void registrarAusenciaDoProfisionalMustFailRegistroAusenciaComOHorarioDeSaidaPreenchido() throws IOException, NumberFormatException, NotFoundException {
+			this.registroService.salvarHorarioSaida("5");
+			
+	}
+	
+	/* Teste que verifica o registro de ausencia do profissional com a situacao do atendimento diferente de ausencia do paciente*/
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
+	@Test(expected = IllegalArgumentException.class)
+	public void registrarAusenciaDoProfisionalMustFailRegistroAusenciaComASituacaoDeAtendimentoDieferenteDeAusenciaPaciente() throws IOException, NumberFormatException, NotFoundException {
+			this.registroService.salvarHorarioSaida("4");
+			
+	}
+	
+	/* Teste que verifica a alteracao do servico com horario de saida preechido*/
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
+	@Test(expected = IllegalArgumentException.class)
+	public void registrarAlteracaoServicoMustFailRegistrandoTrocaServicoComRegistroComHorarioDeSaidaPreechido() throws IOException, NumberFormatException, NotFoundException {
+			this.registroService.salvarHorarioSaida("9");
+			
+	}
+	
+	/* Teste que verifica a alteracao do servico com registro id invalido*/
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
+	@Test(expected = IllegalArgumentException.class)
+	public void registrarAlteracaoServicoMustFailRegistrandoTrocaServicoComRegistroEmSituacaoDiferenteDeAtendimentoNormal() throws IOException, NumberFormatException, NotFoundException {
+			this.registroService.salvarHorarioSaida("8");
+			
+	}
+	
+	/* Teste que verifica a alteracao do servico com registro id invalido*/
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
+	@Test(expected = IllegalArgumentException.class)
+	public void registrarAlteracaoServicoMustFailRegistrandoTrocaServicoComIdRegistroInvalido() throws IOException, NumberFormatException, NotFoundException {
+			this.registroService.salvarHorarioSaida("20");
+			
+	}
+	
+	
+	/* Teste que verifica o registro do horario de saida do paciente sem existir nenhum registro em aberto*/
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
+	@Test(expected = IllegalArgumentException.class)
+	public void salvarHorarioSaidaMustFailRegistrandoHorarioSaidaSemNenhumRegistroEmAberto() throws IOException, NumberFormatException, NotFoundException {
+			this.registroService.salvarHorarioSaida("2");
+			
+	}
+	
+	/* Teste que verifica o registro do horario de saida do paciente sem existir nenhum registro cadastrado*/
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
+	@Test(expected = IllegalArgumentException.class)
+	public void salvarHorarioSaidaMustFailRegistrandoHorarioSaidaSemNenhumRegistroCadastrado() throws IOException, NumberFormatException, NotFoundException {
+			this.registroService.salvarHorarioSaida("3");
+			
+	}
+	
+	/* Teste que verifica o registro do horario de entrada do paciente contendo um registro em aberto*/
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
+	@Test(expected = IllegalArgumentException.class)
+	public void salvarHorarioEntradaMustFailRegistrandoHorarioEntradaContendoUmRegistroEmAberto() throws IOException, NumberFormatException, NotFoundException {
+			this.registroService.salvarHorarioEntrada("1", 8L);
+			
+	}
+	
+	/* Teste que verifica a exportacao de  registro de entrada e saida de um contrato sem registro */
+	@WithUserDetails("henrique_nitatori@hotmail.com")
+	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
+			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
+	@Test(expected = RegistroException.class)
+	public void exportarRegistrosEntradaSaidaMustFailExportandoRegistroEntradaSaidaDeUmContratoSemRegistro() throws IOException {
+		this.registroService.exportarRegistrosEntradaSaida("3");
 
 	}
 	
@@ -513,7 +367,7 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
 	@Test
 	public void registrarAusenciaPacienteAutomaticamenteMustPass() throws NotFoundException {
-		final Registro registro = this.registroService.registrarAusenciaPacienteAutomaticamente(8);
+		final Registro registro = this.registroService.registrarAusenciaPacienteAutomaticamente(10);
 		
 		Assert.assertNotNull(registro);
 		
@@ -537,7 +391,7 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
 	@Test
 	public void registrarAusenciaPacienteAutomaticamenteMustPassTipoContratoPlano() throws NotFoundException {
-		final Registro registro = this.registroService.registrarAusenciaPacienteAutomaticamente(7);
+		final Registro registro = this.registroService.registrarAusenciaPacienteAutomaticamente(10);
 		
 		Assert.assertNotNull(registro);
 		
@@ -553,7 +407,7 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
 	@Test
 	public void registrarAusenciaPacienteAutomaticamenteMustPassTipoContratoParticular() throws NotFoundException {
-		final Registro registro = this.registroService.registrarAusenciaPacienteAutomaticamente(8);
+		final Registro registro = this.registroService.registrarAusenciaPacienteAutomaticamente(10);
 		
 		Assert.assertNotNull(registro);
 		
@@ -570,7 +424,7 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 			"/dataset/PlanoContratado.sql","/dataset/Registro.sql","/dataset/Config.sql" })
 	@Test(expected = RegistroException.class)
 	public void registrarAusenciaPacienteAutomaticamenteMustFailHasRegistroAberto() throws NotFoundException {
-		final Registro registro = this.registroService.registrarAusenciaPacienteAutomaticamente(7);
+		final Registro registro = this.registroService.registrarAusenciaPacienteAutomaticamente(2);
 
 	}
 	

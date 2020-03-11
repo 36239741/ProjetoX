@@ -17,24 +17,31 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/*Entidade que representa uma auditoria das classes e fornece o id*/
+
 @MappedSuperclass
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class AbstractEntity {
 	
+	/* Identificador unico da classe */
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
 	
+	/* Data de criacao de um dado */
 	@NotNull
 	private LocalDateTime created;
 	
+	/* Data de uma atualizacao de um dado */
 	protected LocalDateTime updated;
 	
+	/* Usuario quem criou o ou atualizou o dado */
 	@ManyToOne(targetEntity = Usuario.class)
 	private Usuario usuario;
 	
+	/* Metodo que recupera a hora e a data de criacao e o usuario */
 	@PrePersist()
 	protected void refreshCreated()
 	{
@@ -47,6 +54,7 @@ public class AbstractEntity {
 		}
 	}
 	
+	/* Metodo que recupera a hora e data de atualizacao do dado */
 	@PreUpdate()
 	protected void refreshUpdated()
 	{

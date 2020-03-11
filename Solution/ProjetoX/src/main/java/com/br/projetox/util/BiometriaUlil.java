@@ -14,16 +14,21 @@ import CIDBio.RetCode;
 import CIDBio.Template;
 
 @Component
-public class FingerPrintUtil {
+public class BiometriaUlil {
 		
-		public ImageAndTemplate captureFingerPrint() {
+	/* Metodo captura a digital do paciente
+	 * 
+	 * @return ImageAndTemplate
+	 *  
+	 *  */
+		public ImageAndTemplate capturarBiometria() {
 			ImageAndTemplate template = null;
 				CIDBio cidbio = new CIDBio();
 				 ImageAndTemplate captureImgAndTemplate =  cidbio.CaptureImageAndTemplate();
 				 if(captureImgAndTemplate.getRetCode() == RetCode.SUCCESS) {
 					 template = captureImgAndTemplate;
 				 }else {
-					 throw new FingerPrintException(this.returnErrorException(captureImgAndTemplate.getRetCode().name()));
+					 throw new FingerPrintException(this.retornoDeExcessao(captureImgAndTemplate.getRetCode().name()));
 				 }
 			
 			return template ;
@@ -31,7 +36,7 @@ public class FingerPrintUtil {
 		
 		/*Metodo captura 3 vezes a mesma digital e faz um merge 
 		@return Template - retorna o template depois do merge*/
-		public Template captureThreeFingerPrint() {
+		public Template capturarTresVezesADigital() {
 			Template template =null;
 			ImageAndTemplate[] imgAndTemplate = new ImageAndTemplate[3] ;
 				CIDBio cidbio = new CIDBio();
@@ -41,7 +46,7 @@ public class FingerPrintUtil {
 						imgAndTemplate[i] = captureTemplate;
 					}
 					else {
-						throw new FingerPrintException(this.returnErrorException(captureTemplate.getRetCode().name()));
+						throw new FingerPrintException(this.retornoDeExcessao(captureTemplate.getRetCode().name()));
 					}
 					
 				}
@@ -53,7 +58,7 @@ public class FingerPrintUtil {
 					template = templateMerge;
 				}
 				else {
-					throw new FingerPrintException(this.returnErrorException(templateMerge.getRetCode().name()));
+					throw new FingerPrintException(this.retornoDeExcessao(templateMerge.getRetCode().name()));
 
 				}
 			
@@ -62,20 +67,20 @@ public class FingerPrintUtil {
 		
 		/*Metodo starta o leitor biometrico
 		@return RetCode - retorna SUCCESS se for startado corretamente*/
-		public  RetCode startFingerPrint() {
+		public  RetCode iniciarOLeitor() {
 			RetCode ret = CIDBio.Init();
 			if(ret == RetCode.SUCCESS) {
 				return ret;
 			}
 			else {
-				throw new FingerPrintException(this.returnErrorException(ret.name()));
+				throw new FingerPrintException(this.retornoDeExcessao(ret.name()));
 			}
 		}
 		
 		/*Metodo pega a descricao do enum e a retorna
 		@param String fingerPrintExceptionEnum - nome do erro retornado do RetCode da bibliote CIDBio
 		@return String -  retorna a mensagem especifica do erro*/
-		private String returnErrorException(String fingerPrintExceptionEnum){
+		private String retornoDeExcessao(String fingerPrintExceptionEnum){
 			FingerPrintExceptionEnum fpExceptionEnum = FingerPrintExceptionEnum.valueOf(fingerPrintExceptionEnum);
 			return fpExceptionEnum.getDescricao();
 			}
@@ -84,7 +89,7 @@ public class FingerPrintUtil {
 		/*Metodo verifica se uma digital lida corresponde a passada por variavel
 		@Param byte[] biometria - biometria vinda de um contrato
 		@return Boolean - retorna true se sucesso e false se falhar*/
-		public Boolean verifyFingerprint(byte[] biometria, ImageAndTemplate imgAndTemplate) throws UnsupportedEncodingException {
+		public Boolean verificarDigital(byte[] biometria, ImageAndTemplate imgAndTemplate) throws UnsupportedEncodingException {
 			Boolean returnValue = false;
 				CIDBio cidbio = new CIDBio();
 				if(imgAndTemplate.getRetCode() == RetCode.SUCCESS) {
