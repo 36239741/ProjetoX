@@ -1,4 +1,4 @@
-package br.com.genegouveia.domain.service;
+package br.com.genegouveia.domain.service.contrato;
 
 import java.util.List;
 
@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import br.com.genegouveia.domain.entity.contrato.Servico;
-import br.com.genegouveia.domain.repository.ServicoRepository;
+import br.com.genegouveia.domain.repository.contrato.ServicoRepository;
 
 @Service
 @RemoteProxy

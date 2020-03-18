@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.genegouveia.domain.entity.contrato.Servico;
-import br.com.genegouveia.domain.service.ServicoService;
+import br.com.genegouveia.domain.service.contrato.ServicoService;
 
 @RestController
 @RequestMapping(path = "v1/servicos")

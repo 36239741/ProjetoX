@@ -1,4 +1,4 @@
-package br.com.eits.boot.test.domain.service;
+package br.com.eits.boot.test.domain.service.contrato;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -8,7 +8,7 @@ import org.springframework.test.context.jdbc.Sql;
 
 import br.com.eits.boot.test.domain.AbstractIntegrationTests;
 import br.com.genegouveia.domain.entity.contrato.Servico;
-import br.com.genegouveia.domain.service.ServicoService;
+import br.com.genegouveia.domain.service.contrato.ServicoService;
 
 public class ServicoServiceTest extends AbstractIntegrationTests {
 	@Autowired

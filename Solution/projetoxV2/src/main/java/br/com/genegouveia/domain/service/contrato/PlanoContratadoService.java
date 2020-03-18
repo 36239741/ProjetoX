@@ -1,4 +1,4 @@
-package br.com.genegouveia.domain.service;
+package br.com.genegouveia.domain.service.contrato;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -20,7 +20,8 @@ import br.com.genegouveia.domain.entity.contrato.PlanoContratado;
 import br.com.genegouveia.domain.entity.contrato.Registro;
 import br.com.genegouveia.domain.entity.contrato.Servico;
 import br.com.genegouveia.domain.entity.contrato.TipoContrato;
-import br.com.genegouveia.domain.repository.PlanoContratoRepository;
+import br.com.genegouveia.domain.repository.contrato.PlanoContratoRepository;
+import br.com.genegouveia.domain.service.ConfigParametroService;
 import javassist.NotFoundException;
 
 @Service

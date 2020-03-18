@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.genegouveia.domain.entity.contrato.PlanoContratado;
-import br.com.genegouveia.domain.service.PlanoContratadoService;
+import br.com.genegouveia.domain.service.contrato.PlanoContratadoService;
 import javassist.NotFoundException;
 
 @RestController

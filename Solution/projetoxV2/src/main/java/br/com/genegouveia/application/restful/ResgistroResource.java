@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.genegouveia.domain.entity.contrato.Registro;
-import br.com.genegouveia.domain.service.RegistroService;
+import br.com.genegouveia.domain.service.contrato.RegistroService;
 import javassist.NotFoundException;
 
 @RestController

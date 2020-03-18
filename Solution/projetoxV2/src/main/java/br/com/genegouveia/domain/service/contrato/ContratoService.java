@@ -1,4 +1,4 @@
-package br.com.genegouveia.domain.service;
+package br.com.genegouveia.domain.service.contrato;
 
 import java.io.IOException;
 import java.text.NumberFormat;
@@ -41,7 +41,7 @@ import br.com.genegouveia.domain.entity.contrato.PlanoContratado;
 import br.com.genegouveia.domain.entity.contrato.Registro;
 import br.com.genegouveia.domain.entity.contrato.Servico;
 import br.com.genegouveia.domain.entity.contrato.TipoContrato;
-import br.com.genegouveia.domain.repository.ContratoRepository;
+import br.com.genegouveia.domain.repository.contrato.ContratoRepository;
 
 @Service
 @RemoteProxy

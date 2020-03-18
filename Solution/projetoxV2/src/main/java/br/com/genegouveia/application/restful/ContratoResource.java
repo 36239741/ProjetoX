@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import br.com.genegouveia.domain.entity.contrato.Contrato;
-import br.com.genegouveia.domain.service.ContratoService;
+import br.com.genegouveia.domain.service.contrato.ContratoService;
 import javassist.NotFoundException;
 
 @Component

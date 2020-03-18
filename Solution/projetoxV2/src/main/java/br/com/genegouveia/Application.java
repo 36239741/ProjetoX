@@ -12,6 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 /**
@@ -19,6 +20,7 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
  * @author rodrigo@eits.com.br
  */
 @EnableAsync
+@EnableScheduling
 @SpringBootApplication
 public class Application
 {

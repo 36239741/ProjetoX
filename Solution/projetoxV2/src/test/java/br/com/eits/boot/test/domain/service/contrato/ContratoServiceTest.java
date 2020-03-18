@@ -1,4 +1,4 @@
-package br.com.eits.boot.test.domain.service;
+package br.com.eits.boot.test.domain.service.contrato;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,10 +27,10 @@ import br.com.genegouveia.domain.entity.contrato.DiasSemana;
 import br.com.genegouveia.domain.entity.contrato.PlanoContratado;
 import br.com.genegouveia.domain.entity.contrato.Servico;
 import br.com.genegouveia.domain.entity.contrato.TipoContrato;
-import br.com.genegouveia.domain.repository.ContratoRepository;
-import br.com.genegouveia.domain.repository.PlanoContratoRepository;
-import br.com.genegouveia.domain.repository.ServicoRepository;
-import br.com.genegouveia.domain.service.ContratoService;
+import br.com.genegouveia.domain.repository.contrato.ContratoRepository;
+import br.com.genegouveia.domain.repository.contrato.PlanoContratoRepository;
+import br.com.genegouveia.domain.repository.contrato.ServicoRepository;
+import br.com.genegouveia.domain.service.contrato.ContratoService;
 
 public class ContratoServiceTest extends AbstractIntegrationTests {
 

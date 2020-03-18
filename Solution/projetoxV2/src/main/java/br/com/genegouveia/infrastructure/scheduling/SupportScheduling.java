@@ -23,8 +23,8 @@ import org.springframework.stereotype.Component;
 import br.com.genegouveia.domain.entity.contrato.DiasSemana;
 import br.com.genegouveia.domain.entity.contrato.PlanoContratado;
 import br.com.genegouveia.domain.entity.contrato.Registro;
-import br.com.genegouveia.domain.service.PlanoContratadoService;
-import br.com.genegouveia.domain.service.RegistroService;
+import br.com.genegouveia.domain.service.contrato.PlanoContratadoService;
+import br.com.genegouveia.domain.service.contrato.RegistroService;
 import javassist.NotFoundException;
 
 @Lazy(false)

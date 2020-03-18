@@ -1,4 +1,4 @@
-package br.com.eits.boot.test.domain.service;
+package br.com.eits.boot.test.domain.service.contrato;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -23,9 +23,9 @@ import br.com.eits.boot.test.domain.AbstractIntegrationTests;
 import br.com.genegouveia.domain.entity.contrato.Contrato;
 import br.com.genegouveia.domain.entity.contrato.Registro;
 import br.com.genegouveia.domain.entity.contrato.Situacao;
-import br.com.genegouveia.domain.repository.ContratoRepository;
-import br.com.genegouveia.domain.repository.RegistroRepository;
-import br.com.genegouveia.domain.service.RegistroService;
+import br.com.genegouveia.domain.repository.contrato.ContratoRepository;
+import br.com.genegouveia.domain.repository.contrato.RegistroRepository;
+import br.com.genegouveia.domain.service.contrato.RegistroService;
 import javassist.NotFoundException;
 
 

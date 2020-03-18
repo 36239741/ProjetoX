@@ -1,4 +1,4 @@
-package br.com.genegouveia.domain.repository;
+package br.com.genegouveia.domain.repository.contrato;
 
 
 import java.time.LocalDateTime;
