@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Implementation-Title: projetox
+Implementation-Version: 0.0.1
+Built-By: henrique
+Implementation-Vendor-Id: br.com.genegouveia
+Build-Jdk: 1.8.0_242
+Implementation-URL: https://projects.spring.io/spring-boot/#/spring-bo
+ ot-starter-parent/projetox
+Created-By: Maven Integration for Eclipse
+Main-Class: br.com.genegouveia.Application
+

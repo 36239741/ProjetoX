@@ -60,7 +60,7 @@ public class PlanoContratado extends AbstractEntity implements Serializable{
 	@NotNull
 	private int sessao;
 	
-	/* Associacao com a entidade diaConsulta. */
+	/* Lista de diaConsulta. */
 	@OneToMany(targetEntity = DiaConsulta.class,cascade = {
 			CascadeType.PERSIST,
 			CascadeType.MERGE,

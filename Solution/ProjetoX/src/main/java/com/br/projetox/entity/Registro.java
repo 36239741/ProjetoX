@@ -48,12 +48,8 @@ public class Registro extends AbstractEntity implements Serializable {
 	 */
 	@Enumerated(EnumType.ORDINAL)
 	private Situacao situacao;
-	
-	/* Associacao com a Entidade contrato. */
-	@ManyToOne(targetEntity = Contrato.class,fetch = FetchType.LAZY)
-	private Contrato contrato;
-	
-	/* Associacao com a entidade planoContratado. */
+		
+	/* entidade de plano contratado. */
 	@ManyToOne(targetEntity = PlanoContratado.class,fetch = FetchType.EAGER,optional = false)
 	private PlanoContratado planoContratado;
 	

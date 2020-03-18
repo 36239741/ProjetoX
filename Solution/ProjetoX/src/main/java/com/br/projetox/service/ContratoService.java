@@ -154,7 +154,7 @@ public class ContratoService {
 						planoServico = linha.getCell(PLANO + atualizarNumeroCelula).toString().trim().split("-");
 						planoContratado.setTipoContrato(
 								(planoServico[0].trim().equals("Particular") ? TipoContrato.PARTICULAR : TipoContrato.PLANO));
-						Servico servico = this.servicoService.consultarServicoPeloNome(planoServico[1].trim());
+						Servico servico = this.servicoService.consultarServicosPorNomeServicoServicoId(null,(planoServico[1].trim()));
 								planoContratado.setServico(servico);
 
 						Double numeroSessoes = Double.parseDouble(linha.getCell(NUMERO_SESSOES + atualizarNumeroCelula).toString());
@@ -205,7 +205,7 @@ public class ContratoService {
 				consultarContrato.get().setValorTotal(listaContrato.get(i).getValorTotal());
 				
 				for(PlanoContratado plano : listaContrato.get(i).getPlanoContratado()) {
-					Servico servico = this.servicoService.consultarServicoPeloNome(plano.getServico().getServico());
+					Servico servico = this.servicoService.consultarServicosPorNomeServicoServicoId(null, (plano.getServico().getServico()));
 					
 					//Verifica se o planoContratado existe
 					PlanoContratado planoContratado = this.planoContratadoService.

@@ -152,7 +152,7 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 	public void salvarHorarioEntradaMustPassRegistrandoHorarioEntrada() throws IOException, NumberFormatException, NotFoundException {
 			final LocalTime horarioEntrada = LocalTime.of(LocalDateTime.now(ZoneId.of("America/Maceio")).getHour(), LocalDateTime.now(ZoneId.of("America/Maceio")).getMinute());
 			final Situacao situacaoAtendimento = Situacao.ATENDIMENTO_NORMAL;
-			final Double valorAtendimento = 5000.00;
+			final Double valorAtendimento = 50.00;
 			Registro registro = this.registroService.salvarHorarioEntrada("2", 10L);
 			Assert.assertNotNull(registro);
 			Contrato contrato = this.contratoRepository.findById(2L).get();
@@ -161,8 +161,8 @@ public class RegistroServiceTest extends AbstractIntegrationTest {
 			
 			Assert.assertEquals(valorAtendimento, registro.getValorTotal());
 			Assert.assertEquals(situacaoAtendimento, registro.getSituacao());
-			Assert.assertEquals(contrato.getNumero(), registro.getContrato().getNumero());
-			Assert.assertEquals(contrato.getNomePaciente(), registro.getContrato().getNomePaciente());
+			Assert.assertEquals(contrato.getNumero(), registro.getPlanoContratado().getContrato().getNumero());
+			Assert.assertEquals(contrato.getNomePaciente(), registro.getPlanoContratado().getContrato().getNomePaciente());
 			Assert.assertEquals(horarioEntrada,horarioEntradaRegistro );
 	}
 	

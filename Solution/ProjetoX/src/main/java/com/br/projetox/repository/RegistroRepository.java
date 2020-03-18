@@ -18,23 +18,24 @@ import com.br.projetox.entity.Situacao;
 @Repository
 public interface RegistroRepository extends JpaRepository<Registro, Long>{
 	
-	Registro findByContrato(Contrato contrato);
 	
-	@Query("FROM Registro registro WHERE registro.id = (SELECT max(id) FROM Registro registro where registro.contrato.numero = :numeroContrato)")
+	Registro findByPlanoContratadoContrato(Contrato contrato);
+	
+	@Query("FROM Registro registro WHERE registro.id = (SELECT max(id) FROM Registro registro where registro.planoContratado.contrato.numero = :numeroContrato)")
 	Registro consultarUltimoRegistroContrato(@Param("numeroContrato") String numeroContrato);
 	
-	@Query("FROM Registro registro WHERE registro.contrato.numero = :numeroContrato")
+	@Query("FROM Registro registro WHERE registro.planoContratado.contrato.numero = :numeroContrato")
 	public Page<Registro> consultarRegistros(@Param("numeroContrato") String numeroContrato, Pageable pageable);
 	
 	
-	@Query("FROM Registro registro WHERE registro.contrato.numero = :numeroContrato AND registro.dataHoraEntrada "
+	@Query("FROM Registro registro WHERE registro.planoContratado.contrato.numero = :numeroContrato AND registro.dataHoraEntrada "
 			+ "BETWEEN :dataInicial AND :dataFinal")
 	public Page<Registro> consultarRegistroPorDataInicialFinalNumeroContrato(@Param("dataInicial") LocalDateTime dataInicial,
 			@Param("dataFinal") LocalDateTime dataFinal,
 			@Param("numeroContrato") String numeroContrato,
 			Pageable pagebale);
 	
-	@Query("FROM Registro registro WHERE registro.planoContratado.id = :planoId AND registro.contrato.id = :contratoId AND registro.dataHoraEntrada "
+	@Query("FROM Registro registro WHERE registro.planoContratado.id = :planoId AND registro.planoContratado.contrato.id = :contratoId AND registro.dataHoraEntrada "
 			+ " BETWEEN :dataInicial AND :dataFinal")
 	public Page<Registro> consultarRegistroPorDataInicialFinalPlanoIdContratoId(@Param("dataInicial") LocalDateTime dataInicial,
 			@Param("dataFinal") LocalDateTime dataFinal,

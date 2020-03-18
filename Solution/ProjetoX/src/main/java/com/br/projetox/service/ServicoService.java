@@ -19,17 +19,20 @@ public class ServicoService {
 	private ServicoRepository repository;
 
 	/*
-	 * Metodo consulta um servico pelo seu nome
+	 * Metodo consulta os servicos pelo nome do servico ou pelo id do servico
+	 * 
+	 * @param servicoId
 	 * 
 	 * @param nomeServico
 	 * 
 	 * @return Servico
 	 */
-	public Servico consultarServicoPeloNome(String servico) {
-		Servico consultarServico = this.repository.findByServicoIgnoreCase(servico);
-		Assert.notNull(consultarServico, "Nenhum servico encontrado");
-		return consultarServico;
+	public Servico consultarServicosPorNomeServicoServicoId(Long servicoId, String nomeServico) {
+		Servico servico = this.repository.consultarContratosPorNomeservicoServicoId(nomeServico, servicoId);
+		Assert.notNull(servico, "Nenhum servico encontrado");
+		return servico;
 	}
+	
 
 	/*
 	 * Metodo lista todos servicos cadastrados 
@@ -39,15 +42,5 @@ public class ServicoService {
 		return this.repository.findAll();
 	}
 
-	/*
-	 * Metodo consulta um servico em especifico
-	 * 
-	 * @param id
-	 * 
-	 * @return Servico
-	 */
-	public Servico consultarServicoPorId(Long id) throws NotFoundException {
-		return this.repository.findById(id)
-				.orElseThrow(() -> new NotFoundException("Não foi encontrado o servico com o id: " + id));
-	}
+
 }

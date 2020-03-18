@@ -131,7 +131,7 @@ public class PlanoContratadoService {
 	 */
 	public PlanoContratado salvarPlanoContratado(PlanoContratado planoContratado) throws NotFoundException {
 		
-		Servico servico = this.servicoService.consultarServicoPeloNome(planoContratado.getServico().getServico());
+		Servico servico = this.servicoService.consultarServicosPorNomeServicoServicoId(null ,(planoContratado.getServico().getServico()));
 				
 		PlanoContratado plano = this.planoContraRepository.
 				consultarPlanoContratadoAtivoPorServiceIdContratoIdTipoContrato(servico.getId(), planoContratado.getContrato().getNumero(),

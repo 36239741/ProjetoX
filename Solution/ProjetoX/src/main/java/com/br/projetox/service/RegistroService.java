@@ -76,7 +76,7 @@ public class RegistroService {
 	public Registro salvarHorarioEntrada(String numeroContrato, long idPlanocontratado)
 			throws NumberFormatException, NotFoundException {
 		Contrato contrato = this.contratoService.consultarContratoPorNumeroContrato(numeroContrato);
-		PlanoContratado planoContratado = this.planoContratadoService.consultarPlanoContratadoPorId(1L);
+		PlanoContratado planoContratado = this.planoContratadoService.consultarPlanoContratadoPorId(idPlanocontratado);
 		
 		Registro findRegistro = this.registroRepository.consultarUltimoRegistroContrato(contrato.getNumero());
 
@@ -89,7 +89,6 @@ public class RegistroService {
 		}
 		
 			Registro registro = new Registro();
-			registro.setContrato(contrato);
 			registro.setPlanoContratado(planoContratado);
 			registro.setValorTotal(planoContratado.getValorAtendimento());
 			registro.setDataHoraEntrada(LocalDateTime.now(ZoneId.of("America/Maceio")));
@@ -168,7 +167,7 @@ public class RegistroService {
 		Registro consultarRegistro = this.registroRepository.consultarUltimoRegistroContrato(numeroContrato);
 		
 		Assert.notNull(consultarRegistro, "Não contêm nenhum registro no contrato de número " + numeroContrato + ".");
-		Assert.isTrue(consultarRegistro.getDataHoraSaida() == null, "Não contêm nenhum registro de entrada em aberto para o paciente " + consultarRegistro.getContrato().getNomePaciente() + ".");
+		Assert.isTrue(consultarRegistro.getDataHoraSaida() == null, "Não contêm nenhum registro de entrada em aberto para o paciente " + consultarRegistro.getPlanoContratado().getContrato().getNomePaciente() + ".");
 			
 		// compara o horario de saida + tempo de tolerancia com o horario atual
 			Duration verificaValorAdicional = Duration.between(
@@ -331,7 +330,6 @@ public class RegistroService {
 		// registrando ausência do paciente
 		if (findRegistro == null || findRegistro.getDataHoraSaida() != null) {
 			Registro registro = new Registro();
-			registro.setContrato(plano.getContrato());
 			registro.setPlanoContratado(plano);
 			registro.setSituacao(Situacao.AUSENCIA_DO_PACIENTE);
 

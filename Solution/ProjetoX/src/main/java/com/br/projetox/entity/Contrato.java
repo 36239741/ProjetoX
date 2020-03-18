@@ -63,14 +63,14 @@ public class Contrato extends AbstractEntity implements Serializable {
 	/* Valor do desconto especificado pelo admnistrador do sistema. */
 	private Double desconto;
 	
-	/* Associacao com a entidade PlanoContratado */
+	/* Lista de planos Contratados */
 	@JsonIgnoreProperties("contrato")
 	@OneToMany(targetEntity = PlanoContratado.class,cascade = {CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.MERGE}, fetch = FetchType.LAZY,mappedBy = "contrato")
 	private List<PlanoContratado> planoContratado = new ArrayList<PlanoContratado>();
 	
-	/* Associacao com a entidade Registro */
+	/* Lista de registros */
 	@JsonIgnoreProperties("contrato")
-	@OneToMany(targetEntity = Registro.class,cascade = {CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.MERGE}, fetch = FetchType.LAZY,mappedBy = "contrato")
+	@OneToMany(targetEntity = Registro.class,cascade = {CascadeType.PERSIST,CascadeType.REMOVE,CascadeType.MERGE}, fetch = FetchType.LAZY)
 	private List<Registro> registro = new ArrayList<Registro>();
 	
 	/* Status do contrato. */

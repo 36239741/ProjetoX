@@ -1,0 +1,45 @@
+{
+  "hints": [],
+  "groups": [
+    {
+      "sourceType": "br.com.genegouveia.application.configuration.settings.AppSettings",
+      "name": "app",
+      "type": "br.com.genegouveia.application.configuration.settings.AppSettings"
+    },
+    {
+      "sourceType": "br.com.genegouveia.application.configuration.settings.DWRSettings",
+      "name": "dwr",
+      "type": "br.com.genegouveia.application.configuration.settings.DWRSettings"
+    }
+  ],
+  "properties": [
+    {
+      "sourceType": "br.com.genegouveia.application.configuration.settings.AppSettings",
+      "name": "app.external-url",
+      "description": "URL externa da aplicação.",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "br.com.genegouveia.application.configuration.settings.AppSettings",
+      "name": "app.mail-from",
+      "description": "Remetente padrão para envio de emails.",
+      "type": "java.lang.String"
+    },
+    {
+      "sourceType": "br.com.genegouveia.application.configuration.settings.AppSettings",
+      "name": "app.password-token-expiration-hours",
+      "description": "Tempo de expiração do token de redefinição de senha.",
+      "type": "java.lang.Integer"
+    },
+    {
+      "sourceType": "br.com.genegouveia.application.configuration.settings.DWRSettings",
+      "name": "dwr.debug",
+      "type": "java.lang.Boolean"
+    },
+    {
+      "sourceType": "br.com.genegouveia.application.configuration.settings.DWRSettings",
+      "name": "dwr.script-compressed",
+      "type": "java.lang.Boolean"
+    }
+  ]
+}
