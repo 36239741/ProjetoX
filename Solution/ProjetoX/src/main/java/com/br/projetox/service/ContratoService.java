@@ -277,20 +277,11 @@ public class ContratoService {
 
 
 	/*
-	 * Metodo captura tres vezes a digital, realiza um merge nas tres imagens e
-	 * salva no banco o template da biometria em forma de bytes 
-	 * 
-	 * @param String contractNumber - Numero do contrato, que sera cadastrado a
-	 * biometria
-	 * 
-	 * @return void
-	 * 
-	 * @throws FingerPrintException
+	 * Método que salva no banco o template da biometria em forma de bytes
+	 * @param numeroContrato Numero do contrato, que sera cadastrado a biometria
+	 * @param binary binário da biometria capturada
 	 */
-	public void salvarBiometria(String numeroContrato) throws NotFoundException {
-		Template templateMerge = this.biometria.capturarTresVezesADigital();
-		byte[] binary;
-		binary = templateMerge.getTemplate().getBytes();
+	public void salvarBiometria(String numeroContrato, byte[] binary) {
 		this.repository.salvarBiometria(numeroContrato, binary);
 	}
 
@@ -498,5 +489,19 @@ public class ContratoService {
 		return this.repository.save(contrato);
 		
 	}
+	
+	/*
+	 * Método que lista os contratos por filtros
+	 * 
+	 * @param numero
+	 * @param nomePaciente
+	 * @param ativo
+	 * @param pageRequest
+	 * @return
+	 */
+	public Page<Contrato> consultarContratosAtivos(String numero, String nomePaciente, PageRequest pageRequest){
+		 return this.repository.consultarContratos(numero, nomePaciente, true, pageRequest);
+	}
+	
 
 }

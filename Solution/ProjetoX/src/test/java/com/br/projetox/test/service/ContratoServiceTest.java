@@ -77,7 +77,7 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 		Assert.assertEquals("Henrique Nitatori", contrato.getNomePaciente());
 	}
 	
-/* Teste salva uma biometria em um contrato*/
+	/* Teste salva uma biometria em um contrato*/
 	
 	@Sql({ "/dataset/truncate.sql", "/dataset/Usuario.sql", "/dataset/Servico.sql", "/dataset/Contrato.sql",
 		"/dataset/PlanoContratado.sql","/dataset/RegistroTestExportPlanilha.sql","/dataset/Config.sql" })
@@ -85,6 +85,7 @@ public class ContratoServiceTest extends AbstractIntegrationTest {
 	@WithUserDetails("henrique_nitatori@hotmail.com")
 	public void salvarBiometriaTestMustPass() throws Exception {
 		this.service.salvarBiometria("1");
+		//TODO: passar um bytearray e verificar se a biometria foi salva
 	}
 	
 	

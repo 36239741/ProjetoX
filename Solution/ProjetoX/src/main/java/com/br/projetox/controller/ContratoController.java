@@ -41,6 +41,25 @@ public class ContratoController {
 	@Autowired
 	private ContratoService service;
 	
+	@GetMapping(path = "/ativos")
+	public ResponseEntity<Page<Contrato>> consultarContratosAtivos(@RequestParam("numero") String numero, 
+																   @RequestParam("nomePaciente") String nomePaciente, 
+																   @RequestParam("page") Integer page,
+																   @RequestParam("size") Integer size, 
+																   @RequestParam("sort") String sort,
+																   @RequestParam("atributo") String atributo) throws UnsupportedEncodingException {
+		
+		PageRequest pageable = null;
+		if(page != null) {
+			Direction direction =null;
+			direction = sort.trim().equals("ASC")? Direction.ASC : Direction.DESC;
+			pageable = PageRequest.of(page, size,
+					org.springframework.data.domain.Sort.by(direction, atributo));
+		}
+		
+		Page<Contrato> contratos = this.service.consultarContratosAtivos(numero, nomePaciente, pageable);
+		return ResponseEntity.ok(contratos);
+	}
 	
 	@GetMapping(path = "/consultar-contrato-biometria")
 	public ResponseEntity<Contrato> consultarPorBiometria() throws UnsupportedEncodingException{
@@ -55,8 +74,8 @@ public class ContratoController {
 	}
 	
 	@PostMapping(path = "/salvar-biometria")
-	public void salvarBiometria(@RequestBody String numeroContrato) throws NotFoundException {
-		this.service.salvarBiometria(numeroContrato);
+	public void saveFingerprint(@RequestBody Contrato contrato) {
+		this.service.salvarBiometria(contrato.getNumero(), contrato.getBiometria());
 	}
 	
 	@GetMapping

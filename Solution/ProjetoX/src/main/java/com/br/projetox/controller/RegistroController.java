@@ -1,7 +1,6 @@
 package com.br.projetox.controller;
 
 import java.io.IOException;
-import java.util.Map;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.br.projetox.entity.PlanoContratado;
 import com.br.projetox.entity.Registro;
 import com.br.projetox.service.RegistroService;
 
@@ -25,13 +25,14 @@ import javassist.NotFoundException;
 
 @RestController
 @RequestMapping(path = "v1/registros")
-public class ResgistroController {
+public class RegistroController {
 	@Autowired
 	private RegistroService registroService;
 	
 	@PostMapping(path = "/salvar-registro-entrada")
-	public Registro saveHorarioEntrada(@RequestParam(name = "numeroContrato") String numeroContrato, @RequestParam(name = "idPlanoContratado") long idPlanoContratado) throws NumberFormatException, NotFoundException {
-		 return this.registroService.salvarHorarioEntrada(numeroContrato,idPlanoContratado);
+	public void saveHorarioEntrada(@RequestBody PlanoContratado plano) 
+			throws NumberFormatException, NotFoundException {
+		 this.registroService.salvarHorarioEntrada(plano.getContrato().getNumero(), plano.getId());
 		 
 	}
 	

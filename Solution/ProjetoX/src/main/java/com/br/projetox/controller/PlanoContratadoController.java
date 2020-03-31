@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.br.projetox.entity.PlanoContratado;
+import com.br.projetox.entity.Registro;
 import com.br.projetox.entity.Servico;
 import com.br.projetox.service.PlanoContratadoService;
 
@@ -45,8 +47,13 @@ public class PlanoContratadoController {
 	 }
 	 @PostMapping(path = "/remover-plano-contratado")
 	 public void removerPLanoContratado(@RequestBody long planoContratadoId) {
-		 this.removerPLanoContratado(planoContratadoId);
+		 this.planoContratadoService.removerPlanoContratado(planoContratadoId);
 	 }
+	 
+	 @GetMapping(path = "/listar-planos-por-contrato")
+		public List<PlanoContratado> listarPlanosAtivosPorContrato(@RequestParam(name = "numeroContrato") String numeroContrato){
+			return this.planoContratadoService.listarPlanosAtivosPorContrato(numeroContrato);
+		}
 	 
 }
 

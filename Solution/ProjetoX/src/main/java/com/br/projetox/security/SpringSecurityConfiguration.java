@@ -54,7 +54,13 @@ public class SpringSecurityConfiguration extends WebSecurityConfigurerAdapter {
 		.httpBasic()
 		.authenticationEntryPoint(new CustomEntryPoint())
 		.and()
-		.authorizeRequests().antMatchers(HttpMethod.OPTIONS,"/**").permitAll()
+		.authorizeRequests()
+		.antMatchers("/v1/contratos/salvar-biometria/**" ).permitAll()
+		.antMatchers("/v1/contratos/ativos/**" ).permitAll()
+		.antMatchers("/v1/registros/salvar-registro-entrada/**" ).permitAll()
+		.antMatchers("/v1/registros/salvar-registro-saida/**" ).permitAll()
+		.antMatchers("/v1/planos/listar-planos-por-contrato/**" ).permitAll()
+		.antMatchers(HttpMethod.OPTIONS,"/**").permitAll()
 		.anyRequest()
 		.authenticated();
 	}

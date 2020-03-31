@@ -2,12 +2,10 @@ package com.br.projetox.service;
 
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +21,6 @@ import com.br.projetox.entity.PlanoContratado;
 import com.br.projetox.entity.Registro;
 import com.br.projetox.entity.Servico;
 import com.br.projetox.entity.TipoContrato;
-import com.br.projetox.exception.MapPlanoContratadoException;
 import com.br.projetox.repository.PlanoContratoRepository;
 
 import javassist.NotFoundException;
@@ -271,6 +268,15 @@ public class PlanoContratadoService {
 		return this.planoContraRepository.consultarPlanoContratadoPorDiasSemana(diasSemana);
 	}
 	
+	/*
+	 * Método que lista os planos ativos de um contrato para serem usados pelo front-end 
+	 * para realizar a abertura de um atendimento
+	 * 
+	 */
+	public List<PlanoContratado> listarPlanosAtivosPorContrato(String numeroContrato){
+		return this.planoContraRepository.consultarPlanoContratadoPorNumeroContrato(numeroContrato);
+		
+	}
 	
 
 }
