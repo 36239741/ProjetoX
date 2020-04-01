@@ -20,6 +20,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -58,6 +59,10 @@ public class ContratoController {
 		}
 		
 		Page<Contrato> contratos = this.service.consultarContratosAtivos(numero, nomePaciente, pageable);
+		
+		contratos.forEach((Contrato contrato) -> {
+			this.clearContrato(contrato);
+		});
 		return ResponseEntity.ok(contratos);
 	}
 	
@@ -74,7 +79,7 @@ public class ContratoController {
 	}
 	
 	@PostMapping(path = "/salvar-biometria")
-	public void saveFingerprint(@RequestBody Contrato contrato) {
+	public void salvarBiometria(@RequestBody Contrato contrato) {
 		this.service.salvarBiometria(contrato.getNumero(), contrato.getBiometria());
 	}
 	
@@ -145,6 +150,21 @@ public class ContratoController {
 		 header.set("Content-type","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
          return new ResponseEntity<>(new ByteArrayResource(planilhaRegistro.toByteArray()),
                  header, HttpStatus.CREATED);
+	}
+	
+	private void clearContrato(Contrato contrato) {
+		Assert.notNull(contrato, "Contrato não definido.");
+		contrato.setCreated(null);
+		contrato.setDesconto(null);
+		contrato.setDiferenca(null);
+		contrato.setPlanoContratado(null);
+		contrato.setRegistro(null);
+		contrato.setTipoContratoTransient(null);
+		contrato.setUpdated(null);
+		contrato.setValorExecutado(null);
+		contrato.setUsuario(null);
+		contrato.setValorTotal(null);
+		contrato.setAtivo(null);
 	}
 	
 }

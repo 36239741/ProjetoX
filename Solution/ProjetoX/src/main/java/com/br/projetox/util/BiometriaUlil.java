@@ -89,11 +89,16 @@ public class BiometriaUlil {
 		/*Metodo verifica se uma digital lida corresponde a passada por variavel
 		@Param byte[] biometria - biometria vinda de um contrato
 		@return Boolean - retorna true se sucesso e false se falhar*/
-		public Boolean verificarDigital(byte[] biometria, ImageAndTemplate imgAndTemplate) throws UnsupportedEncodingException {
+		public Boolean verificarDigital(Byte[] biometria, ImageAndTemplate imgAndTemplate) throws UnsupportedEncodingException {
 			Boolean returnValue = false;
 				CIDBio cidbio = new CIDBio();
 				if(imgAndTemplate.getRetCode() == RetCode.SUCCESS) {
-					String stringTemplate = new String(biometria, "UTF-8"); 
+					byte[] bytes = new byte[biometria.length];
+					int j=0;
+					for(Byte b: biometria) {
+					    bytes[j++] = b.byteValue();
+					}
+					String stringTemplate = new String(bytes, "UTF-8"); 
 					MatchResult score = cidbio.MatchTemplates(stringTemplate ,imgAndTemplate.getTemplateString());
 					if(score.getRetCode() == RetCode.SUCCESS) {
 						returnValue = true;

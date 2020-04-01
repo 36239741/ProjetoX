@@ -58,7 +58,7 @@ public class Contrato extends AbstractEntity implements Serializable {
 	private Double valorTotal;
 	
 	/* Biometria do paciente que frequenta as consultas. */
-	private byte[] biometria;
+	private Byte[] biometria;
 	
 	/* Valor do desconto especificado pelo admnistrador do sistema. */
 	private Double desconto;

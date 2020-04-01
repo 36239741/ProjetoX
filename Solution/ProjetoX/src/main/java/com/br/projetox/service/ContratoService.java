@@ -281,7 +281,7 @@ public class ContratoService {
 	 * @param numeroContrato Numero do contrato, que sera cadastrado a biometria
 	 * @param binary binário da biometria capturada
 	 */
-	public void salvarBiometria(String numeroContrato, byte[] binary) {
+	public void salvarBiometria(String numeroContrato, Byte[] binary) {
 		this.repository.salvarBiometria(numeroContrato, binary);
 	}
 

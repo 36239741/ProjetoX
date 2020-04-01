@@ -35,7 +35,7 @@ public interface ContratoRepository extends JpaRepository<Contrato, Long> {
 	@Modifying
 	@Query("UPDATE Contrato contrato SET contrato.biometria = :biometria WHERE contrato.numero = :numeroContrato ")
 	public void salvarBiometria(@Param("numeroContrato") String numeroContrato,
-							   @Param("biometria") byte[] biometria);
+							   @Param("biometria") Byte[] biometria);
 	
 
 
